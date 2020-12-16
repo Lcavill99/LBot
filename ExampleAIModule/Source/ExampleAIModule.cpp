@@ -1,83 +1,112 @@
 #include "ExampleAIModule.h"
+#include "BWEM 1.4.1/src/bwem.h"
 #include <iostream>
 
 using namespace BWAPI;
 using namespace Filter;
+using namespace BWEM;
+using namespace BWEM::BWAPI_ext;
+using namespace BWEM::utils;
+
+namespace { auto & theMap = BWEM::Map::Instance(); }
 
 void ExampleAIModule::onStart()
 {
-  // Hello World!
-  Broodwar->sendText("Hello world!");
+	try
+	{
+		// Hello World!
+		Broodwar->sendText("Hello world!");
 
-  // Print the map name.
-  // BWAPI returns std::string when retrieving a string, don't forget to add .c_str() when printing!
-  Broodwar << "The map is " << Broodwar->mapName() << "!" << std::endl;
+		// Print the map name.
+		// BWAPI returns std::string when retrieving a string, don't forget to add .c_str() when printing!
+		Broodwar << "The map is " << Broodwar->mapName() << "!" << std::endl;
 
-  // Enable the UserInput flag, which allows us to control the bot and type messages.
-  Broodwar->enableFlag(Flag::UserInput);
+		// Enable the UserInput flag, which allows us to control the bot and type messages.
+		Broodwar->enableFlag(Flag::UserInput);
 
-  // Uncomment the following line and the bot will know about everything through the fog of war (cheat).
-  //Broodwar->enableFlag(Flag::CompleteMapInformation);
+		// Uncomment the following line and the bot will know about everything through the fog of war (cheat).
+		//Broodwar->enableFlag(Flag::CompleteMapInformation);
 
-  // Set the command optimization level so that common commands can be grouped
-  // and reduce the bot's APM (Actions Per Minute).
-  Broodwar->setCommandOptimizationLevel(2);
+		// Set the command optimization level so that common commands can be grouped
+		// and reduce the bot's APM (Actions Per Minute).
+		Broodwar->setCommandOptimizationLevel(2);
 
-  // Check if this is a replay
-  if ( Broodwar->isReplay() )
-  {
-
-    // Announce the players in the replay
-    Broodwar << "The following players are in this replay:" << std::endl;
+		// Check if this is a replay
+		if ( Broodwar->isReplay() )
+		{
+			// Announce the players in the replay
+			Broodwar << "The following players are in this replay:" << std::endl;
     
-    // Iterate all the players in the game using a std:: iterator
-    Playerset players = Broodwar->getPlayers();
-    for(auto p : players)
-    {
-      // Only print the player if they are not an observer
-      if ( !p->isObserver() )
-        Broodwar << p->getName() << ", playing as " << p->getRace() << std::endl;
-    }
+			// Iterate all the players in the game using a std:: iterator
+			Playerset players = Broodwar->getPlayers();
+			for(auto p : players)
+			{
+				// Only print the player if they are not an observer
+				if ( !p->isObserver() )
+					Broodwar << p->getName() << ", playing as " << p->getRace() << std::endl;
+			}
 
-  }
-  else // if this is not a replay
-  {
-    // Retrieve you and your enemy's races. enemy() will just return the first enemy.
-    // If you wish to deal with multiple enemies then you must use enemies().
-    if ( Broodwar->enemy() ) // First make sure there is an enemy
-      Broodwar << "The matchup is " << Broodwar->self()->getRace() << " vs " << Broodwar->enemy()->getRace() << std::endl;
-  }
+			}
+		else // if this is not a replay
+		{
+			// Retrieve you and your enemy's races. enemy() will just return the first enemy.
+			// If you wish to deal with multiple enemies then you must use enemies().
+			if ( Broodwar->enemy() ) // First make sure there is an enemy
+			Broodwar << "The matchup is " << Broodwar->self()->getRace() << " vs " << Broodwar->enemy()->getRace() << std::endl;
 
+			Broodwar << "Map initialization..." << std::endl;
+
+			theMap.Initialize();
+			theMap.EnableAutomaticPathAnalysis();
+			bool startingLocationsOK = theMap.FindBasesForStartingLocations();
+			assert(startingLocationsOK);
+
+			BWEM::utils::MapPrinter::Initialize(&theMap);
+			BWEM::utils::printMap(theMap);      // will print the map into the file <StarCraftFolder>bwapi-data/map.bmp
+			BWEM::utils::pathExample(theMap);   // add to the printed map a path between two starting locations
+
+			Broodwar << "gg" << std::endl;
+		}
+	}
+	catch (const std::exception & e)
+	{
+		Broodwar << "EXCEPTION: " << e.what() << std::endl;
+	}
 }
 
 void ExampleAIModule::onEnd(bool isWinner)
 {
-  // Called when the game ends
-  if ( isWinner )
-  {
-    // Log your win here!
-  }
+	// Called when the game ends
+	if ( isWinner )
+	{
+		// Log your win here!
+	}
 }
 
 void ExampleAIModule::onFrame()
 {
-  // Called once every game frame
+    // Called once every game frame
+	try
+	{
+		BWEM::utils::gridMapExample(theMap);
+		BWEM::utils::drawMap(theMap);
 
-  // Display the game frame rate as text in the upper left area of the screen
-  Broodwar->drawTextScreen(200, 0,  "FPS: %d", Broodwar->getFPS() );
-  Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS() );
 
-  // Return if the game is a replay or is paused
-  if ( Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self() )
-    return;
+		// Display the game frame rate as text in the upper left area of the screen
+	    Broodwar->drawTextScreen(200, 0,  "FPS: %d", Broodwar->getFPS() );
+	    Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS() );
 
-  // Prevent spamming by only running our onFrame once every number of latency frames.
-  // Latency frames are the number of frames before commands are processed.
-  if ( Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0 )
-    return;
+	    // Return if the game is a replay or is paused
+	    if ( Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self() )
+		    return;
 
-  // Iterate through all the units that we own
-  for (auto &u : Broodwar->self()->getUnits())
+	    // Prevent spamming by only running our onFrame once every number of latency frames.
+		// Latency frames are the number of frames before commands are processed.
+		if ( Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0 )
+			return;
+
+		// Iterate through all the units that we own
+		for (auto &u : Broodwar->self()->getUnits())
   {
     // Ignore the unit if it no longer exists
     // Make sure to include this block when handling any Unit pointer!
@@ -189,10 +218,16 @@ void ExampleAIModule::onFrame()
     }
 
   } // closure: unit iterator
+    }
+	catch (const std::exception & e)
+	{
+		Broodwar << "EXCEPTION: " << e.what() << std::endl;
+	}
 }
 
 void ExampleAIModule::onSendText(std::string text)
 {
+	BWEM::utils::MapDrawer::ProcessCommand(text);
 
   // Send the text to the game if it is not being processed.
   Broodwar->sendText("%s", text.c_str());
@@ -267,6 +302,15 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
 
 void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit)
 {
+	try
+	{
+		if (unit->getType().isMineralField())    theMap.OnMineralDestroyed(unit);
+		else if (unit->getType().isSpecialBuilding()) theMap.OnStaticBuildingDestroyed(unit);
+	}
+	catch (const std::exception & e)
+	{
+		Broodwar << "EXCEPTION: " << e.what() << std::endl;
+	}
 }
 
 void ExampleAIModule::onUnitMorph(BWAPI::Unit unit)

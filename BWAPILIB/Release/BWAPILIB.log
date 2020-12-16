@@ -31,4 +31,4 @@
   UpgradeType.cpp
   WeaponType.cpp
   LINK : MSIL .netmodule or module compiled with /GL found; restarting link with /LTCG; add /LTCG to the link command line to improve linker performance
-  BWAPILIB.vcxproj -> D:\Storage\Repos\BWAPI\Release\BWAPILIB.lib
+  BWAPILIB.vcxproj -> D:\Storage\Repos\LBot\Release\BWAPILIB.lib
