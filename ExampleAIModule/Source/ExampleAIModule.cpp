@@ -54,6 +54,7 @@ void ExampleAIModule::onStart()
 			if ( Broodwar->enemy() ) // First make sure there is an enemy
 			Broodwar << "The matchup is " << Broodwar->self()->getRace() << " vs " << Broodwar->enemy()->getRace() << std::endl;
 
+			// Initialise BWEM
 			Broodwar << "Map initialization..." << std::endl;
 
 			theMap.Initialize();
