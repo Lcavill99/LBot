@@ -6,6 +6,7 @@
 
 class ExampleAIModule : public BWAPI::AIModule
 {
+	int barracks;
 public:
   // Virtual functions for callbacks, leave these as they are.
   virtual void onStart();

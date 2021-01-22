@@ -123,7 +123,16 @@ void ExampleAIModule::onFrame()
 
 		// If the unit is a worker unit
 		if ( u->getType().isWorker() )
-		{
+		{	
+			// Build barracks
+			if (barracks == 0 && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
+			{
+				//find a location for spawning pool and construct it
+				TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, u->getTilePosition());
+				u->build(UnitTypes::Terran_Barracks, buildPosition);
+				barracks = barracks++;
+			}
+
 			// if our worker is idle
 			if ( u->isIdle() )
 			{

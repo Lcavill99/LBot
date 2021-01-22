@@ -1,10 +1,28 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Platforms\Win32\PlatformToolsets\v141_xp\Toolset.targets(39,5): warning MSB8051: Support for targeting Windows XP is deprecated and will not be present in future releases of Visual Studio. Please see https://go.microsoft.com/fwlink/?linkid=2023588 for more information.
+  EasyBMP.cpp
+  area.cpp
+  base.cpp
+  bwapiExt.cpp
+  bwem.cpp
+  cp.cpp
+  exampleWall.cpp
+  examples.cpp
+  graph.cpp
+  gridMap.cpp
+  map.cpp
+  mapDrawer.cpp
+  mapImpl.cpp
+  mapPrinter.cpp
+  neutral.cpp
+  tiles.cpp
+  utils.cpp
+  winutils.cpp
+  Dll.cpp
   ExampleAIModule.cpp
-C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Platforms\Win32\PlatformToolsets\v141_xp\Toolset.targets(39,5): warning MSB8051: Support for targeting Windows XP is deprecated and will not be present in future releases of Visual Studio. Please see https://go.microsoft.com/fwlink/?linkid=2023588 for more information.
      Creating library Release\ExampleAIModule.lib and object Release\ExampleAIModule.exp
   Generating code
-  82 of 8028 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
+  81 of 8028 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
     48 functions were new in current compilation
-    27 functions had inline decision re-evaluated but remain unchanged
+    26 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   ExampleAIModule.vcxproj -> D:\Storage\Repos\LBot\Release\ExampleAIModule.dll
