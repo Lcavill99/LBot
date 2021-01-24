@@ -124,13 +124,15 @@ void ExampleAIModule::onFrame()
 		// If the unit is a worker unit
 		if (u->getType().isWorker())
 		{	
+			// ----- Starting build order ----- //			
+
 			// Build initial depot
-			if ((!depot) && (Broodwar->self()->supplyUsed() == 18 && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice()))
+			if (depot == 0 && Broodwar->self()->supplyUsed() == 18 && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 			{
 				//find a location for depot and construct it
 				TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, u->getTilePosition());
 				u->build(UnitTypes::Terran_Supply_Depot, buildPosition);
-				depot = true;
+				depot = depot++;
 			}
 
 			// Build barracks
@@ -142,19 +144,37 @@ void ExampleAIModule::onFrame()
 				barracks = barracks++;
 			}
 
+			// Build second barracks
+			if (barracks == 1 && Broodwar->self()->supplyUsed() == 26 && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
+			{
+				//find a location for barracks and construct it
+				TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, u->getTilePosition());
+				u->build(UnitTypes::Terran_Barracks, buildPosition);
+				barracks = barracks++;
+			}			
+
+			// Build second initial depot
+			if (depot == 1 && Broodwar->self()->supplyUsed() == 30 && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
+			{
+				//find a location for depot and construct it
+				TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, u->getTilePosition());
+				u->build(UnitTypes::Terran_Supply_Depot, buildPosition);
+				depot = depot++;
+			}
+
 			// if our worker is idle
-			if ( u->isIdle() )
+			if (u->isIdle())
 			{
 				// Order workers carrying a resource to return them to the center,
 				// otherwise find a mineral patch to harvest.
-				if ( u->isCarryingGas() || u->isCarryingMinerals() )
+				if (u->isCarryingGas() || u->isCarryingMinerals())
 				{
 					u->returnCargo();
 				}
-				else if ( !u->getPowerUp() )  // The worker cannot harvest anything if it
+				else if (!u->getPowerUp())  // The worker cannot harvest anything if it
 				{                             // is carrying a powerup such as a flag
 					// Harvest from the nearest mineral patch or gas refinery
-					if ( !u->gather( u->getClosestUnit( IsMineralField || IsRefinery )) )
+					if (!u->gather(u->getClosestUnit(IsMineralField || IsRefinery)))
 					{
 						// If the call fails, then print the last error message
 						Broodwar << Broodwar->getLastError() << std::endl;
@@ -166,7 +186,7 @@ void ExampleAIModule::onFrame()
 		else if (u->getType().isResourceDepot()) // A resource depot is a Command Center, Nexus, or Hatchery
 		{
 			// Order the depot to construct more workers! But only when it is idle.
-			if (u->isIdle() && !u->train(u->getType().getRace().getWorker()))
+			if (u->isIdle() && !u->train(UnitTypes::Terran_SCV))
 			{
 				// If that fails, draw the error at the location so that you can visibly see what went wrong!
 				// However, drawing the error once will only appear for a single frame
@@ -219,7 +239,24 @@ void ExampleAIModule::onFrame()
 						}
 					} // closure: supplyBuilder is valid
 				} // closure: insufficient supply
-			} // closure: failed to train idle unit
+			} // closure: failed to train idle unit			
+		}
+		else if (u->getType().canProduce())
+		{
+			if (u->isIdle() && !u->train(UnitTypes::Terran_Marine))
+			{
+				// If that fails, draw the error at the location so that you can visibly see what went wrong!
+				// However, drawing the error once will only appear for a single frame
+				// so create an event that keeps it on the screen for some frames
+				Position pos = u->getPosition();
+				Error lastErr = Broodwar->getLastError();
+				Broodwar->registerEvent([pos, lastErr](Game*)
+				{
+					Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
+				},   // action
+					nullptr,    // condition
+					Broodwar->getLatencyFrames());  // frames to run
+			}
 		}
 	} // closure: unit iterator    
 }

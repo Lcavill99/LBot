@@ -7,7 +7,8 @@
 class ExampleAIModule : public BWAPI::AIModule
 {
 	int barracks;
-	bool depot;
+	int depot;
+	int refinery;
 public:
   // Virtual functions for callbacks, leave these as they are.
   virtual void onStart();
