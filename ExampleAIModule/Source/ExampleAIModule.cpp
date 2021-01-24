@@ -241,7 +241,7 @@ void ExampleAIModule::onFrame()
 				} // closure: insufficient supply
 			} // closure: failed to train idle unit			
 		}
-		else if (u->getType().canProduce())
+		else if (u->getType() == UnitTypes::Terran_Barracks)
 		{
 			if (u->isIdle() && !u->train(UnitTypes::Terran_Marine))
 			{
