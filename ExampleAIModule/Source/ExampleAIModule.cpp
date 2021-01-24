@@ -162,6 +162,16 @@ void ExampleAIModule::onFrame()
 				depot = depot++;
 			}
 
+			// Build refinery
+			if (refinery == 0 && Broodwar->self()->supplyUsed() == 42 && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
+			{
+				Unitset geysers = Broodwar->getGeysers(); // get all geysers
+				Unit closestGeyser = geysers.getClosestUnit(); // get closest geyser
+				TilePosition buildPosition = closestGeyser->getTilePosition(); // get closest geyser position
+				u->build(UnitTypes::Terran_Refinery, buildPosition);
+				refinery = refinery++;
+			}
+
 			// if our worker is idle
 			if (u->isIdle())
 			{
