@@ -96,7 +96,7 @@ void ExampleAIModule::onFrame()
 	// Latency frames are the number of frames before commands are processed.
 	if ( Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0 )
 		return;
-
+	
 	// Iterate through all the units that we own
 	for (auto &u : Broodwar->self()->getUnits())
     {
@@ -120,16 +120,25 @@ void ExampleAIModule::onFrame()
 
 		// Finally make the unit do some stuff!
 
+		// Marines Attack closest unit
+		if ((u->getType() == UnitTypes::Terran_Marine) && u->isIdle())
+		{
+			u->attack(u->getClosestUnit(Filter::IsEnemy));
+		}
 
 		// If the unit is a worker unit
 		if (u->getType().isWorker())
 		{	
-			// ----- Starting build order ----- //			
+		   /*
+			*
+			* Starting build order
+			*
+			*/
 
 			// Build initial depot
 			if (depot == 0 && Broodwar->self()->supplyUsed() == 18 && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 			{
-				//find a location for depot and construct it
+				// Find a location for depot and construct it
 				TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, u->getTilePosition());
 				u->build(UnitTypes::Terran_Supply_Depot, buildPosition);
 				depot = depot++;
@@ -138,7 +147,7 @@ void ExampleAIModule::onFrame()
 			// Build barracks
 			if (barracks == 0 && Broodwar->self()->supplyUsed() == 22 && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
 			{
-				//find a location for barracks and construct it
+				// Find a location for barracks and construct it
 				TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, u->getTilePosition());
 				u->build(UnitTypes::Terran_Barracks, buildPosition);
 				barracks = barracks++;
@@ -147,7 +156,7 @@ void ExampleAIModule::onFrame()
 			// Build second barracks
 			if (barracks == 1 && Broodwar->self()->supplyUsed() == 26 && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
 			{
-				//find a location for barracks and construct it
+				// Find a location for barracks and construct it
 				TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, u->getTilePosition());
 				u->build(UnitTypes::Terran_Barracks, buildPosition);
 				barracks = barracks++;
@@ -156,33 +165,32 @@ void ExampleAIModule::onFrame()
 			// Build second initial depot
 			if (depot == 1 && Broodwar->self()->supplyUsed() == 30 && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 			{
-				//find a location for depot and construct it
+				// Find a location for depot and construct it
 				TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, u->getTilePosition());
 				u->build(UnitTypes::Terran_Supply_Depot, buildPosition);
 				depot = depot++;
 			}
 
-			// Build refinery
+			// Build refinery **NEEDS TO BE IMPROVED FROM CLOSEST**
 			if (refinery == 0 && Broodwar->self()->supplyUsed() == 42 && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
 			{
-				Unitset geysers = Broodwar->getGeysers(); // get all geysers
-				Unit closestGeyser = geysers.getClosestUnit(); // get closest geyser
-				TilePosition buildPosition = closestGeyser->getTilePosition(); // get closest geyser position
+				Unitset geysers = Broodwar->getGeysers(); // Get all geysers
+				Unit closestGeyser = geysers.getClosestUnit(); // Get closest geyser
+				TilePosition buildPosition = closestGeyser->getTilePosition(); // Get closest geyser position
 				u->build(UnitTypes::Terran_Refinery, buildPosition);
 				refinery = refinery++;
 			}
 
-			// if our worker is idle
+			// If worker is idle
 			if (u->isIdle())
 			{
-				// Order workers carrying a resource to return them to the center,
-				// otherwise find a mineral patch to harvest.
+				// If carrying a resource return them to the center
 				if (u->isCarryingGas() || u->isCarryingMinerals())
 				{
 					u->returnCargo();
 				}
-				else if (!u->getPowerUp())  // The worker cannot harvest anything if it
-				{                             // is carrying a powerup such as a flag
+				else if (!u->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
+				{	
 					// Harvest from the nearest mineral patch or gas refinery
 					if (!u->gather(u->getClosestUnit(IsMineralField || IsRefinery)))
 					{
@@ -193,7 +201,12 @@ void ExampleAIModule::onFrame()
 				} // closure: has no powerup
 			} // closure: if idle
 		}
-		else if (u->getType().isResourceDepot()) // A resource depot is a Command Center, Nexus, or Hatchery
+	   /*
+	    *
+	    * Command center
+		*
+		*/
+		else if (u->getType().isResourceDepot()) // Command Center, Nexus, or Hatchery
 		{
 			// Order the depot to construct more workers! But only when it is idle.
 			if (u->isIdle() && !u->train(UnitTypes::Terran_SCV))
@@ -251,6 +264,11 @@ void ExampleAIModule::onFrame()
 				} // closure: insufficient supply
 			} // closure: failed to train idle unit			
 		}
+		/*
+		*
+		* Barracks
+		*
+		*/
 		else if (u->getType() == UnitTypes::Terran_Barracks)
 		{
 			if (u->isIdle() && !u->train(UnitTypes::Terran_Marine))
