@@ -77,10 +77,13 @@ void ExampleAIModule::onEnd(bool isWinner)
 	}
 }
 
-void ExampleAIModule::onFrame()
-{
-    // Called once every game frame
-	
+void ExampleAIModule::onFrame() // Called once every game frame
+{  
+   /*
+	*
+	* On-frame initalisation
+	*
+	*/
 	BWEM::utils::gridMapExample(theMap);
 	BWEM::utils::drawMap(theMap);
 
@@ -97,9 +100,19 @@ void ExampleAIModule::onFrame()
 	if ( Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0 )
 		return;
 	
+   /*
+	*
+	* Units
+	*
+	*/
 	// Iterate through all the units that we own
 	for (auto &u : Broodwar->self()->getUnits())
     {
+	   /*
+		*
+		* Worker initalisation
+		*
+		*/
 		// Ignore the unit if it no longer exists
 		// Make sure to include this block when handling any Unit pointer!
 		if ( !u->exists() )
@@ -120,67 +133,100 @@ void ExampleAIModule::onFrame()
 
 		// Finally make the unit do some stuff!
 
+
 		// Marines Attack closest unit
 		if ((u->getType() == UnitTypes::Terran_Marine) && u->isIdle())
 		{
 			u->attack(u->getClosestUnit(Filter::IsEnemy));
 		}
 
+	   /*
+		*
+		* Workers
+		*
+		*/
 		// If the unit is a worker unit
 		if (u->getType().isWorker())
 		{	
+
 		   /*
 			*
-			* Starting build order
+			* ZERG build order
 			*
 			*/
-
-			// Build initial depot
-			if (depot == 0 && Broodwar->self()->supplyUsed() == 18 && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
+			if (Broodwar->enemy()->getRace() == Races::Zerg) 
 			{
-				// Find a location for depot and construct it
-				TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, u->getTilePosition());
-				u->build(UnitTypes::Terran_Supply_Depot, buildPosition);
-				depot = depot++;
+				// Build initial depot
+				if (depot == 0 && Broodwar->self()->supplyUsed() == 18 && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
+				{
+					// Find a location for depot and construct it
+					TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, u->getTilePosition());
+					u->build(UnitTypes::Terran_Supply_Depot, buildPosition);
+					depot = depot++;
+				}
+
+				// Build barracks
+				if (barracks == 0 && Broodwar->self()->supplyUsed() == 22 && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
+				{
+					// Find a location for barracks and construct it
+					TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, u->getTilePosition());
+					u->build(UnitTypes::Terran_Barracks, buildPosition);
+					barracks = barracks++;
+				}
+
+				// Build second barracks
+				if (barracks == 1 && Broodwar->self()->supplyUsed() == 26 && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
+				{
+					// Find a location for barracks and construct it
+					TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, u->getTilePosition());
+					u->build(UnitTypes::Terran_Barracks, buildPosition);
+					barracks = barracks++;
+				}
+
+				// Build second initial depot
+				if (depot == 1 && Broodwar->self()->supplyUsed() == 30 && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
+				{
+					// Find a location for depot and construct it
+					TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, u->getTilePosition());
+					u->build(UnitTypes::Terran_Supply_Depot, buildPosition);
+					depot = depot++;
+				}
+
+				// Build refinery **NEEDS TO BE IMPROVED FROM CLOSEST**
+				if (refinery == 0 && Broodwar->self()->supplyUsed() == 42 && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
+				{
+					Unitset geysers = Broodwar->getGeysers(); // Get all geysers
+					Unit closestGeyser = geysers.getClosestUnit(); // Get closest geyser
+					TilePosition buildPosition = closestGeyser->getTilePosition(); // Get closest geyser position
+					u->build(UnitTypes::Terran_Refinery, buildPosition);
+					refinery = refinery++;
+				}
 			}
-
-			// Build barracks
-			if (barracks == 0 && Broodwar->self()->supplyUsed() == 22 && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
+		   /*
+			*
+			* PROTOSS build order
+			*
+			*/
+			else if (Broodwar->enemy()->getRace() == Races::Protoss)
 			{
-				// Find a location for barracks and construct it
-				TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, u->getTilePosition());
-				u->build(UnitTypes::Terran_Barracks, buildPosition);
-				barracks = barracks++;
+
 			}
-
-			// Build second barracks
-			if (barracks == 1 && Broodwar->self()->supplyUsed() == 26 && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
+		   /*
+			*
+			* TERRAN build order
+			*
+			*/
+			else
 			{
-				// Find a location for barracks and construct it
-				TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, u->getTilePosition());
-				u->build(UnitTypes::Terran_Barracks, buildPosition);
-				barracks = barracks++;
-			}			
 
-			// Build second initial depot
-			if (depot == 1 && Broodwar->self()->supplyUsed() == 30 && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
-			{
-				// Find a location for depot and construct it
-				TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, u->getTilePosition());
-				u->build(UnitTypes::Terran_Supply_Depot, buildPosition);
-				depot = depot++;
 			}
+			
 
-			// Build refinery **NEEDS TO BE IMPROVED FROM CLOSEST**
-			if (refinery == 0 && Broodwar->self()->supplyUsed() == 42 && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
-			{
-				Unitset geysers = Broodwar->getGeysers(); // Get all geysers
-				Unit closestGeyser = geysers.getClosestUnit(); // Get closest geyser
-				TilePosition buildPosition = closestGeyser->getTilePosition(); // Get closest geyser position
-				u->build(UnitTypes::Terran_Refinery, buildPosition);
-				refinery = refinery++;
-			}
-
+		   /*
+			*
+			* Worker mineral and gas assignment
+			*
+			*/
 			// If worker is idle
 			if (u->isIdle())
 			{
@@ -201,6 +247,7 @@ void ExampleAIModule::onFrame()
 				} // closure: has no powerup
 			} // closure: if idle
 		}
+
 	   /*
 	    *
 	    * Command center
@@ -208,7 +255,7 @@ void ExampleAIModule::onFrame()
 		*/
 		else if (u->getType().isResourceDepot()) // Command Center, Nexus, or Hatchery
 		{
-			// Order the depot to construct more workers! But only when it is idle.
+			// Construct workers when idle
 			if (u->isIdle() && !u->train(UnitTypes::Terran_SCV))
 			{
 				// If that fails, draw the error at the location so that you can visibly see what went wrong!
@@ -223,6 +270,11 @@ void ExampleAIModule::onFrame()
 				nullptr,    // condition
 				Broodwar->getLatencyFrames());  // frames to run
 
+			   /*
+				*
+				* Base BWAPI supply builder
+				*
+				*/
 				// Retrieve the supply provider type in the case that we have run out of supplies
 				UnitType supplyProviderType = u->getType().getRace().getSupplyProvider();
 				static int lastChecked = 0;
@@ -264,6 +316,7 @@ void ExampleAIModule::onFrame()
 				} // closure: insufficient supply
 			} // closure: failed to train idle unit			
 		}
+
 		/*
 		*
 		* Barracks
@@ -271,6 +324,7 @@ void ExampleAIModule::onFrame()
 		*/
 		else if (u->getType() == UnitTypes::Terran_Barracks)
 		{
+			// Train marines if idle
 			if (u->isIdle() && !u->train(UnitTypes::Terran_Marine))
 			{
 				// If that fails, draw the error at the location so that you can visibly see what went wrong!
@@ -282,8 +336,8 @@ void ExampleAIModule::onFrame()
 				{
 					Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
 				},   // action
-					nullptr,    // condition
-					Broodwar->getLatencyFrames());  // frames to run
+				nullptr,    // condition
+				Broodwar->getLatencyFrames());  // frames to run
 			}
 		}
 	} // closure: unit iterator    
