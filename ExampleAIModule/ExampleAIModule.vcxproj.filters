@@ -57,6 +57,10 @@
     <ClCompile Include="Source\BWEM 1.4.1\EasyBMP_1.06\EasyBMP.cpp">
       <Filter>BWEM</Filter>
     </ClCompile>
+    <ClCompile Include="Source\BuildOrder.cpp" />
+    <ClCompile Include="Source\WorkerManager.cpp" />
+    <ClCompile Include="Source\ArmyManager.cpp" />
+    <ClCompile Include="Source\Scouting.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ExampleAIModule.h" />
@@ -117,6 +121,10 @@
     <ClInclude Include="Source\BWEM 1.4.1\EasyBMP_1.06\EasyBMP.h">
       <Filter>BWEM</Filter>
     </ClInclude>
+    <ClInclude Include="Source\BuildOrder.h" />
+    <ClInclude Include="Source\WorkerManager.h" />
+    <ClInclude Include="Source\ArmyManager.h" />
+    <ClInclude Include="Source\Scouting.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="BWEM">

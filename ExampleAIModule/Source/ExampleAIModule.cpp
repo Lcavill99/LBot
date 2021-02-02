@@ -1,4 +1,5 @@
 #include "ExampleAIModule.h"
+#include "BuildOrder.h"
 #include "BWEM 1.4.1/src/bwem.h"
 #include <iostream>
 
@@ -28,6 +29,8 @@ void ExampleAIModule::onStart()
 	// Set the command optimization level so that common commands can be grouped
 	// and reduce the bot's APM (Actions Per Minute).
 	Broodwar->setCommandOptimizationLevel(2);
+
+	buildOrder = new BuildOrder;
 
 	// Check if this is a replay
 	if ( Broodwar->isReplay() )
@@ -79,11 +82,11 @@ void ExampleAIModule::onEnd(bool isWinner)
 
 void ExampleAIModule::onFrame() // Called once every game frame
 {  
-   /*
-	*
-	* On-frame initalisation
-	*
-	*/
+    /*
+	 *
+	 * On-frame initalisation
+	 *
+	 */
 	BWEM::utils::gridMapExample(theMap);
 	BWEM::utils::drawMap(theMap);
 
@@ -115,19 +118,19 @@ void ExampleAIModule::onFrame() // Called once every game frame
 		*/
 		// Ignore the unit if it no longer exists
 		// Make sure to include this block when handling any Unit pointer!
-		if ( !u->exists() )
+		if (!u->exists())
 		  continue;
 
 		// Ignore the unit if it has one of the following status ailments
-		if ( u->isLockedDown() || u->isMaelstrommed() || u->isStasised() )
+		if (u->isLockedDown() || u->isMaelstrommed() || u->isStasised())
 		  continue;
 
 		// Ignore the unit if it is in one of the following states
-		if ( u->isLoaded() || !u->isPowered() || u->isStuck() )
+		if (u->isLoaded() || !u->isPowered() || u->isStuck())
 		  continue;
 
 		// Ignore the unit if it is incomplete or busy constructing
-		if ( !u->isCompleted() || u->isConstructing() )
+		if (!u->isCompleted() || u->isConstructing())
 		  continue;
 
 
@@ -147,80 +150,9 @@ void ExampleAIModule::onFrame() // Called once every game frame
 		*/
 		// If the unit is a worker unit
 		if (u->getType().isWorker())
-		{	
+		{
 
-		   /*
-			*
-			* ZERG build order
-			*
-			*/
-			if (Broodwar->enemy()->getRace() == Races::Zerg) 
-			{
-				// Build initial depot
-				if (depot == 0 && Broodwar->self()->supplyUsed() == 18 && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
-				{
-					// Find a location for depot and construct it
-					TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, u->getTilePosition());
-					u->build(UnitTypes::Terran_Supply_Depot, buildPosition);
-					depot = depot++;
-				}
-
-				// Build barracks
-				if (barracks == 0 && Broodwar->self()->supplyUsed() == 22 && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
-				{
-					// Find a location for barracks and construct it
-					TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, u->getTilePosition());
-					u->build(UnitTypes::Terran_Barracks, buildPosition);
-					barracks = barracks++;
-				}
-
-				// Build second barracks
-				if (barracks == 1 && Broodwar->self()->supplyUsed() == 26 && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
-				{
-					// Find a location for barracks and construct it
-					TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, u->getTilePosition());
-					u->build(UnitTypes::Terran_Barracks, buildPosition);
-					barracks = barracks++;
-				}
-
-				// Build second initial depot
-				if (depot == 1 && Broodwar->self()->supplyUsed() == 30 && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
-				{
-					// Find a location for depot and construct it
-					TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, u->getTilePosition());
-					u->build(UnitTypes::Terran_Supply_Depot, buildPosition);
-					depot = depot++;
-				}
-
-				// Build refinery **NEEDS TO BE IMPROVED FROM CLOSEST**
-				if (refinery == 0 && Broodwar->self()->supplyUsed() == 42 && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
-				{
-					Unitset geysers = Broodwar->getGeysers(); // Get all geysers
-					Unit closestGeyser = geysers.getClosestUnit(); // Get closest geyser
-					TilePosition buildPosition = closestGeyser->getTilePosition(); // Get closest geyser position
-					u->build(UnitTypes::Terran_Refinery, buildPosition);
-					refinery = refinery++;
-				}
-			}
-		   /*
-			*
-			* PROTOSS build order
-			*
-			*/
-			else if (Broodwar->enemy()->getRace() == Races::Protoss)
-			{
-
-			}
-		   /*
-			*
-			* TERRAN build order
-			*
-			*/
-			else
-			{
-
-			}
-			
+			buildOrder->buildOrder(u);
 
 		   /*
 			*
@@ -272,7 +204,7 @@ void ExampleAIModule::onFrame() // Called once every game frame
 
 			   /*
 				*
-				* Base BWAPI supply builder
+				* Base BWAPI Supply builder
 				*
 				*/
 				// Retrieve the supply provider type in the case that we have run out of supplies
@@ -292,16 +224,17 @@ void ExampleAIModule::onFrame() // Called once every game frame
 						if (supplyProviderType.isBuilding())
 						{
 							TilePosition targetBuildLocation = Broodwar->getBuildLocation(supplyProviderType, supplyBuilder->getTilePosition());
-
 							if (targetBuildLocation)
 							{
 								// Register an event that draws the target build location
-								Broodwar->registerEvent([targetBuildLocation,supplyProviderType](Game*)
+								Broodwar->registerEvent([targetBuildLocation, supplyProviderType](Game*)
 								{
-									Broodwar->drawBoxMap(Position(targetBuildLocation), Position(targetBuildLocation + supplyProviderType.tileSize()), Colors::Blue);
+									Broodwar->drawBoxMap(Position(targetBuildLocation),
+										Position(targetBuildLocation + supplyProviderType.tileSize()),
+										Colors::Blue);
 								},
-								nullptr,  // condition
-								supplyProviderType.buildTime() + 100);  // frames to run
+									nullptr,  // condition
+									supplyProviderType.buildTime() + 100);  // frames to run
 
 								// Order the builder to construct the supply structure
 								supplyBuilder->build(supplyProviderType, targetBuildLocation);
@@ -314,7 +247,7 @@ void ExampleAIModule::onFrame() // Called once every game frame
 						}
 					} // closure: supplyBuilder is valid
 				} // closure: insufficient supply
-			} // closure: failed to train idle unit			
+			} // closure: failed to train idle unit		
 		}
 
 		/*
@@ -324,6 +257,24 @@ void ExampleAIModule::onFrame() // Called once every game frame
 		*/
 		else if (u->getType() == UnitTypes::Terran_Barracks)
 		{
+			// Train medics until you have 3
+			while (!medics == 3)
+			{
+				if (!u->train(UnitTypes::Terran_Medic))
+				{
+					// If that fails, draw the error at the location so that you can visibly see what went wrong!
+					// However, drawing the error once will only appear for a single frame
+					// so create an event that keeps it on the screen for some frames
+					Position pos = u->getPosition();
+					Error lastErr = Broodwar->getLastError();
+					Broodwar->registerEvent([pos, lastErr](Game*)
+					{
+						Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
+					},   // action
+						nullptr,    // condition
+						Broodwar->getLatencyFrames());  // frames to run
+				}
+			}
 			// Train marines if idle
 			if (u->isIdle() && !u->train(UnitTypes::Terran_Marine))
 			{
@@ -336,9 +287,9 @@ void ExampleAIModule::onFrame() // Called once every game frame
 				{
 					Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
 				},   // action
-				nullptr,    // condition
-				Broodwar->getLatencyFrames());  // frames to run
-			}
+					nullptr,    // condition
+					Broodwar->getLatencyFrames());  // frames to run
+			}			
 		}
 	} // closure: unit iterator    
 }

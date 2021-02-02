@@ -1,5 +1,6 @@
 #pragma once
 #include <BWAPI.h>
+#include "BuildOrder.h"
 #include "BWEM 1.4.1/src/bwem.h"
 
 // Remember not to use "Broodwar" in any global class constructor!
@@ -9,8 +10,11 @@ class ExampleAIModule : public BWAPI::AIModule
 	int barracks;
 	int depot;
 	int refinery;
+	int academy;
+	int medics;
+	BuildOrder *buildOrder;
+
 public:
-  // Virtual functions for callbacks, leave these as they are.
   virtual void onStart();
   virtual void onEnd(bool isWinner);
   virtual void onFrame();
@@ -28,6 +32,5 @@ public:
   virtual void onUnitRenegade(BWAPI::Unit unit);
   virtual void onSaveGame(std::string gameName);
   virtual void onUnitComplete(BWAPI::Unit unit);
-  // Everything below this line is safe to modify.
 
 };
