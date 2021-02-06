@@ -142,7 +142,7 @@ void ExampleAIModule::onFrame() // Called once every game frame
 		{
 			u->attack(u->getClosestUnit(Filter::IsEnemy));
 		}
-
+		
 	   /*
 		*
 		* Workers
@@ -150,10 +150,8 @@ void ExampleAIModule::onFrame() // Called once every game frame
 		*/
 		// If the unit is a worker unit
 		if (u->getType().isWorker())
-		{
-
+		{				
 			buildOrder->buildOrder(u);
-
 		   /*
 			*
 			* Worker mineral and gas assignment
@@ -258,7 +256,7 @@ void ExampleAIModule::onFrame() // Called once every game frame
 		else if (u->getType() == UnitTypes::Terran_Barracks)
 		{
 			// Train medics until you have 3
-			while (!medics == 3)
+			while (medics != 3)
 			{
 				if (!u->train(UnitTypes::Terran_Medic))
 				{

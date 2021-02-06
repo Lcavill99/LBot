@@ -6,7 +6,7 @@ using namespace Filter;
 
 void BuildOrder::buildOrder(BWAPI::UnitInterface *u)
 {
-   /*
+	/*
 	*
 	* ZERG build order
 	*
@@ -65,22 +65,22 @@ void BuildOrder::buildOrder(BWAPI::UnitInterface *u)
 			// Find a location for academy and construct it
 			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Academy, u->getTilePosition());
 			u->build(UnitTypes::Terran_Academy, buildPosition);
-		}
+		}				
 	}
-	/*
-		*
-		* PROTOSS build order
-		*
-		*/
+   /*
+	*
+    * PROTOSS build order
+	*
+	*/
 	else if (Broodwar->enemy()->getRace() == Races::Protoss)
 	{
 
 	}
 	/*
-		*
-		* TERRAN build order
-		*
-		*/
+	*
+	* TERRAN build order
+	*
+	*/
 	else
 	{
 
