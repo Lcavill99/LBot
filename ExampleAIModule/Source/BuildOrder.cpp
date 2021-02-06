@@ -68,13 +68,62 @@ void BuildOrder::buildOrder(BWAPI::UnitInterface *u)
 			u->build(UnitTypes::Terran_Academy, buildPosition);
 		}				
 	}
+
    /*
 	*
-    * PROTOSS build order
+    * PROTOSS build order **UNFINISHED**
 	*
 	*/
 	else if (Broodwar->enemy()->getRace() == Races::Protoss)
 	{
+		// Build depot
+		if ((depot == 0) && (Broodwar->self()->supplyUsed() >= 18 && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice()))
+		{
+			// Find a location for depot and construct it
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, u->getTilePosition());
+			u->build(UnitTypes::Terran_Supply_Depot, buildPosition);
+		}
+
+		// Build barracks
+		if ((depot == 1 && barracks == 0) && (Broodwar->self()->supplyUsed() >= 22 && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice()))
+		{
+			// Find a location for barracks and construct it
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, u->getTilePosition());
+			u->build(UnitTypes::Terran_Barracks, buildPosition);
+		}
+
+		// Build refinery **NEEDS TO BE IMPROVED FROM CLOSEST**
+		if ((depot == 1 && barracks == 1 && refinery == 0) && (Broodwar->self()->supplyUsed() >= 26 && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice()))
+		{
+			Unitset geysers = Broodwar->getGeysers(); // Get all geysers
+			Unit closestGeyser = geysers.getClosestUnit(); // Get closest geyser
+			TilePosition buildPosition = closestGeyser->getTilePosition(); // Get closest geyser position
+			u->build(UnitTypes::Terran_Refinery, buildPosition);
+		}
+
+		// Build second depot
+		if ((depot == 1 && barracks == 1 && refinery == 1) && (Broodwar->self()->supplyUsed() >= 34 && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice()))
+		{
+			// Find a location for depot and construct it
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, u->getTilePosition());
+			u->build(UnitTypes::Terran_Supply_Depot, buildPosition);
+		}
+
+		// Build factory
+		if ((depot == 2 && barracks == 1 && refinery == 1 && factory == 0) && (Broodwar->self()->minerals() == 200 && Broodwar->self()->gas() == 100))
+		{
+			// Find a location for barracks and construct it
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Factory, u->getTilePosition());
+			u->build(UnitTypes::Terran_Factory, buildPosition);
+		}
+
+		// Build second factory
+		if ((depot == 2 && barracks == 1 && refinery == 1 && factory == 1) && (Broodwar->self()->minerals() == 200))
+		{
+			// Find a location for barracks and construct it
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Factory, u->getTilePosition());
+			u->build(UnitTypes::Terran_Factory, buildPosition);
+		}
 
 	}
 
