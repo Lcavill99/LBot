@@ -152,6 +152,7 @@ void ExampleAIModule::onFrame() // Called once every game frame
 		if (u->getType().isWorker())
 		{				
 			buildOrder->buildOrder(u);
+
 		   /*
 			*
 			* Worker mineral and gas assignment
@@ -255,10 +256,28 @@ void ExampleAIModule::onFrame() // Called once every game frame
 		*/
 		else if (u->getType() == UnitTypes::Terran_Barracks)
 		{
-			// Train medics until you have 3
-			while (medics != 3)
+			if (Broodwar->enemy()->getRace() == Races::Zerg)
 			{
-				if (!u->train(UnitTypes::Terran_Medic))
+				// Train medics until you have 3
+				while (medics < 3)
+				{
+					if (!u->train(UnitTypes::Terran_Medic))
+					{
+						// If that fails, draw the error at the location so that you can visibly see what went wrong!
+						// However, drawing the error once will only appear for a single frame
+						// so create an event that keeps it on the screen for some frames
+						Position pos = u->getPosition();
+						Error lastErr = Broodwar->getLastError();
+						Broodwar->registerEvent([pos, lastErr](Game*)
+						{
+							Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
+						},   // action
+							nullptr,    // condition
+							Broodwar->getLatencyFrames());  // frames to run
+					}
+				}
+				// Train marines if idle
+				if (u->isIdle() && !u->train(UnitTypes::Terran_Marine))
 				{
 					// If that fails, draw the error at the location so that you can visibly see what went wrong!
 					// However, drawing the error once will only appear for a single frame
@@ -272,21 +291,6 @@ void ExampleAIModule::onFrame() // Called once every game frame
 						nullptr,    // condition
 						Broodwar->getLatencyFrames());  // frames to run
 				}
-			}
-			// Train marines if idle
-			if (u->isIdle() && !u->train(UnitTypes::Terran_Marine))
-			{
-				// If that fails, draw the error at the location so that you can visibly see what went wrong!
-				// However, drawing the error once will only appear for a single frame
-				// so create an event that keeps it on the screen for some frames
-				Position pos = u->getPosition();
-				Error lastErr = Broodwar->getLastError();
-				Broodwar->registerEvent([pos, lastErr](Game*)
-				{
-					Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
-				},   // action
-					nullptr,    // condition
-					Broodwar->getLatencyFrames());  // frames to run
 			}			
 		}
 	} // closure: unit iterator    
