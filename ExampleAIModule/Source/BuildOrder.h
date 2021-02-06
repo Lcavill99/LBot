@@ -7,6 +7,7 @@ class BuildOrder
 	int barracks;
 	int refinery;
 	int academy;
+	int factory;
 
 public:
 	// Virtual functions for callbacks, leave these as they are.
