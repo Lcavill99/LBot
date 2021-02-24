@@ -13,7 +13,6 @@ class ExampleAIModule : public BWAPI::AIModule
 	int academy;
 	int medics;
 	BuildOrder *buildOrder;
-	
 
 public:
   virtual void onStart();

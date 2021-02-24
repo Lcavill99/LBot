@@ -11,5 +11,5 @@ class BuildOrder
 
 public:
 	// Virtual functions for callbacks, leave these as they are.
-	void buildOrder(BWAPI::UnitInterface *u);
+	void buildOrder(BWAPI::Unitset workers);
 };
