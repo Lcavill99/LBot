@@ -14,6 +14,8 @@ namespace { auto & theMap = BWEM::Map::Instance(); }
 Unitset workers;
 Unitset mineralWorkers;
 Unitset gasWorkers;
+Unitset army1;
+Unitset army2;
 
 void ExampleAIModule::onStart()
 {	
@@ -129,13 +131,7 @@ void ExampleAIModule::onFrame() // Called once every game frame
 
 		// Ignore the unit if it is incomplete or busy constructing
 		if (!u->isCompleted() || u->isConstructing())
-		  continue;
-
-		// Marines Attack closest unit
-		if ((u->getType() == UnitTypes::Terran_Marine) && u->isIdle())
-		{
-			u->attack(u->getClosestUnit(Filter::IsEnemy));
-		}
+		  continue;	
 		
 	   /*
 		*
@@ -163,14 +159,38 @@ void ExampleAIModule::onFrame() // Called once every game frame
 				}
 				else if (!u->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
 				{	
-					// Harvest from the nearest mineral patch or gas refinery
-					if (!u->gather(u->getClosestUnit(IsMineralField)))
+					// if we have a refinery and gasworkers unitset contains less that 3 units *WORKS TEMP*
+					if (Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) >= 1 && gasWorkers.size() < 3)
+					{
+						// gather from nearest refinery
+						if (!u->gather(u->getClosestUnit(IsRefinery)))
+						{
+							// If the call fails, then print the last error message
+							Broodwar << Broodwar->getLastError() << std::endl;
+						}
+						// add to gasWorkers unitset
+						gasWorkers.insert(u);
+					}
+					// Harvest from the nearest mineral patch 
+					else if (!u->gather(u->getClosestUnit(IsMineralField)))
 					{
 						// If the call fails, then print the last error message
 						Broodwar << Broodwar->getLastError() << std::endl;
 					}
 				} // closure: has no powerup
 			} // closure: if idle
+		}
+
+		/*
+		*
+		* Marines
+		*
+		*/
+		// Marines Attack closest unit
+		else if ((u->getType() == UnitTypes::Terran_Marine) && u->isIdle())
+		{
+			army1.insert(u);
+			u->attack(u->getClosestUnit(Filter::IsEnemy));
 		}
 
 	   /*
@@ -250,21 +270,21 @@ void ExampleAIModule::onFrame() // Called once every game frame
 		*/
 		else if (u->getType() == UnitTypes::Terran_Barracks)
 		{
-				// Train marines if idle
-				if (u->isIdle() && !u->train(UnitTypes::Terran_Marine))
+			// Train marines if idle
+			if (u->isIdle() && !u->train(UnitTypes::Terran_Marine))
+			{
+				// If that fails, draw the error at the location so that you can visibly see what went wrong!
+				// However, drawing the error once will only appear for a single frame
+				// so create an event that keeps it on the screen for some frames
+				Position pos = u->getPosition();
+				Error lastErr = Broodwar->getLastError();
+				Broodwar->registerEvent([pos, lastErr](Game*)
 				{
-					// If that fails, draw the error at the location so that you can visibly see what went wrong!
-					// However, drawing the error once will only appear for a single frame
-					// so create an event that keeps it on the screen for some frames
-					Position pos = u->getPosition();
-					Error lastErr = Broodwar->getLastError();
-					Broodwar->registerEvent([pos, lastErr](Game*)
-					{
-						Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
-					},   // action
-						nullptr,    // condition
-						Broodwar->getLatencyFrames());  // frames to run
-				}			
+					Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
+				},   // action
+					nullptr,    // condition
+					Broodwar->getLatencyFrames());  // frames to run
+			}			
 		}
 
 	   /*
