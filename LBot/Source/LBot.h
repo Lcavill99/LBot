@@ -1,10 +1,18 @@
 #pragma once
 #include <BWAPI.h>
+#include "BuildOrder.h"
 
 // Remember not to use "Broodwar" in any global class constructor!
 
 class LBot : public BWAPI::AIModule
 {
+	int barracks;
+	int depot;
+	int refinery;
+	int academy;
+	int medics;
+	BuildOrder *buildOrder;
+
 public:
   // Virtual functions for callbacks, leave these as they are.
   virtual void onStart();

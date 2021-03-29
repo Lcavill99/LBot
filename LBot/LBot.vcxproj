@@ -90,10 +90,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BuildOrder.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\LBot.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BuildOrder.h" />
     <ClInclude Include="Source\LBot.h" />
   </ItemGroup>
   <ItemGroup>
