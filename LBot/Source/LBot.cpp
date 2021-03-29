@@ -1,4 +1,5 @@
 #include "LBot.h"
+#include "BuildOrder.h"
 #include <iostream>
 
 using namespace BWAPI;
@@ -26,6 +27,8 @@ void LBot::onStart()
 	// and reduce the bot's APM (Actions Per Minute).
 	Broodwar->setCommandOptimizationLevel(2);
 
+	buildOrder = new BuildOrder;
+
 	// Check if this is a replay
 	if ( Broodwar->isReplay() )
 	{
@@ -47,9 +50,7 @@ void LBot::onStart()
 		// If you wish to deal with multiple enemies then you must use enemies().
 		if ( Broodwar->enemy() ) // First make sure there is an enemy
 		Broodwar << "The matchup is " << Broodwar->self()->getRace() << " vs " << Broodwar->enemy()->getRace() << std::endl;
-	}
-
-	buildOrder = new BuildOrder;
+	}	
 }
 
 void LBot::onEnd(bool isWinner)
@@ -95,7 +96,7 @@ void LBot::onFrame()
 		// Ignore the unit if it is incomplete or busy constructing
 		if ( !u->isCompleted() || u->isConstructing() )
 			continue;
-
+		
 		//** WORKERS **//
 		if (u->getType().isWorker())
 		{
@@ -148,8 +149,8 @@ void LBot::onFrame()
 				{ 
 					Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str()); 
 				},   // action
-				nullptr,    // condition
-				Broodwar->getLatencyFrames());  // frames to run
+					nullptr,    // condition
+					Broodwar->getLatencyFrames());  // frames to run
 
 				// Retrieve the supply provider type in the case that we have run out of supplies
 				UnitType supplyProviderType = u->getType().getRace().getSupplyProvider();
@@ -176,8 +177,8 @@ void LBot::onFrame()
 								{
 									Broodwar->drawBoxMap( Position(targetBuildLocation), Position(targetBuildLocation + supplyProviderType.tileSize()), Colors::Blue);
 								},
-								nullptr,  // condition
-								supplyProviderType.buildTime() + 100 );  // frames to run
+									nullptr,  // condition
+									supplyProviderType.buildTime() + 100 );  // frames to run
 
 								// Order the builder to construct the supply structure
 								supplyBuilder->build( supplyProviderType, targetBuildLocation );
@@ -207,13 +208,13 @@ void LBot::onFrame()
 				{
 					Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
 				},   // action
-				nullptr,    // condition
-				Broodwar->getLatencyFrames());  // frames to run
+					nullptr,    // condition
+					Broodwar->getLatencyFrames());  // frames to run
 			}
 		}
-	} // closure: unit iterator
 
-	buildOrder->buildOrder(workers);
+		buildOrder->buildOrder(workers);
+	} // closure: unit iterator	
 }
 
 void LBot::onSendText(std::string text)
