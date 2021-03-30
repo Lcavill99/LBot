@@ -12,6 +12,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 	academy = Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy);
 	factory = Broodwar->self()->allUnitCount(UnitTypes::Terran_Factory);
 	static int lastChecked = 0;
+	static int movetime = 100;
 
 	/*
 	*
@@ -21,7 +22,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 	if (Broodwar->enemy()->getRace() == Races::Zerg)
 	{
 		// Build depot
-		if (depot == 0 && Broodwar->self()->supplyUsed() >= 18 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
+		if (depot == 0 && Broodwar->self()->supplyUsed() >= 18 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -53,7 +54,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build barracks
-		if (barracks == 0 && Broodwar->self()->supplyUsed() >= 22 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
+		if (barracks == 0 && Broodwar->self()->supplyUsed() >= 22 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -85,7 +86,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build second barracks
-		if (barracks == 1 && Broodwar->self()->supplyUsed() >= 26 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
+		if (barracks == 1 && Broodwar->self()->supplyUsed() >= 26 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -117,7 +118,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build second depot
-		if (depot == 1 && Broodwar->self()->supplyUsed() >= 28 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
+		if (depot == 1 && Broodwar->self()->supplyUsed() >= 28 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -149,7 +150,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build refinery **NEEDS TO BE IMPROVED FROM CLOSEST**
-		if (refinery == 0 && Broodwar->self()->supplyUsed() >= 30 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
+		if (refinery == 0 && Broodwar->self()->supplyUsed() >= 30 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -182,7 +183,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build academy
-		if (academy == 0 && Broodwar->self()->supplyUsed() >= 36 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Academy.mineralPrice())
+		if (academy == 0 && Broodwar->self()->supplyUsed() >= 36 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Academy.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -222,7 +223,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 	else if (Broodwar->enemy()->getRace() == Races::Protoss)
 	{
 		// Build depot
-		if (depot == 0 && Broodwar->self()->supplyUsed() >= 18 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
+		if (depot == 0 && Broodwar->self()->supplyUsed() >= 18 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -253,7 +254,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build barracks
-		if (barracks == 0 && Broodwar->self()->supplyUsed() >= 22 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
+		if (barracks == 0 && Broodwar->self()->supplyUsed() >= 22 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -284,7 +285,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build refinery **NEEDS TO BE IMPROVED FROM CLOSEST**
-		if (refinery == 0 && Broodwar->self()->supplyUsed() >= 26 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
+		if (refinery == 0 && Broodwar->self()->supplyUsed() >= 26 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -316,7 +317,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build second depot
-		if (depot == 1 && Broodwar->self()->supplyUsed() >= 34 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
+		if (depot == 1 && Broodwar->self()->supplyUsed() >= 34 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -347,7 +348,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build factory
-		if (factory == 0 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() == 200 && Broodwar->self()->gas() == 100)
+		if (factory == 0 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() == 200 && Broodwar->self()->gas() == 100)
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -378,7 +379,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build second factory
-		if (factory == 1 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() == 200)
+		if (factory == 1 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() == 200)
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -417,7 +418,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 	else
 	{
 		// Build depot
-		if (depot == 0 && Broodwar->self()->supplyUsed() >= 18 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
+		if (depot == 0 && Broodwar->self()->supplyUsed() >= 18 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -448,7 +449,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build barracks
-		if (barracks == 0 && Broodwar->self()->supplyUsed() >= 22 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
+		if (barracks == 0 && Broodwar->self()->supplyUsed() >= 22 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -479,7 +480,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build refinery **NEEDS TO BE IMPROVED FROM CLOSEST**
-		if (refinery == 0 && Broodwar->self()->supplyUsed() >= 22 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
+		if (refinery == 0 && Broodwar->self()->supplyUsed() >= 22 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -511,7 +512,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build second depot
-		if (depot == 1 && Broodwar->self()->supplyUsed() >= 30 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
+		if (depot == 1 && Broodwar->self()->supplyUsed() >= 30 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -542,7 +543,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build factory
-		if (factory == 0 && Broodwar->self()->supplyUsed() >= 32 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Factory.mineralPrice())
+		if (factory == 0 && Broodwar->self()->supplyUsed() >= 32 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Factory.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -573,7 +574,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build second factory
-		if (factory == 1 && Broodwar->self()->supplyUsed() >= 36 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Factory.mineralPrice())
+		if (factory == 1 && Broodwar->self()->supplyUsed() >= 36 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Factory.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -604,7 +605,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build third depot
-		if (depot == 2 && Broodwar->self()->supplyUsed() >= 46 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
+		if (depot == 2 && Broodwar->self()->supplyUsed() >= 46 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -635,7 +636,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 
 		// Build fourth depot
-		if (depot == 3 && Broodwar->self()->supplyUsed() >= 56 && lastChecked + 300 < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
+		if (depot == 3 && Broodwar->self()->supplyUsed() >= 56 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 		{
 			lastChecked = Broodwar->getFrameCount();
 
