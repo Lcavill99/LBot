@@ -10,6 +10,7 @@ Unitset mineralWorkers;
 Unitset gasWorkers;
 Unitset army1;
 Unitset army2;
+Unit scout;
 
 void LBot::onStart()
 {
@@ -102,6 +103,8 @@ void LBot::onFrame()
 		{
 			// Add worker to worker unitset
 			workers.insert(u);
+
+			
 			
 			// If worker is idle
 			if (u->isIdle())
@@ -113,6 +116,11 @@ void LBot::onFrame()
 				}
 				else if (!u->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
 				{
+					if (!scout)
+					{
+						scout = u;
+					}
+
 					// if we have a refinery and gasworkers unitset contains less that 3 units *WORKS TEMP*
 					if (Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) >= 1 && gasWorkers.size() < 3 || gasWorkers.contains(u))
 					{
@@ -215,6 +223,22 @@ void LBot::onFrame()
 					nullptr,    // condition
 					Broodwar->getLatencyFrames());  // frames to run
 			}
+		}		
+
+		auto& startLocations = Broodwar->getStartLocations();
+
+		for (TilePosition baseLocation : startLocations)
+		{
+			if (Broodwar->isExplored(baseLocation))
+			{
+				continue;
+			}
+
+			Position pos(baseLocation);
+			Broodwar->drawCircleMap(pos, 32, Colors::Red, true);
+
+			scout->move(pos);
+			break;
 		}
 
 		buildOrder->buildOrder(workers);
