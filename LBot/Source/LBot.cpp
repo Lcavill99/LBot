@@ -114,7 +114,7 @@ void LBot::onFrame()
 				else if (!u->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
 				{
 					// if we have a refinery and gasworkers unitset contains less that 3 units *WORKS TEMP*
-					if (Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) >= 1 && gasWorkers.size() < 3)
+					if (Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) >= 1 && gasWorkers.size() < 3 || gasWorkers.contains(u))
 					{
 						// gather from nearest refinery
 						if (!u->gather(u->getClosestUnit(IsRefinery)))
@@ -122,8 +122,12 @@ void LBot::onFrame()
 							// If the call fails, then print the last error message
 							Broodwar << Broodwar->getLastError() << std::endl;
 						}
-						// add to gasWorkers unitset
-						gasWorkers.insert(u);
+
+						if (!gasWorkers.contains(u)) 
+						{
+							// add to gasWorkers unitset
+							gasWorkers.insert(u);
+						}						
 					}
 					// Harvest from the nearest mineral patch 
 					else if (!u->gather(u->getClosestUnit(IsMineralField)))
