@@ -102,9 +102,7 @@ void LBot::onFrame()
 		if (u->getType().isWorker())
 		{
 			// Add worker to worker unitset
-			workers.insert(u);
-
-			
+			workers.insert(u);		
 			
 			// If worker is idle
 			if (u->isIdle())
@@ -223,16 +221,40 @@ void LBot::onFrame()
 					nullptr,    // condition
 					Broodwar->getLatencyFrames());  // frames to run
 			}
-		}		
+		}
+		//** ACADEMY **//
+		else if (u->getType() == UnitTypes::Terran_Academy)
+		{
+			if (!u->isResearching())
+			{
+				if ((!Broodwar->self()->hasResearched(TechTypes::Stim_Packs)) && u->canResearch(TechTypes::Stim_Packs) && Broodwar->self()->minerals() >= TechTypes::Stim_Packs.mineralPrice() && Broodwar->self()->gas() >= TechTypes::Stim_Packs.gasPrice())
+				{
+					u->research(TechTypes::Stim_Packs);
+				}
+				if ((!Broodwar->self()->hasResearched(TechTypes::Restoration)) && u->canResearch(TechTypes::Restoration) && Broodwar->self()->minerals() >= TechTypes::Restoration.mineralPrice() && Broodwar->self()->gas() >= TechTypes::Restoration.gasPrice())
+				{
+					u->research(TechTypes::Restoration);
+				}
+				if ((!Broodwar->self()->hasResearched(TechTypes::Optical_Flare)) && u->canResearch(TechTypes::Optical_Flare) && Broodwar->self()->minerals() >= TechTypes::Optical_Flare.mineralPrice() && Broodwar->self()->gas() >= TechTypes::Optical_Flare.gasPrice())
+				{
+					u->research(TechTypes::Optical_Flare);
+				}
+			}			
+		}
 
+		//** SCOUTING **//		
 		auto& startLocations = Broodwar->getStartLocations();
 
 		for (TilePosition baseLocation : startLocations)
 		{
+			// if the location is already explored, move on
 			if (Broodwar->isExplored(baseLocation))
 			{
 				continue;
 			}
+
+			// if scout is under attack, run away until enemies have stopped attacking
+			// if scout has found enemy base, return to base
 
 			Position pos(baseLocation);
 			Broodwar->drawCircleMap(pos, 32, Colors::Red, true);
@@ -242,6 +264,7 @@ void LBot::onFrame()
 		}
 
 		buildOrder->buildOrder(workers);
+		
 	} // closure: unit iterator	
 }
 
