@@ -8,8 +8,8 @@ class BuildOrder
 	int refinery;
 	int academy;
 	int factory;
+	bool scoutTime;
 
-public:
-	// Virtual functions for callbacks, leave these as they are.
+public:	
 	void buildOrder(BWAPI::Unitset workers);
 };

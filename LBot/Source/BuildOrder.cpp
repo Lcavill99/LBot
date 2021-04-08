@@ -11,6 +11,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 	refinery = Broodwar->self()->allUnitCount(UnitTypes::Terran_Refinery);
 	academy = Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy);
 	factory = Broodwar->self()->allUnitCount(UnitTypes::Terran_Factory);
+	scoutTime = false;
 	static int lastChecked = 0;
 	static int movetime = 100;
 
@@ -212,6 +213,10 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 						UnitTypes::Terran_Academy.buildTime() + 100);  // frames to run
 				}
 			}
+		}
+		if (academy == 1)
+		{
+			scoutTime = true;
 		}
 	}
 
