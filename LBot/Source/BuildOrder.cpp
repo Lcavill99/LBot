@@ -13,7 +13,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 	factory = Broodwar->self()->allUnitCount(UnitTypes::Terran_Factory);
 	scoutTime = false;
 	static int lastChecked = 0;
-	static int movetime = 100;
+	static int movetime = 150;
 
 	/*
 	*
