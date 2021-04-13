@@ -206,8 +206,26 @@ void LBot::onFrame()
 		//** BARRACKS **//
 		else if (u->getType() == UnitTypes::Terran_Barracks)
 		{
+			if (Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy) == 1 && (Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) == 9 && Broodwar->self()->allUnitCount(UnitTypes::Terran_Medic) != 3 || Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) == 18 && Broodwar->self()->allUnitCount(UnitTypes::Terran_Medic) != 6))
+			{
+				if (u->isIdle() && !u->train(UnitTypes::Terran_Medic))
+				{
+					// If that fails, draw the error at the location so that you can visibly see what went wrong!
+					// However, drawing the error once will only appear for a single frame
+					// so create an event that keeps it on the screen for some frames
+					Position pos = u->getPosition();
+					Error lastErr = Broodwar->getLastError();
+					Broodwar->registerEvent([pos, lastErr](Game*)
+					{
+						Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
+					},   // action
+						nullptr,    // condition
+						Broodwar->getLatencyFrames());  // frames to run
+				}
+			}
+
 			// Train marines if idle
-			if (u->isIdle() && !u->train(UnitTypes::Terran_Marine))
+			else if (u->isIdle() && Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) != 18 && !u->train(UnitTypes::Terran_Marine))
 			{
 				// If that fails, draw the error at the location so that you can visibly see what went wrong!
 				// However, drawing the error once will only appear for a single frame
@@ -255,11 +273,25 @@ void LBot::onFrame()
 		else if (u->getType() == UnitTypes::Terran_Marine)
 		{
 			// insert unit into army
-			if (army1.count < 30)
+			if (army1.size() < 30)
 			{
 				army1.insert(u);
 			}
-			else if (army1.count = 30 && army2.count < 30)
+			else if (army1.size() == 30 && army2.size() < 30)
+			{
+				army2.insert(u);
+			}
+		}
+
+		//** MEDICS **//
+		else if (u->getType() == UnitTypes::Terran_Medic)
+		{
+			// insert unit into army
+			if (army1.size() < 30)
+			{
+				army1.insert(u);
+			}
+			else if (army1.size() == 30 && army2.size() < 30)
 			{
 				army2.insert(u);
 			}
