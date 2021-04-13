@@ -222,10 +222,11 @@ void LBot::onFrame()
 					Broodwar->getLatencyFrames());  // frames to run
 			}
 		}
+
 		//** ACADEMY **//
 		else if (u->getType() == UnitTypes::Terran_Academy)
 		{
-			if (!u->isResearching())
+			if (!u->isResearching() && !u->isUpgrading())
 			{
 				if ((!Broodwar->self()->hasResearched(TechTypes::Stim_Packs)) && u->canResearch(TechTypes::Stim_Packs) && Broodwar->self()->minerals() >= TechTypes::Stim_Packs.mineralPrice() && Broodwar->self()->gas() >= TechTypes::Stim_Packs.gasPrice())
 				{
@@ -239,31 +240,54 @@ void LBot::onFrame()
 				{
 					u->research(TechTypes::Optical_Flare);
 				}
+				if (u->canUpgrade(UpgradeTypes::U_238_Shells) && Broodwar->self()->minerals() >= UpgradeTypes::U_238_Shells.mineralPrice() && Broodwar->self()->gas() >= UpgradeTypes::U_238_Shells.gasPrice())
+				{
+					u->upgrade(UpgradeTypes::U_238_Shells);
+				}
+				if (u->canUpgrade(UpgradeTypes::Caduceus_Reactor) && Broodwar->self()->minerals() >= UpgradeTypes::Caduceus_Reactor.mineralPrice() && Broodwar->self()->gas() >= UpgradeTypes::Caduceus_Reactor.gasPrice())
+				{
+					u->upgrade(UpgradeTypes::Caduceus_Reactor);
+				}
 			}			
 		}
 
 		//** SCOUTING **//		
 		auto& startLocations = Broodwar->getStartLocations();
 
-		for (TilePosition baseLocation : startLocations)
+		if (Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy) == 1)
 		{
-			// if the location is already explored, move on
-			if (Broodwar->isExplored(baseLocation))
+			for (TilePosition baseLocation : startLocations)
 			{
-				continue;
+				// if the location is already explored, move on
+				if (Broodwar->isExplored(baseLocation))
+				{
+					continue;
+				}
+
+				// if scout is under attack, run away until enemies have stopped attacking
+				// if scout has found enemy base, return to base
+
+				Position pos(baseLocation);
+				Broodwar->drawCircleMap(pos, 32, Colors::Red, true);
+
+				scout->move(pos);
+				break;
 			}
-
-			// if scout is under attack, run away until enemies have stopped attacking
-			// if scout has found enemy base, return to base
-
-			Position pos(baseLocation);
-			Broodwar->drawCircleMap(pos, 32, Colors::Red, true);
-
-			scout->move(pos);
-			break;
-		}
+		}	
 
 		buildOrder->buildOrder(workers);
+
+		//1 medic for every 10 marines
+
+		//add marines to unitset
+		//add medics to unitset
+		//once at 30 units in unitset stop
+
+		//repeat unitset adding
+		//move second unitset to expansion
+
+		//attacking army 
+		//TEMP* attack enemy base (attackmove)
 		
 	} // closure: unit iterator	
 }
