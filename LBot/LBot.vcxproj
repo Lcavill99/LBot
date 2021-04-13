@@ -93,11 +93,13 @@
     <ClCompile Include="Source\BuildOrder.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\LBot.cpp" />
+    <ClCompile Include="Source\Research.cpp" />
     <ClCompile Include="Source\Scouting.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BuildOrder.h" />
     <ClInclude Include="Source\LBot.h" />
+    <ClInclude Include="Source\Research.h" />
     <ClInclude Include="Source\Scouting.h" />
   </ItemGroup>
   <ItemGroup>
