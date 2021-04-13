@@ -228,15 +228,15 @@ void LBot::onFrame()
 		{
 			if (!u->isResearching() && !u->isUpgrading())
 			{
-				if ((!Broodwar->self()->hasResearched(TechTypes::Stim_Packs)) && u->canResearch(TechTypes::Stim_Packs) && Broodwar->self()->minerals() >= TechTypes::Stim_Packs.mineralPrice() && Broodwar->self()->gas() >= TechTypes::Stim_Packs.gasPrice())
+				if (u->canResearch(TechTypes::Stim_Packs) && Broodwar->self()->minerals() >= TechTypes::Stim_Packs.mineralPrice() && Broodwar->self()->gas() >= TechTypes::Stim_Packs.gasPrice())
 				{
 					u->research(TechTypes::Stim_Packs);
 				}
-				if ((!Broodwar->self()->hasResearched(TechTypes::Restoration)) && u->canResearch(TechTypes::Restoration) && Broodwar->self()->minerals() >= TechTypes::Restoration.mineralPrice() && Broodwar->self()->gas() >= TechTypes::Restoration.gasPrice())
+				if (u->canResearch(TechTypes::Restoration) && Broodwar->self()->minerals() >= TechTypes::Restoration.mineralPrice() && Broodwar->self()->gas() >= TechTypes::Restoration.gasPrice())
 				{
 					u->research(TechTypes::Restoration);
 				}
-				if ((!Broodwar->self()->hasResearched(TechTypes::Optical_Flare)) && u->canResearch(TechTypes::Optical_Flare) && Broodwar->self()->minerals() >= TechTypes::Optical_Flare.mineralPrice() && Broodwar->self()->gas() >= TechTypes::Optical_Flare.gasPrice())
+				if (u->canResearch(TechTypes::Optical_Flare) && Broodwar->self()->minerals() >= TechTypes::Optical_Flare.mineralPrice() && Broodwar->self()->gas() >= TechTypes::Optical_Flare.gasPrice())
 				{
 					u->research(TechTypes::Optical_Flare);
 				}
@@ -249,6 +249,20 @@ void LBot::onFrame()
 					u->upgrade(UpgradeTypes::Caduceus_Reactor);
 				}
 			}			
+		}
+		
+		//** MARINES **//
+		else if (u->getType() == UnitTypes::Terran_Marine)
+		{
+			// insert unit into army
+			if (army1.count < 30)
+			{
+				army1.insert(u);
+			}
+			else if (army1.count = 30 && army2.count < 30)
+			{
+				army2.insert(u);
+			}
 		}
 
 		//** SCOUTING **//		
@@ -274,6 +288,7 @@ void LBot::onFrame()
 				break;
 			}
 		}	
+		
 
 		buildOrder->buildOrder(workers);
 
