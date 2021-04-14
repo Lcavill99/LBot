@@ -66,16 +66,15 @@ void LBot::onEnd(bool isWinner)
 void LBot::onFrame()
 {
 	// Display the game frame rate as text in the upper left area of the screen
-	Broodwar->drawTextScreen(200, 0,  "FPS: %d", Broodwar->getFPS() );
-	Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS() );
+	Broodwar->drawTextScreen(200, 0,  "FPS: %d", Broodwar->getFPS());
 
 	// Return if the game is a replay or is paused
-	if ( Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self() )
+	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
 		return;
 
 	// Prevent spamming by only running our onFrame once every number of latency frames.
 	// Latency frames are the number of frames before commands are processed.
-	if ( Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0 )
+	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 		return;
 
 	// Iterate through all the units that we own
@@ -83,19 +82,19 @@ void LBot::onFrame()
 	{
 		// Ignore the unit if it no longer exists
 		// Make sure to include this block when handling any Unit pointer!
-		if ( !u->exists() )
+		if (!u->exists())
 			continue;
 
 		// Ignore the unit if it has one of the following status ailments
-		if ( u->isLockedDown() || u->isMaelstrommed() || u->isStasised() )
+		if (u->isLockedDown() || u->isMaelstrommed() || u->isStasised())
 			continue;
 
 		// Ignore the unit if it is in one of the following states
-		if ( u->isLoaded() || !u->isPowered() || u->isStuck() )
+		if (u->isLoaded() || !u->isPowered() || u->isStuck())
 			continue;
 
 		// Ignore the unit if it is incomplete or busy constructing
-		if ( !u->isCompleted() || u->isConstructing() )
+		if (!u->isCompleted() || u->isConstructing())
 			continue;
 		
 		//** WORKERS **//
@@ -120,7 +119,7 @@ void LBot::onFrame()
 					}
 
 					// if we have a refinery and gasworkers unitset contains less that 3 units *WORKS TEMP*
-					if (Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) >= 1 && gasWorkers.size() < 3 || gasWorkers.contains(u))
+					if ((Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) == 1 && gasWorkers.size() != 3) || gasWorkers.contains(u))
 					{
 						// gather from nearest refinery
 						if (!u->gather(u->getClosestUnit(IsRefinery)))
@@ -145,10 +144,10 @@ void LBot::onFrame()
 			} // closure: if idle
 		}
 		//** COMMAND CENTER **//
-		else if ( u->getType().isResourceDepot() ) // A resource depot is a Command Center, Nexus, or Hatchery
+		else if (u->getType().isResourceDepot()) // A resource depot is a Command Center, Nexus, or Hatchery
 		{
 			// Order the depot to construct more workers! But only when it is idle.
-			if ( u->isIdle() && !u->train(u->getType().getRace().getWorker()) )
+			if (u->isIdle() && !u->train(u->getType().getRace().getWorker()))
 			{
 				// If that fails, draw the error at the location so that you can visibly see what went wrong!
 				// However, drawing the error once will only appear for a single frame
@@ -167,37 +166,37 @@ void LBot::onFrame()
 				static int lastChecked = 0;
 
 				// If we are supply blocked and haven't tried constructing more recently
-				if (  lastErr == Errors::Insufficient_Supply && lastChecked + 400 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(supplyProviderType) == 0 )
+				if ( lastErr == Errors::Insufficient_Supply && lastChecked + 400 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(supplyProviderType) == 0)
 				{
 					lastChecked = Broodwar->getFrameCount();
 
 					// Retrieve a unit that is capable of constructing the supply needed
-					Unit supplyBuilder = u->getClosestUnit(  GetType == supplyProviderType.whatBuilds().first && (IsIdle || IsGatheringMinerals) && IsOwned);
+					Unit supplyBuilder = u->getClosestUnit(GetType == supplyProviderType.whatBuilds().first && (IsIdle || IsGatheringMinerals) && IsOwned);
 					
 					// If a unit was found
-					if ( supplyBuilder )
+					if (supplyBuilder)
 					{
-						if ( supplyProviderType.isBuilding() )
+						if (supplyProviderType.isBuilding())
 						{
 							TilePosition targetBuildLocation = Broodwar->getBuildLocation(supplyProviderType, supplyBuilder->getTilePosition());
-							if ( targetBuildLocation )
+							if (targetBuildLocation)
 							{
 								// Register an event that draws the target build location
 								Broodwar->registerEvent([targetBuildLocation,supplyProviderType](Game*)
 								{
-									Broodwar->drawBoxMap( Position(targetBuildLocation), Position(targetBuildLocation + supplyProviderType.tileSize()), Colors::Blue);
+									Broodwar->drawBoxMap(Position(targetBuildLocation), Position(targetBuildLocation + supplyProviderType.tileSize()), Colors::Blue);
 								},
 									nullptr,  // condition
-									supplyProviderType.buildTime() + 100 );  // frames to run
+									supplyProviderType.buildTime() + 100);  // frames to run
 
 								// Order the builder to construct the supply structure
-								supplyBuilder->build( supplyProviderType, targetBuildLocation );
+								supplyBuilder->build(supplyProviderType, targetBuildLocation);
 							}
 						}
 						else
 						{
 							// Train the supply provider (Overlord) if the provider is not a structure
-							supplyBuilder->train( supplyProviderType );
+							supplyBuilder->train(supplyProviderType);
 						}
 					} // closure: supplyBuilder is valid
 				} // closure: insufficient supply
@@ -273,11 +272,11 @@ void LBot::onFrame()
 		else if (u->getType() == UnitTypes::Terran_Marine)
 		{
 			// insert unit into army
-			if (army1.size() < 30)
+			if (army1.size() < 12)
 			{
 				army1.insert(u);
 			}
-			else if (army1.size() == 30 && army2.size() < 30)
+			else if (army1.size() == 12 && army2.size() < 12)
 			{
 				army2.insert(u);
 			}
@@ -287,11 +286,11 @@ void LBot::onFrame()
 		else if (u->getType() == UnitTypes::Terran_Medic)
 		{
 			// insert unit into army
-			if (army1.size() < 30)
+			if (army1.size() < 12)
 			{
 				army1.insert(u);
 			}
-			else if (army1.size() == 30 && army2.size() < 30)
+			else if (army1.size() == 12 && army2.size() < 12)
 			{
 				army2.insert(u);
 			}
