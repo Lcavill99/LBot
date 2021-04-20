@@ -2,6 +2,7 @@
 #include <BWAPI.h>
 #include "BuildOrder.h"
 #include "Scouting.h"
+#include "Research.h"
 
 // Remember not to use "Broodwar" in any global class constructor!
 
@@ -13,6 +14,7 @@ class LBot : public BWAPI::AIModule
 	int academy;
 	int medics;
 	BuildOrder *buildOrder;
+	Research *research;
 	Scouting *scouting;
 
 public:
