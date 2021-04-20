@@ -1,9 +1,14 @@
 #include "LBot.h"
+#include "../BWEM/BWEM/include/bwem.h"
 #include "BuildOrder.h"
 #include <iostream>
 
 using namespace BWAPI;
 using namespace Filter;
+namespace 
+{ 
+	auto & theMap = BWEM::Map::Instance(); 
+}
 
 Unitset workers;
 Unitset mineralWorkers;
@@ -26,6 +31,18 @@ void LBot::onStart()
 
 	buildOrder = new BuildOrder;
 	research = new Research;
+
+	//BWEM Initalisation
+	Broodwar << "Map initialization..." << std::endl;
+
+	theMap.Initialize();
+	theMap.EnableAutomaticPathAnalysis();
+	bool startingLocationsOK = theMap.FindBasesForStartingLocations();
+	assert(startingLocationsOK);
+
+	BWEM::utils::MapPrinter::Initialize(&theMap);
+	BWEM::utils::printMap(theMap);      // will print the map into the file <StarCraftFolder>bwapi-data/map.bmp
+	BWEM::utils::pathExample(theMap);   // add to the printed map a path between two starting locations
 
 	// Check if this is a replay
 	if ( Broodwar->isReplay() )
