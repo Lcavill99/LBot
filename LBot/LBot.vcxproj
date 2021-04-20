@@ -90,6 +90,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\ArmyManager.cpp" />
     <ClCompile Include="Source\BuildOrder.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\LBot.cpp" />
@@ -97,6 +98,7 @@
     <ClCompile Include="Source\Scouting.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\ArmyManager.h" />
     <ClInclude Include="Source\BuildOrder.h" />
     <ClInclude Include="Source\LBot.h" />
     <ClInclude Include="Source\Research.h" />
