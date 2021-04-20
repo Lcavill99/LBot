@@ -11,5 +11,5 @@ class BuildOrder
 	bool scoutTime;
 
 public:	
-	void buildOrder(BWAPI::Unitset workers);
+	void buildOrder(BWAPI::Unitset workers);	
 };

@@ -14,7 +14,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 	scoutTime = false;
 	static int lastChecked = 0;
 	static int movetime = 150;
-
+		
 	/*
 	*
 	* ZERG build order
