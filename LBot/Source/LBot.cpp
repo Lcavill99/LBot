@@ -14,10 +14,6 @@ Unit scout;
 
 void LBot::onStart()
 {
-	// Print the map name.
-	// BWAPI returns std::string when retrieving a string, don't forget to add .c_str() when printing!
-	Broodwar << "The map is " << Broodwar->mapName() << "!" << std::endl;
-
 	// Enable the UserInput flag, which allows us to control the bot and type messages.
 	Broodwar->enableFlag(Flag::UserInput);
 
@@ -45,14 +41,7 @@ void LBot::onStart()
 		if ( !p->isObserver() )
 			Broodwar << p->getName() << ", playing as " << p->getRace() << std::endl;
 		}
-	}
-	else // if this is not a replay
-	{
-		// Retrieve you and your enemy's races. enemy() will just return the first enemy.
-		// If you wish to deal with multiple enemies then you must use enemies().
-		if ( Broodwar->enemy() ) // First make sure there is an enemy
-		Broodwar << "The matchup is " << Broodwar->self()->getRace() << " vs " << Broodwar->enemy()->getRace() << std::endl;
-	}	
+	}		
 }
 
 void LBot::onEnd(bool isWinner)
@@ -148,7 +137,7 @@ void LBot::onFrame()
 		else if (u->getType().isResourceDepot()) // A resource depot is a Command Center, Nexus, or Hatchery
 		{
 			// Order the depot to construct more workers! But only when it is idle.
-			if (u->isIdle() && !u->train(u->getType().getRace().getWorker()))
+			if (u->isIdle() && !u->train(UnitTypes::Terran_SCV))
 			{
 				// If that fails, draw the error at the location so that you can visibly see what went wrong!
 				// However, drawing the error once will only appear for a single frame
@@ -167,7 +156,7 @@ void LBot::onFrame()
 				static int lastChecked = 0;
 
 				// If we are supply blocked and haven't tried constructing more recently
-				if ( lastErr == Errors::Insufficient_Supply && lastChecked + 400 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(supplyProviderType) == 0)
+				if (lastErr == Errors::Insufficient_Supply && lastChecked + 400 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(supplyProviderType) == 0)
 				{
 					lastChecked = Broodwar->getFrameCount();
 
