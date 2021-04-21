@@ -27,7 +27,7 @@ void LBot::onStart()
 	armyManager = new ArmyManager;
 
 	// Check if this is a replay
-	if ( Broodwar->isReplay() )
+	if (Broodwar->isReplay())
 	{
 		// Announce the players in the replay
 		Broodwar << "The following players are in this replay:" << std::endl;
@@ -97,10 +97,7 @@ void LBot::onFrame()
 		
 		//** WORKERS **//
 		if (u->getType().isWorker())
-		{
-			// Add worker to worker unitset
-			workers.insert(u);		
-			
+		{	
 			// If worker is idle
 			if (u->isIdle())
 			{
@@ -262,35 +259,8 @@ void LBot::onFrame()
 			}
 		}
 		
-		////** SCOUTING **//		
-		//auto& startLocations = Broodwar->getStartLocations();
-
-		//if (Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy) == 1)
-		//{
-		//	for (TilePosition baseLocation : startLocations)
-		//	{
-		//		// if the location is already explored, move on
-		//		if (Broodwar->isExplored(baseLocation))
-		//		{
-		//			continue;
-		//		}
-
-		//		// if scout is under attack, run away until enemies have stopped attacking
-		//		// if scout has found enemy base, return to base
-
-		//		Position pos(baseLocation);
-		//		Broodwar->drawCircleMap(pos, 32, Colors::Red, true);
-
-		//		scout->move(pos);
-		//		break;
-		//	}
-		//}	
-		
 		buildOrder->buildOrder(workers);
 		research->research(u);
-
-		
-		
 
 		//1 medic for every 10 marines
 
@@ -363,10 +333,16 @@ void LBot::onUnitHide(BWAPI::Unit unit)
 
 void LBot::onUnitCreate(BWAPI::Unit unit)
 {
-	if ( Broodwar->isReplay() )
+	if (unit->getType().isWorker())
+	{
+		// Add worker to worker unitset
+		workers.insert(unit);
+	}
+
+	if (Broodwar->isReplay())
 	{
 		// if we are in a replay, then we will print out the build order of the structures
-		if ( unit->getType().isBuilding() && !unit->getPlayer()->isNeutral() )
+		if (unit->getType().isBuilding() && !unit->getPlayer()->isNeutral())
 		{
 			int seconds = Broodwar->getFrameCount()/24;
 			int minutes = seconds/60;

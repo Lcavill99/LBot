@@ -91,6 +91,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\ArmyManager.cpp" />
+    <ClCompile Include="Source\BuildingManager.cpp" />
     <ClCompile Include="Source\BuildOrder.cpp" />
     <ClCompile Include="Source\BWEM\area.cpp" />
     <ClCompile Include="Source\BWEM\base.cpp" />
@@ -110,9 +111,11 @@
     <ClCompile Include="Source\LBot.cpp" />
     <ClCompile Include="Source\Research.cpp" />
     <ClCompile Include="Source\ScoutManager.cpp" />
+    <ClCompile Include="Source\WorkerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ArmyManager.h" />
+    <ClInclude Include="Source\BuildingManager.h" />
     <ClInclude Include="Source\BuildOrder.h" />
     <ClInclude Include="Source\BWEM\area.h" />
     <ClInclude Include="Source\BWEM\base.h" />
@@ -132,6 +135,7 @@
     <ClInclude Include="Source\LBot.h" />
     <ClInclude Include="Source\Research.h" />
     <ClInclude Include="Source\ScoutManager.h" />
+    <ClInclude Include="Source\WorkerManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BWAPILIB\BWAPILIB.vcxproj">

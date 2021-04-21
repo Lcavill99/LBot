@@ -49,6 +49,8 @@
       <Filter>BWEM</Filter>
     </ClCompile>
     <ClCompile Include="Source\ScoutManager.cpp" />
+    <ClCompile Include="Source\WorkerManager.cpp" />
+    <ClCompile Include="Source\BuildingManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BuildOrder.h" />
@@ -101,6 +103,8 @@
       <Filter>BWEM</Filter>
     </ClInclude>
     <ClInclude Include="Source\ScoutManager.h" />
+    <ClInclude Include="Source\WorkerManager.h" />
+    <ClInclude Include="Source\BuildingManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="BWEM">
