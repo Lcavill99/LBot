@@ -5,5 +5,5 @@ class ArmyManager
 {
 
 public:
-	void armyManager(BWAPI::Unit u);
+	void ArmyManager::removeUnit(BWAPI::Unit u);
 };
