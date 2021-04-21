@@ -8,7 +8,7 @@
 using namespace BWAPI;
 
 /*
- * Assign a scout **CAN MOVE THIS TO A UNIT MANAGER FILE**
+ * Assign a worker to be the scout **CAN MOVE THIS TO A UNIT MANAGER FILE**
  */
 void ScoutManager::setScout()
 {
@@ -52,6 +52,9 @@ void ScoutManager::goScout()
 	}
 }
 
+/*
+ * Send scout back to command center
+ */
 void ScoutManager::sendHome()
 {
 
