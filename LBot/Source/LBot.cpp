@@ -1,21 +1,16 @@
 #include "LBot.h"
-#include "../BWEM/BWEM/include/bwem.h"
 #include "BuildOrder.h"
 #include <iostream>
 
 using namespace BWAPI;
 using namespace Filter;
-namespace 
-{ 
-	auto & theMap = BWEM::Map::Instance(); 
-}
 
 Unitset workers;
 Unitset mineralWorkers;
 Unitset gasWorkers;
 Unitset army1;
 Unitset army2;
-Unit scout;
+int scouts = 0;
 
 void LBot::onStart()
 {
@@ -31,18 +26,7 @@ void LBot::onStart()
 
 	buildOrder = new BuildOrder;
 	research = new Research;
-
-	//BWEM Initalisation
-	Broodwar << "Map initialization..." << std::endl;
-
-	theMap.Initialize();
-	theMap.EnableAutomaticPathAnalysis();
-	bool startingLocationsOK = theMap.FindBasesForStartingLocations();
-	assert(startingLocationsOK);
-
-	BWEM::utils::MapPrinter::Initialize(&theMap);
-	BWEM::utils::printMap(theMap);      // will print the map into the file <StarCraftFolder>bwapi-data/map.bmp
-	BWEM::utils::pathExample(theMap);   // add to the printed map a path between two starting locations
+	scoutManager = new ScoutManager;
 
 	// Check if this is a replay
 	if ( Broodwar->isReplay() )
@@ -72,6 +56,12 @@ void LBot::onEnd(bool isWinner)
 
 void LBot::onFrame()
 {
+	if (scouts == 0)
+	{
+		scoutManager->setScout();
+		scoutManager->goScout();
+		scouts = 1;
+	}
 	// Display the game frame rate as text in the upper left area of the screen
 	Broodwar->drawTextScreen(200, 0,  "FPS: %d", Broodwar->getFPS());
 
@@ -119,12 +109,8 @@ void LBot::onFrame()
 					u->returnCargo();
 				}
 				else if (!u->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
-				{
-					if (!scout)
-					{
-						scout = u;
-					}
-
+				{	
+					
 					// if we have a refinery and gasworkers unitset contains less that 3 units *WORKS TEMP*
 					if ((Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) == 1 && gasWorkers.size() != 3) || gasWorkers.contains(u))
 					{
@@ -274,33 +260,36 @@ void LBot::onFrame()
 				army2.insert(u);
 			}
 		}
+		
+		////** SCOUTING **//		
+		//auto& startLocations = Broodwar->getStartLocations();
 
-		//** SCOUTING **//		
-		auto& startLocations = Broodwar->getStartLocations();
+		//if (Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy) == 1)
+		//{
+		//	for (TilePosition baseLocation : startLocations)
+		//	{
+		//		// if the location is already explored, move on
+		//		if (Broodwar->isExplored(baseLocation))
+		//		{
+		//			continue;
+		//		}
 
-		if (Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy) == 1)
-		{
-			for (TilePosition baseLocation : startLocations)
-			{
-				// if the location is already explored, move on
-				if (Broodwar->isExplored(baseLocation))
-				{
-					continue;
-				}
+		//		// if scout is under attack, run away until enemies have stopped attacking
+		//		// if scout has found enemy base, return to base
 
-				// if scout is under attack, run away until enemies have stopped attacking
-				// if scout has found enemy base, return to base
+		//		Position pos(baseLocation);
+		//		Broodwar->drawCircleMap(pos, 32, Colors::Red, true);
 
-				Position pos(baseLocation);
-				Broodwar->drawCircleMap(pos, 32, Colors::Red, true);
-
-				scout->move(pos);
-				break;
-			}
-		}	
+		//		scout->move(pos);
+		//		break;
+		//	}
+		//}	
 		
 		buildOrder->buildOrder(workers);
 		research->research(u);
+
+		
+		
 
 		//1 medic for every 10 marines
 
@@ -315,6 +304,9 @@ void LBot::onFrame()
 		//TEMP* attack enemy base (attackmove)
 		
 	} // closure: unit iterator	
+	
+	
+	
 }
 
 void LBot::onSendText(std::string text)

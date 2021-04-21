@@ -1,7 +1,7 @@
 #pragma once
 #include <BWAPI.h>
 #include "BuildOrder.h"
-#include "Scouting.h"
+#include "ScoutManager.h"
 #include "Research.h"
 
 // Remember not to use "Broodwar" in any global class constructor!
@@ -15,7 +15,7 @@ class LBot : public BWAPI::AIModule
 	int medics;
 	BuildOrder *buildOrder;
 	Research *research;
-	Scouting *scouting;
+	ScoutManager *scoutManager;
 
 public:
   // Virtual functions for callbacks, leave these as they are.

@@ -92,17 +92,46 @@
   <ItemGroup>
     <ClCompile Include="Source\ArmyManager.cpp" />
     <ClCompile Include="Source\BuildOrder.cpp" />
+    <ClCompile Include="Source\BWEM\area.cpp" />
+    <ClCompile Include="Source\BWEM\base.cpp" />
+    <ClCompile Include="Source\BWEM\bwapiExt.cpp" />
+    <ClCompile Include="Source\BWEM\bwem.cpp" />
+    <ClCompile Include="Source\BWEM\cp.cpp" />
+    <ClCompile Include="Source\BWEM\graph.cpp" />
+    <ClCompile Include="Source\BWEM\gridMap.cpp" />
+    <ClCompile Include="Source\BWEM\map.cpp" />
+    <ClCompile Include="Source\BWEM\mapDrawer.cpp" />
+    <ClCompile Include="Source\BWEM\mapImpl.cpp" />
+    <ClCompile Include="Source\BWEM\mapPrinter.cpp" />
+    <ClCompile Include="Source\BWEM\neutral.cpp" />
+    <ClCompile Include="Source\BWEM\tiles.cpp" />
+    <ClCompile Include="Source\BWEM\utils.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\LBot.cpp" />
     <ClCompile Include="Source\Research.cpp" />
-    <ClCompile Include="Source\Scouting.cpp" />
+    <ClCompile Include="Source\ScoutManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ArmyManager.h" />
     <ClInclude Include="Source\BuildOrder.h" />
+    <ClInclude Include="Source\BWEM\area.h" />
+    <ClInclude Include="Source\BWEM\base.h" />
+    <ClInclude Include="Source\BWEM\bwapiExt.h" />
+    <ClInclude Include="Source\BWEM\bwem.h" />
+    <ClInclude Include="Source\BWEM\cp.h" />
+    <ClInclude Include="Source\BWEM\defs.h" />
+    <ClInclude Include="Source\BWEM\graph.h" />
+    <ClInclude Include="Source\BWEM\gridMap.h" />
+    <ClInclude Include="Source\BWEM\map.h" />
+    <ClInclude Include="Source\BWEM\mapDrawer.h" />
+    <ClInclude Include="Source\BWEM\mapImpl.h" />
+    <ClInclude Include="Source\BWEM\mapPrinter.h" />
+    <ClInclude Include="Source\BWEM\neutral.h" />
+    <ClInclude Include="Source\BWEM\tiles.h" />
+    <ClInclude Include="Source\BWEM\utils.h" />
     <ClInclude Include="Source\LBot.h" />
     <ClInclude Include="Source\Research.h" />
-    <ClInclude Include="Source\Scouting.h" />
+    <ClInclude Include="Source\ScoutManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BWAPILIB\BWAPILIB.vcxproj">

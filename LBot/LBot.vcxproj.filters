@@ -5,12 +5,106 @@
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\LBot.cpp" />
     <ClCompile Include="Source\Research.cpp" />
-    <ClCompile Include="Source\Scouting.cpp" />
+    <ClCompile Include="Source\ArmyManager.cpp" />
+    <ClCompile Include="Source\BWEM\area.cpp">
+      <Filter>BWEM</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEM\base.cpp">
+      <Filter>BWEM</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEM\bwapiExt.cpp">
+      <Filter>BWEM</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEM\bwem.cpp">
+      <Filter>BWEM</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEM\cp.cpp">
+      <Filter>BWEM</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEM\graph.cpp">
+      <Filter>BWEM</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEM\gridMap.cpp">
+      <Filter>BWEM</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEM\map.cpp">
+      <Filter>BWEM</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEM\mapDrawer.cpp">
+      <Filter>BWEM</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEM\mapImpl.cpp">
+      <Filter>BWEM</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEM\mapPrinter.cpp">
+      <Filter>BWEM</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEM\neutral.cpp">
+      <Filter>BWEM</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEM\tiles.cpp">
+      <Filter>BWEM</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEM\utils.cpp">
+      <Filter>BWEM</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ScoutManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BuildOrder.h" />
     <ClInclude Include="Source\LBot.h" />
     <ClInclude Include="Source\Research.h" />
-    <ClInclude Include="Source\Scouting.h" />
+    <ClInclude Include="Source\ArmyManager.h" />
+    <ClInclude Include="Source\BWEM\area.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEM\base.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEM\bwapiExt.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEM\bwem.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEM\cp.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEM\defs.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEM\graph.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEM\gridMap.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEM\map.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEM\mapDrawer.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEM\mapImpl.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEM\mapPrinter.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEM\neutral.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEM\tiles.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEM\utils.h">
+      <Filter>BWEM</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ScoutManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="BWEM">
+      <UniqueIdentifier>{2010bc00-2ad5-4e09-8c15-846fdde12505}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
