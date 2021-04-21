@@ -8,7 +8,7 @@
 using namespace BWAPI;
 
 /*
- * Assign a scout
+ * Assign a scout **CAN MOVE THIS TO A UNIT MANAGER FILE**
  */
 void ScoutManager::setScout()
 {
@@ -50,4 +50,9 @@ void ScoutManager::goScout()
 		scout->move(pos);
 		break;
 	}
+}
+
+void ScoutManager::sendHome()
+{
+
 }

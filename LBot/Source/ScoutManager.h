@@ -9,4 +9,5 @@ public:
 	void ScoutManager::setScout();
 	BWAPI::Unit ScoutManager::getScout();
 	void ScoutManager::goScout();
+	void ScoutManager::sendHome();
 };
