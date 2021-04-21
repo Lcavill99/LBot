@@ -1,5 +1,9 @@
+/*
+ *
+ * Handles all build order logic
+ *
+ */
 #include "BuildOrder.h"
-#include <iostream>
 
 using namespace BWAPI;
 using namespace Filter;
@@ -216,7 +220,6 @@ void BuildOrder::buildOrder(BWAPI::Unitset workers)
 		}
 		if (academy == 1)
 		{
-			scoutTime = true;
 		}
 	}
 

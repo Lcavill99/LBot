@@ -8,7 +8,6 @@ class BuildOrder
 	int refinery;
 	int academy;
 	int factory;
-	bool scoutTime;
 
 public:	
 	void BuildOrder::buildOrder(BWAPI::Unitset workers);	
