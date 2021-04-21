@@ -1,8 +1,11 @@
 #pragma once
 #include <BWAPI.h>
 #include "BuildOrder.h"
-#include "ScoutManager.h"
 #include "Research.h"
+#include "ScoutManager.h"
+#include "WorkerManager.h"
+#include "BuildingManager.h"
+#include "ArmyManager.h"
 
 // Remember not to use "Broodwar" in any global class constructor!
 
@@ -13,12 +16,22 @@ class LBot : public BWAPI::AIModule
 	int refinery;
 	int academy;
 	int medics;
+	bool haveScout;
+
+	Unitset workers;
+	Unitset mineralWorkers;
+	Unitset gasWorkers;
+	Unitset army1;
+	Unitset army2;
+
 	BuildOrder *buildOrder;
 	Research *research;
 	ScoutManager *scoutManager;
+	WorkerManager *workerManager;
+	BuildingManager *buildingManager;
+	ArmyManager *armyManager;
 
 public:
-  // Virtual functions for callbacks, leave these as they are.
   virtual void onStart();
   virtual void onEnd(bool isWinner);
   virtual void onFrame();
@@ -36,6 +49,4 @@ public:
   virtual void onUnitRenegade(BWAPI::Unit unit);
   virtual void onSaveGame(std::string gameName);
   virtual void onUnitComplete(BWAPI::Unit unit);
-  // Everything below this line is safe to modify.
-
 };

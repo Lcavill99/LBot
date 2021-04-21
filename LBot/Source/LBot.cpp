@@ -5,13 +5,6 @@
 using namespace BWAPI;
 using namespace Filter;
 
-Unitset workers;
-Unitset mineralWorkers;
-Unitset gasWorkers;
-Unitset army1;
-Unitset army2;
-int scouts = 0;
-
 void LBot::onStart()
 {
 	// Enable the UserInput flag, which allows us to control the bot and type messages.
@@ -24,9 +17,14 @@ void LBot::onStart()
 	// and reduce the bot's APM (Actions Per Minute).
 	Broodwar->setCommandOptimizationLevel(2);
 
+	haveScout = false;
+
 	buildOrder = new BuildOrder;
 	research = new Research;
 	scoutManager = new ScoutManager;
+	workerManager = new WorkerManager;
+	buildingManager = new BuildingManager;
+	armyManager = new ArmyManager;
 
 	// Check if this is a replay
 	if ( Broodwar->isReplay() )
@@ -55,13 +53,7 @@ void LBot::onEnd(bool isWinner)
 }
 
 void LBot::onFrame()
-{
-	if (scouts == 0)
-	{
-		scoutManager->setScout();
-		scoutManager->goScout();
-		scouts = 1;
-	}
+{	
 	// Display the game frame rate as text in the upper left area of the screen
 	Broodwar->drawTextScreen(200, 0,  "FPS: %d", Broodwar->getFPS());
 
@@ -73,6 +65,15 @@ void LBot::onFrame()
 	// Latency frames are the number of frames before commands are processed.
 	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 		return;
+
+
+	if (!haveScout)
+	{
+		scoutManager->setScout();
+		scoutManager->goScout();
+		haveScout = true;
+	}
+
 
 	// Iterate through all the units that we own
 	for (auto &u : Broodwar->self()->getUnits())
@@ -304,9 +305,6 @@ void LBot::onFrame()
 		//TEMP* attack enemy base (attackmove)
 		
 	} // closure: unit iterator	
-	
-	
-	
 }
 
 void LBot::onSendText(std::string text)
@@ -380,6 +378,21 @@ void LBot::onUnitCreate(BWAPI::Unit unit)
 
 void LBot::onUnitDestroy(BWAPI::Unit unit)
 {
+	if (unit->getPlayer() == Broodwar->self())
+	{
+		if (unit->getType().isWorker())
+		{
+			workerManager->removeUnit(unit);
+		}
+		if (unit->getType().isBuilding())
+		{
+			buildingManager->removeUnit(unit);
+		}
+		if (!unit->getType().isWorker() && !unit->getType().isBuilding())
+		{
+			armyManager->removeUnit(unit);
+		}
+	}
 }
 
 void LBot::onUnitMorph(BWAPI::Unit unit)
