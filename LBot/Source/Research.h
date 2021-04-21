@@ -5,5 +5,5 @@ class Research
 {
 
 public:
-	void research(BWAPI::Unit u);
+	void Research::research(BWAPI::Unit u);
 };

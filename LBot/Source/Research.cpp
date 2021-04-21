@@ -1,8 +1,11 @@
+/*
+ *
+ * Handles all research logic
+ *
+ */
 #include "Research.h"
-#include <iostream>
 
 using namespace BWAPI;
-using namespace Filter;
 
 void Research::research(BWAPI::Unit u)
 {
