@@ -1,5 +1,7 @@
 #pragma once
 #include <BWAPI.h>
+#include "WorkerManager.h"
+#include "ScoutManager.h"
 
 class BuildOrder
 {
@@ -9,6 +11,12 @@ class BuildOrder
 	int academy;
 	int factory;
 
-public:	
-	void BuildOrder::buildOrder(BWAPI::Unitset workers);	
+	WorkerManager *workerManager;
+	ScoutManager *scoutManager;
+
+public:
+	void BuildOrder::buildOrder(BWAPI::Unitset set);	
+	/*void BuildOrder::Zerg(BWAPI::Unitset set);
+	void BuildOrder::Protoss(BWAPI::Unitset set);
+	void BuildOrder::Terran(BWAPI::Unitset set);*/
 };
