@@ -8,17 +8,12 @@
 using namespace BWAPI;
 
 /*
- * Assign a worker to be the scout **CAN MOVE THIS TO A UNIT MANAGER FILE**
+ * Assign a worker to be the scout
  */
 void ScoutManager::setScout()
 {
-	for (auto &u : Broodwar->self()->getUnits())
-	{		
-		if (u->getType().isWorker() && !u->isConstructing())
-		{
-			scout = u;
-		}
-	}	
+	workerManager = new WorkerManager;
+	scout = workerManager->getWorker();
 }
 
 /*
