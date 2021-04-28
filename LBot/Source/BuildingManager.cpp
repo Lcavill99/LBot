@@ -8,9 +8,17 @@
 using namespace BWAPI;
 
 /*
- * Remove unit
+ * Add unit to Unitset
  */
-void BuildingManager::removeUnit(BWAPI::Unit u)
+void BuildingManager::addUnit(BWAPI::Unitset set, BWAPI::Unit u)
 {
+	set.insert(u);
+}
 
+/*
+ * Remove unit from unitset
+ */
+void BuildingManager::removeUnit(BWAPI::Unitset set, BWAPI::Unit u)
+{
+	set.erase(u);
 }

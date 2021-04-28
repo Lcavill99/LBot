@@ -5,5 +5,6 @@ class BuildingManager
 {
 
 public:
-	void BuildingManager::removeUnit(BWAPI::Unit u);
+	void BuildingManager::addUnit(BWAPI::Unitset set, BWAPI::Unit u);
+	void BuildingManager::removeUnit(BWAPI::Unitset set, BWAPI::Unit u);
 };
