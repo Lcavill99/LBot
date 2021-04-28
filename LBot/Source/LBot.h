@@ -7,8 +7,6 @@
 #include "BuildingManager.h"
 #include "ArmyManager.h"
 
-// Remember not to use "Broodwar" in any global class constructor!
-
 class LBot : public BWAPI::AIModule
 {
 	int barracks;
@@ -17,12 +15,6 @@ class LBot : public BWAPI::AIModule
 	int academy;
 	int medics;
 	bool haveScout;
-
-	Unitset workers;
-	Unitset mineralWorkers;
-	Unitset gasWorkers;
-	Unitset army1;
-	Unitset army2;
 
 	BuildOrder *buildOrder;
 	Research *research;

@@ -5,6 +5,13 @@
 using namespace BWAPI;
 using namespace Filter;
 
+Unitset allWorkers;
+Unitset minWorkers;
+Unitset gasWorkers;
+Unitset allBuildings;
+Unitset army1;
+Unitset army2;
+
 void LBot::onStart()
 {
 	// Enable the UserInput flag, which allows us to control the bot and type messages.
@@ -67,14 +74,6 @@ void LBot::onFrame()
 		return;
 
 
-	if (!haveScout)
-	{
-		scoutManager->setScout();
-		scoutManager->goScout();
-		haveScout = true;
-	}
-
-
 	// Iterate through all the units that we own
 	for (auto &u : Broodwar->self()->getUnits())
 	{
@@ -97,7 +96,23 @@ void LBot::onFrame()
 		
 		//** WORKERS **//
 		if (u->getType().isWorker())
-		{	
+		{				
+			if (!allWorkers.contains(u))
+			{
+				// add to gasWorkers unitset
+				allWorkers.insert(u);
+			}
+			if (u->isGatheringMinerals() && !minWorkers.contains(u))
+			{
+				// add to gasWorkers unitset
+				minWorkers.insert(u);
+			}
+			if (u->isGatheringGas() && !gasWorkers.contains(u))
+			{
+				// add to gasWorkers unitset
+				gasWorkers.insert(u);
+			}
+
 			// If worker is idle
 			if (u->isIdle())
 			{
@@ -107,8 +122,7 @@ void LBot::onFrame()
 					u->returnCargo();
 				}
 				else if (!u->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
-				{	
-					
+				{						
 					// if we have a refinery and gasworkers unitset contains less that 3 units *WORKS TEMP*
 					if ((Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) == 1 && gasWorkers.size() != 3) || gasWorkers.contains(u))
 					{
@@ -116,21 +130,16 @@ void LBot::onFrame()
 						if (!u->gather(u->getClosestUnit(IsRefinery)))
 						{
 							// If the call fails, then print the last error message
-							Broodwar << Broodwar->getLastError() << std::endl;
-						}
-
-						if (!gasWorkers.contains(u)) 
-						{
-							// add to gasWorkers unitset
-							gasWorkers.insert(u);
-						}						
+							Broodwar << Broodwar->getLastError() << std::endl;							
+						}							
 					}
 					// Harvest from the nearest mineral patch 
 					else if (!u->gather(u->getClosestUnit(IsMineralField)))
-					{
+					{						
 						// If the call fails, then print the last error message
-						Broodwar << Broodwar->getLastError() << std::endl;
+						Broodwar << Broodwar->getLastError() << std::endl;						
 					}
+					
 				} // closure: has no powerup
 			} // closure: if idle
 		}
@@ -231,50 +240,38 @@ void LBot::onFrame()
 			}
 		}		
 		
-		//** MARINES **//
-		else if (u->getType() == UnitTypes::Terran_Marine)
-		{
-			// insert unit into army
-			if (army1.size() < 12) // ALTER TO IF CONTAINS THE UNIT
-			{
-				army1.insert(u);
-			}
-			else if (army1.size() == 12 && army2.size() < 12)
-			{
-				army2.insert(u);
-			}
-		}
+		////** MARINES **//
+		//else if (u->getType() == UnitTypes::Terran_Marine)
+		//{
+		//	// insert unit into army
+		//	if (army1.size() < 12) // ALTER TO IF CONTAINS THE UNIT
+		//	{
+		//		army1.insert(u);
+		//	}
+		//	else if (army1.size() == 12 && army2.size() < 12)
+		//	{
+		//		army2.insert(u);
+		//	}
+		//}
 
-		//** MEDICS **//
-		else if (u->getType() == UnitTypes::Terran_Medic)
-		{
-			// insert unit into army
-			if (army1.size() < 12)
-			{
-				army1.insert(u);
-			}
-			else if (army1.size() == 12 && army2.size() < 12)
-			{
-				army2.insert(u);
-			}
-		}
+		////** MEDICS **//
+		//else if (u->getType() == UnitTypes::Terran_Medic)
+		//{
+		//	// insert unit into army
+		//	if (army1.size() < 12)
+		//	{
+		//		army1.insert(u);
+		//	}
+		//	else if (army1.size() == 12 && army2.size() < 12)
+		//	{
+		//		army2.insert(u);
+		//	}
+		//}
 		
-		buildOrder->buildOrder(workers);
+		buildOrder->buildOrder(minWorkers);
 		research->research(u);
-
-		//1 medic for every 10 marines
-
-		//add marines to unitset
-		//add medics to unitset
-		//once at 30 units in unitset stop
-
-		//repeat unitset adding
-		//move second unitset to expansion
-
-		//attacking army 
-		//TEMP* attack enemy base (attackmove)
 		
-	} // closure: unit iterator	
+	} // closure: unit iterator		
 }
 
 void LBot::onSendText(std::string text)
@@ -336,7 +333,7 @@ void LBot::onUnitCreate(BWAPI::Unit unit)
 	if (unit->getType().isWorker())
 	{
 		// Add worker to worker unitset
-		workers.insert(unit);
+		workerManager->addUnit(allWorkers, unit);
 	}
 
 	if (Broodwar->isReplay())
@@ -354,21 +351,21 @@ void LBot::onUnitCreate(BWAPI::Unit unit)
 
 void LBot::onUnitDestroy(BWAPI::Unit unit)
 {
-	if (unit->getPlayer() == Broodwar->self())
+	/*if (u->getPlayer() == Broodwar->self())
 	{
-		if (unit->getType().isWorker())
+		if (u->getType().isWorker())
 		{
-			workerManager->removeUnit(unit);
+			workerManager->removeUnit(allWorkers, u);
 		}
-		if (unit->getType().isBuilding())
+		if (u->getType().isBuilding())
 		{
-			buildingManager->removeUnit(unit);
+			buildingManager->removeUnit(allBuildings, u);
 		}
-		if (!unit->getType().isWorker() && !unit->getType().isBuilding())
+		if (!u->getType().isWorker() && !u->getType().isBuilding())
 		{
-			armyManager->removeUnit(unit);
+			armyManager->removeUnit(army1, u);
 		}
-	}
+	}*/
 }
 
 void LBot::onUnitMorph(BWAPI::Unit unit)
