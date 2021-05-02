@@ -222,7 +222,7 @@ void BuildOrder::buildOrder()
 				}
 			}
 		}
-		if (academy == 1 && !haveScout && lastChecked + movetime < Broodwar->getFrameCount())
+		if (academy == 1 && !haveScout && lastChecked + 500 < Broodwar->getFrameCount())
 		{
 			lastChecked = Broodwar->getFrameCount();
 			scoutManager->setScout();
