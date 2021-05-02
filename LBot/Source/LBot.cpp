@@ -58,6 +58,8 @@ void LBot::onEnd(bool isWinner)
 
 void LBot::onFrame()
 {	
+	static int lastChecked = 0;
+
 	// Display the game frame rate as text in the upper left area of the screen
 	Broodwar->drawTextScreen(200, 0,  "FPS: %d", Broodwar->getFPS());
 
@@ -71,6 +73,38 @@ void LBot::onFrame()
 		return;
 
 	buildOrder->buildOrder();
+
+	// If supply count is almost at cap, build a supply depot to continue progression
+	if ((Broodwar->self()->supplyUsed() == Broodwar->self()->supplyTotal() - 1) && lastChecked + 150 < Broodwar->getFrameCount())
+	{
+		lastChecked = Broodwar->getFrameCount();
+
+		Unit builder = workerManager->getWorker();
+
+		// If worker is found
+		if (builder)
+		{
+			// Find a location for depot
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, builder->getTilePosition());
+
+			// If build position is found
+			if (buildPosition)
+			{
+				// Build
+				builder->build(UnitTypes::Terran_Supply_Depot, buildPosition);
+
+				// Register an event that draws the target build location
+				Broodwar->registerEvent([buildPosition, builder](Game*)
+				{
+					Broodwar->drawBoxMap(Position(buildPosition),
+						Position(buildPosition + UnitTypes::Terran_Supply_Depot.tileSize()),
+						Colors::Blue);
+				},
+					nullptr,  // condition
+					UnitTypes::Terran_Supply_Depot.buildTime() + 100);  // frames to run
+			}
+		}
+	}
 
 	// Iterate through all the units owned by the player
 	for (auto &u : Broodwar->self()->getUnits())
@@ -164,47 +198,7 @@ void LBot::onFrame()
 				},   // action
 					nullptr,    // condition
 					Broodwar->getLatencyFrames());  // frames to run
-
-				// Retrieve the supply provider type in the case that we have run out of supplies
-				UnitType supplyProviderType = u->getType().getRace().getSupplyProvider();
-				static int lastChecked = 0;
-
-				// If we are supply blocked and haven't tried constructing more recently
-				if (lastErr == Errors::Insufficient_Supply && lastChecked + 400 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(supplyProviderType) == 0)
-				{
-					lastChecked = Broodwar->getFrameCount();
-
-					// Retrieve a unit that is capable of constructing the supply needed
-					Unit supplyBuilder = u->getClosestUnit(GetType == supplyProviderType.whatBuilds().first && (IsIdle || IsGatheringMinerals) && IsOwned);
-					
-					// If a unit was found
-					if (supplyBuilder)
-					{
-						if (supplyProviderType.isBuilding())
-						{
-							TilePosition targetBuildLocation = Broodwar->getBuildLocation(supplyProviderType, supplyBuilder->getTilePosition());
-							if (targetBuildLocation)
-							{
-								// Register an event that draws the target build location
-								Broodwar->registerEvent([targetBuildLocation,supplyProviderType](Game*)
-								{
-									Broodwar->drawBoxMap(Position(targetBuildLocation), Position(targetBuildLocation + supplyProviderType.tileSize()), Colors::Blue);
-								},
-									nullptr,  // condition
-									supplyProviderType.buildTime() + 100);  // frames to run
-
-								// Order the builder to construct the supply structure
-								supplyBuilder->build(supplyProviderType, targetBuildLocation);
-							}
-						}
-						else
-						{
-							// Train the supply provider (Overlord) if the provider is not a structure
-							supplyBuilder->train(supplyProviderType);
-						}
-					} // closure: supplyBuilder is valid
-				} // closure: insufficient supply
-			} // closure: failed to train idle unit
+			}
 		}
 		
 		/*
@@ -251,39 +245,11 @@ void LBot::onFrame()
 		/*
 		 * Academy
 		 */
-		if (u->getType() == UnitTypes::Terran_Academy)
+		else if (u->getType() == UnitTypes::Terran_Academy)
 		{
 			// Perform research
 			buildingManager->researchTech(u);
 		}
-		
-		////** MARINES **//
-		//else if (u->getType() == UnitTypes::Terran_Marine)
-		//{
-		//	// insert unit into army
-		//	if (army1.size() < 12) // ALTER TO IF CONTAINS THE UNIT
-		//	{
-		//		army1.insert(u);
-		//	}
-		//	else if (army1.size() == 12 && army2.size() < 12)
-		//	{
-		//		army2.insert(u);
-		//	}
-		//}
-
-		////** MEDICS **//
-		//else if (u->getType() == UnitTypes::Terran_Medic)
-		//{
-		//	// insert unit into army
-		//	if (army1.size() < 12)
-		//	{
-		//		army1.insert(u);
-		//	}
-		//	else if (army1.size() == 12 && army2.size() < 12)
-		//	{
-		//		army2.insert(u);
-		//	}
-		//}
 		
 	} // closure: unit iterator		
 }
@@ -390,6 +356,8 @@ void LBot::onUnitCreate(BWAPI::Unit u)
 
 void LBot::onUnitDestroy(BWAPI::Unit u)
 {	
+	static int lastChecked = 0;
+
 	// Upon destroying of unit belonging to player
 	if (u->getPlayer() == Broodwar->self())
 	{
@@ -411,7 +379,7 @@ void LBot::onUnitDestroy(BWAPI::Unit u)
 		else if (u->getType().isBuilding())
 		{
 			allBuildings.erase(u);
-			// REBUILD BUILDING
+			// REBUILD BUILDING			
 		}
 		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.contains(u))
 		{
