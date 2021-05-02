@@ -8,7 +8,7 @@
 using namespace BWAPI;
 using namespace Filter;
 
-void BuildOrder::buildOrder(BWAPI::Unitset set)
+void BuildOrder::buildOrder()
 {	
 	depot = Broodwar->self()->allUnitCount(UnitTypes::Terran_Supply_Depot);
 	barracks = Broodwar->self()->allUnitCount(UnitTypes::Terran_Barracks);
@@ -35,7 +35,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset set)
 		{
 			lastChecked = Broodwar->getFrameCount();
 
-			Unit builder = workerManager->getWorkerFromSet(set);
+			Unit builder = workerManager->getWorker();
 
 			// If worker is found
 			if (builder)
@@ -67,7 +67,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset set)
 		{
 			lastChecked = Broodwar->getFrameCount();
 
-			Unit builder = workerManager->getWorkerFromSet(set);
+			Unit builder = workerManager->getWorker();
 
 			// If worker is found
 			if (builder)
@@ -99,7 +99,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset set)
 		{
 			lastChecked = Broodwar->getFrameCount();
 
-			Unit builder = workerManager->getWorkerFromSet(set);
+			Unit builder = workerManager->getWorker();
 
 			// If worker is found
 			if (builder)
@@ -131,7 +131,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset set)
 		{
 			lastChecked = Broodwar->getFrameCount();
 
-			Unit builder = workerManager->getWorkerFromSet(set);
+			Unit builder = workerManager->getWorker();
 
 			// If worker is found
 			if (builder)
@@ -163,7 +163,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset set)
 		{
 			lastChecked = Broodwar->getFrameCount();
 
-			Unit builder = workerManager->getWorkerFromSet(set);
+			Unit builder = workerManager->getWorker();
 
 			// If worker is found
 			if (builder)
@@ -196,7 +196,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset set)
 		{
 			lastChecked = Broodwar->getFrameCount();
 
-			Unit builder = workerManager->getWorkerFromSet(set);
+			Unit builder = workerManager->getWorker();
 
 			// If worker is found
 			if (builder)
@@ -224,6 +224,7 @@ void BuildOrder::buildOrder(BWAPI::Unitset set)
 		}
 		if (academy == 1 && !haveScout && lastChecked + movetime < Broodwar->getFrameCount())
 		{
+			lastChecked = Broodwar->getFrameCount();
 			scoutManager->setScout();
 			haveScout = true;
 			scoutManager->goScout();			

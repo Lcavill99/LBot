@@ -15,7 +15,7 @@ class BuildOrder
 	ScoutManager *scoutManager;
 
 public:
-	void BuildOrder::buildOrder(BWAPI::Unitset set);	
+	void BuildOrder::buildOrder();	
 	/*void BuildOrder::Zerg(BWAPI::Unitset set);
 	void BuildOrder::Protoss(BWAPI::Unitset set);
 	void BuildOrder::Terran(BWAPI::Unitset set);*/
