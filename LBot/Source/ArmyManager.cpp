@@ -43,7 +43,7 @@ void ArmyManager::groupAttack(BWAPI::Unitset* set)
 	//			//Retreat to back of group
 	//			//get closest enemies position
 	//			//get units position
-	//			//if enemy is higher thanunit, negative retreat
+	//			//if enemy is higher than unit, negative retreat
 	//			//if enemy is lower than unit, positive retreat
 	//		}
 	//	}
