@@ -97,6 +97,7 @@ void LBot::onFrame()
 		if (u->getType().isWorker())
 		{		
 			// Unitset management
+			// If worker isnt in the allWorkers unitset
 			if (!allWorkers.contains(u))
 			{
 				// Add to gasWorkers unitset
