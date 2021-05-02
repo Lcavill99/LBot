@@ -72,6 +72,7 @@ void LBot::onFrame()
 	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 		return;
 
+	buildOrder->buildOrder();
 
 	// Iterate through all the units that we own
 	for (auto &u : Broodwar->self()->getUnits())
@@ -123,41 +124,45 @@ void LBot::onFrame()
 			// If worker is idle
 			if (u->isIdle())
 			{
-				//// if we have a refinery and gasworkers unitset contains less that 3 units *WORKS TEMP*
-				//if ((Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) == 1 && gasWorkers.size() != 3) || gasWorkers.contains(u))
-				//{
-				//	//gatherGas();
-				//}
-				/*else
-				{
-					gatherMinerals();
-				}*/
-
 				// If carrying a resource return them to the center
 				if (u->isCarryingGas() || u->isCarryingMinerals())
 				{
 					u->returnCargo();
 				}
-				else if (!u->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
-				{						
-					// if we have a refinery and gasworkers unitset contains less that 3 units *WORKS TEMP*
-					if ((Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) == 1 && gasWorkers.size() != 3) || gasWorkers.contains(u))
-					{
-						// gather from nearest refinery
-						if (!u->gather(u->getClosestUnit(IsRefinery)))
-						{
-							// If the call fails, then print the last error message
-							Broodwar << Broodwar->getLastError() << std::endl;							
-						}							
-					}
-					// Harvest from the nearest mineral patch 
-					else if (!u->gather(u->getClosestUnit(IsMineralField)))
-					{						
-						// If the call fails, then print the last error message
-						Broodwar << Broodwar->getLastError() << std::endl;						
-					}
-					
-				} // closure: has no powerup
+				// if we have a refinery and gasworkers unitset contains less that 3 units *WORKS TEMP*
+				else if ((Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) == 1 && gasWorkers.size() != 3) || gasWorkers.contains(u))
+				{
+					workerManager->gatherGas(u);
+				}
+				else
+				{
+					workerManager->gatherMinerals(u);
+				}
+
+				//// If carrying a resource return them to the center
+				//if (u->isCarryingGas() || u->isCarryingMinerals())
+				//{
+				//	u->returnCargo();
+				//}
+				//else if (!u->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
+				//{						
+				//	// if we have a refinery and gasworkers unitset contains less that 3 units *WORKS TEMP*
+				//	if ((Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) == 1 && gasWorkers.size() != 3) || gasWorkers.contains(u))
+				//	{
+				//		// gather from nearest refinery
+				//		if (!u->gather(u->getClosestUnit(IsRefinery)))
+				//		{
+				//			// If the call fails, then print the last error message
+				//			Broodwar << Broodwar->getLastError() << std::endl;							
+				//		}							
+				//	}
+				//	// Harvest from the nearest mineral patch 
+				//	else if (!u->gather(u->getClosestUnit(IsMineralField)))
+				//	{						
+				//		// If the call fails, then print the last error message
+				//		Broodwar << Broodwar->getLastError() << std::endl;						
+				//	}					
+				//} // closure: has no powerup
 			} // closure: if idle
 		}
 		//** COMMAND CENTER **//
@@ -255,7 +260,12 @@ void LBot::onFrame()
 					nullptr,    // condition
 					Broodwar->getLatencyFrames());  // frames to run
 			}
-		}		
+		}	
+		//** ACADEMY **//
+		if (u->getType() == UnitTypes::Terran_Academy)
+		{
+			buildingManager->researchTech(u);
+		}
 		
 		////** MARINES **//
 		//else if (u->getType() == UnitTypes::Terran_Marine)
@@ -284,9 +294,6 @@ void LBot::onFrame()
 		//		army2.insert(u);
 		//	}
 		//}
-		
-		buildOrder->buildOrder();
-		research->research(u);
 		
 	} // closure: unit iterator		
 }
