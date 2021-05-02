@@ -5,12 +5,12 @@
 using namespace BWAPI;
 using namespace Filter;
 
-BWAPI::Unitset allWorkers;
-BWAPI::Unitset minWorkers;
-BWAPI::Unitset gasWorkers;
-BWAPI::Unitset allBuildings;
-BWAPI::Unitset army1;
-BWAPI::Unitset army2;
+BWAPI::Unitset allWorkers; // Holds all player workers
+BWAPI::Unitset minWorkers; // Holds all player workers assigned to gather minerals
+BWAPI::Unitset gasWorkers; // Holds all player workers assigned to gather gas
+BWAPI::Unitset allBuildings; // Holds all player buildings
+BWAPI::Unitset army1; // Holds all player units assigned to the offensive army
+BWAPI::Unitset army2; // Holds all player units assigned to the secondary/defensive army
 
 void LBot::onStart()
 {
@@ -72,7 +72,7 @@ void LBot::onFrame()
 
 	buildOrder->buildOrder();
 
-	// Iterate through all the units that we own
+	// Iterate through all the units owned by the player
 	for (auto &u : Broodwar->self()->getUnits())
 	{
 		// Ignore the unit if it no longer exists
@@ -91,7 +91,9 @@ void LBot::onFrame()
 		if (!u->isCompleted() || u->isConstructing())
 			continue;
 		
-		//** WORKERS **//
+		/*
+		 * Workers
+		 */
 		if (u->getType().isWorker())
 		{		
 			// Unitset management
@@ -140,7 +142,10 @@ void LBot::onFrame()
 				}				
 			}
 		}
-		//** COMMAND CENTER **//
+
+		/*
+		 * Command Center
+		 */
 		else if (u->getType() == UnitTypes::Terran_Command_Center)
 		{
 			// Construct workers if idle
@@ -199,7 +204,10 @@ void LBot::onFrame()
 				} // closure: insufficient supply
 			} // closure: failed to train idle unit
 		}
-		//** BARRACKS **//
+		
+		/*
+		 * Barracks
+		 */
 		else if (u->getType() == UnitTypes::Terran_Barracks)
 		{
 			// Train 1 medic for every 3 marines, enough for 2 armies
@@ -236,8 +244,11 @@ void LBot::onFrame()
 					nullptr,    // condition
 					Broodwar->getLatencyFrames());  // frames to run
 			}
-		}	
-		//** ACADEMY **//
+		}
+
+		/*
+		 * Academy
+		 */
 		if (u->getType() == UnitTypes::Terran_Academy)
 		{
 			// Perform research
@@ -313,9 +324,10 @@ void LBot::onNukeDetect(BWAPI::Position target)
 	// You can also retrieve all the nuclear missile targets using Broodwar->getNukeDots()!
 }
 
-//POTENTIALLY FIX THE SCOUTING ISSUE?
+// MAY POTENTIALLY FIX THE SCOUTING ISSUE?
 //void LBot::onUnitDiscover(BWAPI::Unit unit)
 //{
+//    //IF ENEMY BASE DISCOVERED, SEND SCOUT HOME?
 //}
 
 //void LBot::onUnitEvade(BWAPI::Unit unit)
