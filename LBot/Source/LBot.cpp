@@ -22,9 +22,7 @@ void LBot::onStart()
 
 	// Set the command optimization level so that common commands can be grouped
 	// and reduce the bot's APM (Actions Per Minute).
-	Broodwar->setCommandOptimizationLevel(2);
-
-	haveScout = false;
+	Broodwar->setCommandOptimizationLevel(2);	
 
 	buildOrder = new BuildOrder;
 	scoutManager = new ScoutManager;
@@ -78,7 +76,6 @@ void LBot::onFrame()
 	for (auto &u : Broodwar->self()->getUnits())
 	{
 		// Ignore the unit if it no longer exists
-		// Make sure to include this block when handling any Unit pointer!
 		if (!u->exists())
 			continue;
 
@@ -96,40 +93,43 @@ void LBot::onFrame()
 		
 		//** WORKERS **//
 		if (u->getType().isWorker())
-		{				
+		{		
+			// Unitset management
 			if (!allWorkers.contains(u))
 			{
-				// add to gasWorkers unitset
+				// Add to gasWorkers unitset
 				allWorkers.insert(u);
 			}
 			if (u->isGatheringMinerals() && !minWorkers.contains(u))
-			{
+			{   
+				// If worker is in the refinery workers unitset, remove to avoid dupilcate
 				if (gasWorkers.contains(u))
 				{
 					gasWorkers.erase(u);
 				}
-				// add to gasWorkers unitset
+				// Add to mineral workers unitset
 				minWorkers.insert(u);
 			}
 			if (u->isGatheringGas() && !gasWorkers.contains(u))
 			{
+				// If worker is in the mineral workers unitset, remove to avoid dupilcate
 				if (minWorkers.contains(u))
 				{
 					minWorkers.erase(u);
 				}
-				// add to gasWorkers unitset
+				// Add to refinery workers unitset
 				gasWorkers.insert(u);
 			}
 
 			// If worker is idle
 			if (u->isIdle())
 			{
-				// If carrying a resource return them to the center
+				// If worker is carrying a resource return them to the command center
 				if (u->isCarryingGas() || u->isCarryingMinerals())
 				{
 					u->returnCargo();
 				}
-				// if we have a refinery and gasworkers unitset contains less that 3 units *WORKS TEMP*
+				// Assign workers to refinery *WORKS TEMP only with 1 refinery*
 				else if ((Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) == 1 && gasWorkers.size() != 3) || gasWorkers.contains(u))
 				{
 					workerManager->gatherGas(u);
@@ -137,38 +137,13 @@ void LBot::onFrame()
 				else
 				{
 					workerManager->gatherMinerals(u);
-				}
-
-				//// If carrying a resource return them to the center
-				//if (u->isCarryingGas() || u->isCarryingMinerals())
-				//{
-				//	u->returnCargo();
-				//}
-				//else if (!u->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
-				//{						
-				//	// if we have a refinery and gasworkers unitset contains less that 3 units *WORKS TEMP*
-				//	if ((Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) == 1 && gasWorkers.size() != 3) || gasWorkers.contains(u))
-				//	{
-				//		// gather from nearest refinery
-				//		if (!u->gather(u->getClosestUnit(IsRefinery)))
-				//		{
-				//			// If the call fails, then print the last error message
-				//			Broodwar << Broodwar->getLastError() << std::endl;							
-				//		}							
-				//	}
-				//	// Harvest from the nearest mineral patch 
-				//	else if (!u->gather(u->getClosestUnit(IsMineralField)))
-				//	{						
-				//		// If the call fails, then print the last error message
-				//		Broodwar << Broodwar->getLastError() << std::endl;						
-				//	}					
-				//} // closure: has no powerup
-			} // closure: if idle
+				}				
+			}
 		}
 		//** COMMAND CENTER **//
-		else if (u->getType().isResourceDepot()) // A resource depot is a Command Center, Nexus, or Hatchery
+		else if (u->getType() == UnitTypes::Terran_Command_Center)
 		{
-			// Order the depot to construct more workers! But only when it is idle.
+			// Construct workers if idle
 			if (u->isIdle() && !u->train(UnitTypes::Terran_SCV))
 			{
 				// If that fails, draw the error at the location so that you can visibly see what went wrong!
@@ -227,6 +202,7 @@ void LBot::onFrame()
 		//** BARRACKS **//
 		else if (u->getType() == UnitTypes::Terran_Barracks)
 		{
+			// Train 1 medic for every 3 marines, enough for 2 armies
 			if (Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy) == 1 && (Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) == 9 && Broodwar->self()->allUnitCount(UnitTypes::Terran_Medic) != 3 || Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) == 18 && Broodwar->self()->allUnitCount(UnitTypes::Terran_Medic) != 6))
 			{
 				if (u->isIdle() && !u->train(UnitTypes::Terran_Medic))
@@ -245,7 +221,7 @@ void LBot::onFrame()
 				}
 			}
 
-			// Train marines if idle
+			// Train marines until marine army count is reached
 			else if (u->isIdle() && Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) != 18 && !u->train(UnitTypes::Terran_Marine))
 			{
 				// If that fails, draw the error at the location so that you can visibly see what went wrong!
@@ -264,6 +240,7 @@ void LBot::onFrame()
 		//** ACADEMY **//
 		if (u->getType() == UnitTypes::Terran_Academy)
 		{
+			// Perform research
 			buildingManager->researchTech(u);
 		}
 		
@@ -336,29 +313,53 @@ void LBot::onNukeDetect(BWAPI::Position target)
 	// You can also retrieve all the nuclear missile targets using Broodwar->getNukeDots()!
 }
 
-void LBot::onUnitDiscover(BWAPI::Unit unit)
-{
-}
+//POTENTIALLY FIX THE SCOUTING ISSUE?
+//void LBot::onUnitDiscover(BWAPI::Unit unit)
+//{
+//}
 
-void LBot::onUnitEvade(BWAPI::Unit unit)
-{
-}
+//void LBot::onUnitEvade(BWAPI::Unit unit)
+//{
+//}
 
-void LBot::onUnitShow(BWAPI::Unit unit)
-{
-}
+//void LBot::onUnitShow(BWAPI::Unit unit)
+//{
+//}
 
-void LBot::onUnitHide(BWAPI::Unit unit)
-{
-}
+//void LBot::onUnitHide(BWAPI::Unit unit)
+//{
+//}
 
-void LBot::onUnitCreate(BWAPI::Unit unit)
-{
-	//if (unit->getType().isWorker())
-	//{
-	//	// Add worker to worker unitset
-	//	workerManager->addUnit(allWorkers, unit);
-	//}
+// NOTE: Workers and command center that the player starts with counts as being created
+void LBot::onUnitCreate(BWAPI::Unit u)
+{	
+	// Upon creation of unit belonging to player
+	if (u->getPlayer() == Broodwar->self())
+	{
+		// Unitset management
+		if (u->getType().isWorker())
+		{
+			// Add worker to worker unitset
+			allWorkers.insert(u);
+		}
+		else if (u->getType().isBuilding())
+		{
+			// Add building to building unitset
+			allBuildings.insert(u);
+		}
+		// If army1 isnt full
+		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() != 12)
+		{
+			// Add unit to army1
+			army1.insert(u);
+		}
+		// If army1 is full and army2 isnt
+		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() == 12 && army2.size() != 12)
+		{
+			// Add unit to army2
+			army2.insert(u);
+		}
+	}
 
 	if (Broodwar->isReplay())
 	{
@@ -373,23 +374,40 @@ void LBot::onUnitCreate(BWAPI::Unit unit)
 	}
 }
 
-void LBot::onUnitDestroy(BWAPI::Unit unit)
-{
-	/*if (u->getPlayer() == Broodwar->self())
+void LBot::onUnitDestroy(BWAPI::Unit u)
+{	
+	// Upon destroying of unit belonging to player
+	if (u->getPlayer() == Broodwar->self())
 	{
+		// Unitset management
 		if (u->getType().isWorker())
 		{
-			workerManager->removeUnit(allWorkers, u);
+			allWorkers.erase(u);
+
+			// Make sure to remove worker from assigned resource unitset
+			if (minWorkers.contains(u))
+			{
+				minWorkers.erase(u);
+			}
+			if (gasWorkers.contains(u))
+			{
+				gasWorkers.erase(u);
+			}
 		}
-		if (u->getType().isBuilding())
+		else if (u->getType().isBuilding())
 		{
-			buildingManager->removeUnit(allBuildings, u);
+			allBuildings.erase(u);
+			// REBUILD BUILDING
 		}
-		if (!u->getType().isWorker() && !u->getType().isBuilding())
+		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.contains(u))
 		{
-			armyManager->removeUnit(army1, u);
+			army1.erase(u);
 		}
-	}*/
+		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army2.contains(u))
+		{
+			army2.erase(u);
+		}
+	}
 }
 
 void LBot::onUnitMorph(BWAPI::Unit unit)
@@ -407,9 +425,9 @@ void LBot::onUnitMorph(BWAPI::Unit unit)
 	}
 }
 
-void LBot::onUnitRenegade(BWAPI::Unit unit)
-{
-}
+//void LBot::onUnitRenegade(BWAPI::Unit unit)
+//{
+//}
 
 void LBot::onSaveGame(std::string gameName)
 {
