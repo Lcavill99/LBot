@@ -109,7 +109,6 @@
     <ClCompile Include="Source\BWEM\utils.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\LBot.cpp" />
-    <ClCompile Include="Source\Research.cpp" />
     <ClCompile Include="Source\ScoutManager.cpp" />
     <ClCompile Include="Source\WorkerManager.cpp" />
   </ItemGroup>
@@ -133,7 +132,6 @@
     <ClInclude Include="Source\BWEM\tiles.h" />
     <ClInclude Include="Source\BWEM\utils.h" />
     <ClInclude Include="Source\LBot.h" />
-    <ClInclude Include="Source\Research.h" />
     <ClInclude Include="Source\ScoutManager.h" />
     <ClInclude Include="Source\WorkerManager.h" />
   </ItemGroup>

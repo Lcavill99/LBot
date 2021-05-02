@@ -4,7 +4,6 @@
     <ClCompile Include="Source\BuildOrder.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\LBot.cpp" />
-    <ClCompile Include="Source\Research.cpp" />
     <ClCompile Include="Source\ArmyManager.cpp" />
     <ClCompile Include="Source\BWEM\area.cpp">
       <Filter>BWEM</Filter>
@@ -55,7 +54,6 @@
   <ItemGroup>
     <ClInclude Include="Source\BuildOrder.h" />
     <ClInclude Include="Source\LBot.h" />
-    <ClInclude Include="Source\Research.h" />
     <ClInclude Include="Source\ArmyManager.h" />
     <ClInclude Include="Source\BWEM\area.h">
       <Filter>BWEM</Filter>
