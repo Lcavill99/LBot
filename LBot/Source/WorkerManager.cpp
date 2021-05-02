@@ -68,16 +68,16 @@ void WorkerManager::removeUnit(BWAPI::Unitset* set, BWAPI::Unit* u)
 /*
  * Worker gathering minerals
  */
-void WorkerManager::gatherMinerals(BWAPI::Unit* u)
+void WorkerManager::gatherMinerals(BWAPI::Unit u)
 {
-	if ((*u)->isCarryingMinerals())
+	/*if (u->isCarryingMinerals())
 	{
-		(*u)->returnCargo();
-	}
-	else if (!(*u)->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
+		u->returnCargo();
+	}*/
+	if (!u->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
 	{
 		// Harvest from the nearest mineral patch 
-		if (!(*u)->gather((*u)->getClosestUnit(IsMineralField)))
+		if (!u->gather(u->getClosestUnit(IsMineralField)))
 		{
 			// If the call fails, then print the last error message
 			Broodwar << Broodwar->getLastError() << std::endl;
@@ -88,16 +88,16 @@ void WorkerManager::gatherMinerals(BWAPI::Unit* u)
 /*
  * Worker gathering gas
  */
-void WorkerManager::gatherGas(BWAPI::Unitset* set, BWAPI::Unit* u)
+void WorkerManager::gatherGas(BWAPI::Unit u)
 {
-	if ((*u)->isCarryingGas())
+	/*if (u->isCarryingGas())
 	{
-		(*u)->returnCargo();
-	}
-	else if (!(*u)->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
+		u->returnCargo();
+	}*/
+	if (!u->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
 	{
 		// gather from nearest refinery
-		if (!(*u)->gather((*u)->getClosestUnit(IsRefinery)))
+		if (!u->gather(u->getClosestUnit(IsRefinery)))
 		{
 			// If the call fails, then print the last error message
 			Broodwar << Broodwar->getLastError() << std::endl;
