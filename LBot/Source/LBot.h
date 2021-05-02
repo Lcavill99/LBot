@@ -1,7 +1,6 @@
 #pragma once
 #include <BWAPI.h>
 #include "BuildOrder.h"
-#include "Research.h"
 #include "ScoutManager.h"
 #include "WorkerManager.h"
 #include "BuildingManager.h"
@@ -17,7 +16,6 @@ class LBot : public BWAPI::AIModule
 	bool haveScout;
 
 	BuildOrder *buildOrder;
-	Research *research;
 	ScoutManager *scoutManager;
 	WorkerManager *workerManager;
 	BuildingManager *buildingManager;

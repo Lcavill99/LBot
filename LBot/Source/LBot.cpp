@@ -5,12 +5,12 @@
 using namespace BWAPI;
 using namespace Filter;
 
-Unitset allWorkers;
-Unitset minWorkers;
-Unitset gasWorkers;
-Unitset allBuildings;
-Unitset army1;
-Unitset army2;
+BWAPI::Unitset allWorkers;
+BWAPI::Unitset minWorkers;
+BWAPI::Unitset gasWorkers;
+BWAPI::Unitset allBuildings;
+BWAPI::Unitset army1;
+BWAPI::Unitset army2;
 
 void LBot::onStart()
 {
@@ -27,7 +27,6 @@ void LBot::onStart()
 	haveScout = false;
 
 	buildOrder = new BuildOrder;
-	research = new Research;
 	scoutManager = new ScoutManager;
 	workerManager = new WorkerManager;
 	buildingManager = new BuildingManager;
@@ -104,11 +103,19 @@ void LBot::onFrame()
 			}
 			if (u->isGatheringMinerals() && !minWorkers.contains(u))
 			{
+				if (gasWorkers.contains(u))
+				{
+					gasWorkers.erase(u);
+				}
 				// add to gasWorkers unitset
 				minWorkers.insert(u);
 			}
 			if (u->isGatheringGas() && !gasWorkers.contains(u))
 			{
+				if (minWorkers.contains(u))
+				{
+					minWorkers.erase(u);
+				}
 				// add to gasWorkers unitset
 				gasWorkers.insert(u);
 			}
@@ -116,6 +123,16 @@ void LBot::onFrame()
 			// If worker is idle
 			if (u->isIdle())
 			{
+				//// if we have a refinery and gasworkers unitset contains less that 3 units *WORKS TEMP*
+				//if ((Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) == 1 && gasWorkers.size() != 3) || gasWorkers.contains(u))
+				//{
+				//	//gatherGas();
+				//}
+				/*else
+				{
+					gatherMinerals();
+				}*/
+
 				// If carrying a resource return them to the center
 				if (u->isCarryingGas() || u->isCarryingMinerals())
 				{
@@ -268,7 +285,7 @@ void LBot::onFrame()
 		//	}
 		//}
 		
-		buildOrder->buildOrder(minWorkers);
+		buildOrder->buildOrder();
 		research->research(u);
 		
 	} // closure: unit iterator		
@@ -330,11 +347,11 @@ void LBot::onUnitHide(BWAPI::Unit unit)
 
 void LBot::onUnitCreate(BWAPI::Unit unit)
 {
-	if (unit->getType().isWorker())
-	{
-		// Add worker to worker unitset
-		workerManager->addUnit(allWorkers, unit);
-	}
+	//if (unit->getType().isWorker())
+	//{
+	//	// Add worker to worker unitset
+	//	workerManager->addUnit(allWorkers, unit);
+	//}
 
 	if (Broodwar->isReplay())
 	{
