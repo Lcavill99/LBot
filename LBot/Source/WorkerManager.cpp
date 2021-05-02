@@ -15,10 +15,12 @@ BWAPI::Unit WorkerManager::getWorker()
 {
 	BWAPI::Unit worker;
 
+	// Loop through all units owned by the player
 	for (auto &u : Broodwar->self()->getUnits())
 	{
 		if (u->getType().isWorker())
 		{
+			// Do not want to select a worker that is gathering gas or carrying any resources
 			if (!u->isConstructing() && !u->isGatheringGas() && !u->isCarryingMinerals() && !u->isCarryingGas())
 			{
 				worker = u;
@@ -26,6 +28,7 @@ BWAPI::Unit WorkerManager::getWorker()
 			}
 		}		
 	}
+	// If no workers can be found, print an error
 	Broodwar->printf("WorkerManager Error: No available workers");
 	return NULL;
 }
@@ -37,14 +40,17 @@ BWAPI::Unit WorkerManager::getWorkerFromSet(BWAPI::Unitset* set)
 {
 	BWAPI::Unit worker;
 
+	// Loop through all units in the unitset
 	for (auto &u : *set)
 	{
+		// Do not want to select a worker that is gathering gas or carrying any resources
 		if (!u->isConstructing() && !u->isGatheringGas() && (!u->isCarryingMinerals() || !u->isCarryingGas()))
 		{
 			worker = u;
 			return worker;
 		}		
 	}
+	// If no workers can be found, print an error
 	Broodwar->printf("WorkerManager Error: No available workers");
 	return NULL;
 }
@@ -74,9 +80,9 @@ void WorkerManager::gatherMinerals(BWAPI::Unit u)
 	{
 		u->returnCargo();
 	}*/
-	if (!u->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
+	if (!u->getPowerUp()) // Worker cannot harvest anything if it is carrying a powerup
 	{
-		// Harvest from the nearest mineral patch 
+		// Gather from the nearest mineral patch 
 		if (!u->gather(u->getClosestUnit(IsMineralField)))
 		{
 			// If the call fails, then print the last error message
@@ -94,9 +100,9 @@ void WorkerManager::gatherGas(BWAPI::Unit u)
 	{
 		u->returnCargo();
 	}*/
-	if (!u->getPowerUp()) // The worker cannot harvest anything if it is carrying a powerup such as a flag
+	if (!u->getPowerUp()) // Worker cannot harvest anything if it is carrying a powerup
 	{
-		// gather from nearest refinery
+		// Gather from nearest refinery
 		if (!u->gather(u->getClosestUnit(IsRefinery)))
 		{
 			// If the call fails, then print the last error message

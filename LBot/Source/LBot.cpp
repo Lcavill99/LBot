@@ -137,6 +137,7 @@ void LBot::onFrame()
 				{
 					workerManager->gatherGas(u);
 				}
+				// Otherwise just assign to minerals
 				else
 				{
 					workerManager->gatherMinerals(u);
@@ -287,35 +288,35 @@ void LBot::onFrame()
 	} // closure: unit iterator		
 }
 
-void LBot::onSendText(std::string text)
+void LBot::onSendText(std::string txt)
 {
 	// Send the text to the game if it is not being processed.
-	Broodwar->sendText("%s", text.c_str());
+	Broodwar->sendText("%s", txt.c_str());
 
 	// Make sure to use %s and pass the text as a parameter,
 	// otherwise you may run into problems when you use the %(percent) character!
 }
 
-void LBot::onReceiveText(BWAPI::Player player, std::string text)
+void LBot::onReceiveText(BWAPI::Player p, std::string txt)
 {
 	// Parse the received text
-	Broodwar << player->getName() << " said \"" << text << "\"" << std::endl;
+	Broodwar << p->getName() << " said \"" << txt << "\"" << std::endl;
 }
 
-void LBot::onPlayerLeft(BWAPI::Player player)
+void LBot::onPlayerLeft(BWAPI::Player p)
 {
 	// Interact verbally with the other players in the game by
 	// announcing that the other player has left.
-	Broodwar->sendText("Goodbye %s!", player->getName().c_str());
+	Broodwar->sendText("Goodbye %s!", p->getName().c_str());
 }
 
-void LBot::onNukeDetect(BWAPI::Position target)
+void LBot::onNukeDetect(BWAPI::Position t)
 {
 	// Check if the target is a valid position
-	if ( target )
+	if (t)
 	{
 		// if so, print the location of the nuclear strike target
-		Broodwar << "Nuclear Launch Detected at " << target << std::endl;
+		Broodwar << "Nuclear Launch Detected at " << t << std::endl;
 	}
 	else 
 	{
@@ -326,20 +327,20 @@ void LBot::onNukeDetect(BWAPI::Position target)
 }
 
 // MAY POTENTIALLY FIX THE SCOUTING ISSUE?
-//void LBot::onUnitDiscover(BWAPI::Unit unit)
+//void LBot::onUnitDiscover(BWAPI::Unit u)
 //{
 //    //IF ENEMY BASE DISCOVERED, SEND SCOUT HOME?
 //}
 
-//void LBot::onUnitEvade(BWAPI::Unit unit)
+//void LBot::onUnitEvade(BWAPI::Unit u)
 //{
 //}
 
-//void LBot::onUnitShow(BWAPI::Unit unit)
+//void LBot::onUnitShow(BWAPI::Unit u)
 //{
 //}
 
-//void LBot::onUnitHide(BWAPI::Unit unit)
+//void LBot::onUnitHide(BWAPI::Unit u)
 //{
 //}
 
@@ -377,12 +378,12 @@ void LBot::onUnitCreate(BWAPI::Unit u)
 	if (Broodwar->isReplay())
 	{
 		// if we are in a replay, then we will print out the build order of the structures
-		if (unit->getType().isBuilding() && !unit->getPlayer()->isNeutral())
+		if (u->getType().isBuilding() && !u->getPlayer()->isNeutral())
 		{
 			int seconds = Broodwar->getFrameCount()/24;
 			int minutes = seconds/60;
 			seconds %= 60;
-			Broodwar->sendText("%.2d:%.2d: %s creates a %s", minutes, seconds, unit->getPlayer()->getName().c_str(), unit->getType().c_str());
+			Broodwar->sendText("%.2d:%.2d: %s creates a %s", minutes, seconds, u->getPlayer()->getName().c_str(), u->getType().c_str());
 		}
 	}
 }
@@ -423,22 +424,22 @@ void LBot::onUnitDestroy(BWAPI::Unit u)
 	}
 }
 
-void LBot::onUnitMorph(BWAPI::Unit unit)
+void LBot::onUnitMorph(BWAPI::Unit u)
 {
-	if ( Broodwar->isReplay() )
+	if (Broodwar->isReplay())
 	{
 		// if we are in a replay, then we will print out the build order of the structures
-		if ( unit->getType().isBuilding() && !unit->getPlayer()->isNeutral() )
+		if (u->getType().isBuilding() && !u->getPlayer()->isNeutral())
 		{
 			int seconds = Broodwar->getFrameCount()/24;
 			int minutes = seconds/60;
 			seconds %= 60;
-			Broodwar->sendText("%.2d:%.2d: %s morphs a %s", minutes, seconds, unit->getPlayer()->getName().c_str(), unit->getType().c_str());
+			Broodwar->sendText("%.2d:%.2d: %s morphs a %s", minutes, seconds, u->getPlayer()->getName().c_str(), u->getType().c_str());
 		}
 	}
 }
 
-//void LBot::onUnitRenegade(BWAPI::Unit unit)
+//void LBot::onUnitRenegade(BWAPI::Unit u)
 //{
 //}
 
@@ -447,6 +448,6 @@ void LBot::onSaveGame(std::string gameName)
 	Broodwar << "The game was saved to \"" << gameName << "\"" << std::endl;
 }
 
-void LBot::onUnitComplete(BWAPI::Unit unit)
-{
-}
+//void LBot::onUnitComplete(BWAPI::Unit u)
+//{
+//}
