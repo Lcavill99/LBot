@@ -6,6 +6,7 @@
 #include "ScoutManager.h"
 
 using namespace BWAPI;
+using namespace Filter;
 
 /*
  * Assign a worker to be the scout
@@ -28,7 +29,7 @@ BWAPI::Unit ScoutManager::getScout()
  * Scouting logic
  */
 void ScoutManager::goScout()
-{	
+{
 	auto& startLocations = Broodwar->getStartLocations();
 
 	for (TilePosition baseLocation : startLocations)
@@ -37,14 +38,14 @@ void ScoutManager::goScout()
 		if (Broodwar->isExplored(baseLocation))
 		{
 			continue;
-		}		
+		}
 
 		Position pos(baseLocation);
 		Broodwar->drawCircleMap(pos, 32, Colors::Red, true);
 
 		scout->move(pos);
 		break;
-	}
+	}		
 }
 
 /*
