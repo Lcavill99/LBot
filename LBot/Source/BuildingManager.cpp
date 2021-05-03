@@ -10,17 +10,17 @@ using namespace BWAPI;
 /*
  * Add unit to Unitset
  */
-void BuildingManager::addUnit(BWAPI::Unitset set, BWAPI::Unit u)
+void BuildingManager::addUnit(BWAPI::Unitset* set, BWAPI::Unit* u)
 {
-	set.insert(u);
+	set->insert(*u);
 }
 
 /*
  * Remove unit from unitset
  */
-void BuildingManager::removeUnit(BWAPI::Unitset set, BWAPI::Unit u)
+void BuildingManager::removeUnit(BWAPI::Unitset* set, BWAPI::Unit* u)
 {
-	set.erase(u);
+	set->erase(*u);
 }
 
 /*
@@ -28,20 +28,7 @@ void BuildingManager::removeUnit(BWAPI::Unitset set, BWAPI::Unit u)
  */
 void BuildingManager::recruitUnit(BWAPI::Unit u)
 {
-	if (u->isIdle() && !u->train(UnitTypes::Terran_Medic))
-	{
-		// If that fails, draw the error at the location so that you can visibly see what went wrong!
-		// However, drawing the error once will only appear for a single frame
-		// so create an event that keeps it on the screen for some frames
-		Position pos = u->getPosition();
-		Error lastErr = Broodwar->getLastError();
-		Broodwar->registerEvent([pos, lastErr](Game*)
-		{
-			Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
-		},   // action
-			nullptr,    // condition
-			Broodwar->getLatencyFrames());  // frames to run
-	}
+	
 }
 
 /*
