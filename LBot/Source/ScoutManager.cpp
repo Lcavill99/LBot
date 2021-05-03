@@ -32,22 +32,25 @@ BWAPI::Unit ScoutManager::getScout()
 void ScoutManager::goScout()
 {
 	auto& startLocations = Broodwar->getStartLocations();
-	
-	// Loop through all start locations
-	for (TilePosition baseLocation : startLocations)
-	{
-		// If the location is already explored, move on
-		if (Broodwar->isExplored(baseLocation))
-		{
-			continue;
-		}
+	auto& enemyBase = Broodwar->enemy()->getStartLocation();
 
-		Position pos(baseLocation);
-		Broodwar->drawCircleMap(pos, 32, Colors::Red, true);
-		// Move to base location to scout
-		scout->move(pos);
-		break;
-	}		
+	while (!Broodwar->isExplored(enemyBase))
+	{
+		// Loop through all start locations
+		for (TilePosition baseLocation : startLocations)
+		{
+			// If the location is already explored, move on
+			if (Broodwar->isExplored(baseLocation))
+			{
+				continue;
+			}
+
+			Position pos(baseLocation);
+			// Move to base location to scout
+			scout->move(pos);
+			break;
+		}
+	}	
 }
 
 /*
@@ -55,5 +58,5 @@ void ScoutManager::goScout()
  */
 void ScoutManager::sendHome()
 {
-
+	
 }
