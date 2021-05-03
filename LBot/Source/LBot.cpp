@@ -74,6 +74,8 @@ void LBot::onFrame()
 
 	buildOrder->buildOrder();
 
+	//armyManager->groupAttack(army1);
+
 	// If supply count is almost at cap, build a supply depot to continue progression
 	if ((Broodwar->self()->supplyUsed() == Broodwar->self()->supplyTotal() - 1) && lastChecked + 150 < Broodwar->getFrameCount())
 	{
@@ -139,7 +141,7 @@ void LBot::onFrame()
 			}
 			if (u->isGatheringMinerals() && !minWorkers.contains(u))
 			{   
-				// If worker is in the refinery workers unitset, remove to avoid dupilcate
+				// If worker is in the refinery workers unitset, remove to avoid duplicate
 				if (gasWorkers.contains(u))
 				{
 					gasWorkers.erase(u);
@@ -149,7 +151,7 @@ void LBot::onFrame()
 			}
 			if (u->isGatheringGas() && !gasWorkers.contains(u))
 			{
-				// If worker is in the mineral workers unitset, remove to avoid dupilcate
+				// If worker is in the mineral workers unitset, remove to avoid duplicate
 				if (minWorkers.contains(u))
 				{
 					minWorkers.erase(u);
@@ -180,12 +182,28 @@ void LBot::onFrame()
 		}
 
 		/*
+		 * Marines
+		 */
+		if (u->getType() == UnitTypes::Terran_Marine)
+		{
+
+		}
+
+		/*
+		 * Medics
+		 */
+		if (u->getType() == UnitTypes::Terran_Medic)
+		{
+
+		}
+
+		/*
 		 * Command Center
 		 */
 		else if (u->getType() == UnitTypes::Terran_Command_Center)
 		{
-			// Construct workers if idle
-			if (u->isIdle() && !u->train(UnitTypes::Terran_SCV))
+			// Construct workers if idle (24 workers per command center)
+			if (u->isIdle() && Broodwar->self()->allUnitCount(UnitTypes::Terran_SCV) != Broodwar->self()->allUnitCount(UnitTypes::Terran_Command_Center) * 24 && !u->train(UnitTypes::Terran_SCV))
 			{
 				// If that fails, draw the error at the location so that you can visibly see what went wrong!
 				// However, drawing the error once will only appear for a single frame
@@ -206,10 +224,29 @@ void LBot::onFrame()
 		 */
 		else if (u->getType() == UnitTypes::Terran_Barracks)
 		{
-			// Train 1 medic for every 3 marines, enough for 2 armies
-			if (Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy) == 1 && (Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) == 9 && Broodwar->self()->allUnitCount(UnitTypes::Terran_Medic) != 3 || Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) == 18 && Broodwar->self()->allUnitCount(UnitTypes::Terran_Medic) != 6))
+			if (Broodwar->enemy()->getRace() == Races::Zerg)
 			{
-				if (u->isIdle() && !u->train(UnitTypes::Terran_Medic))
+				// Train 1 medic for every 3 marines, enough for 2 armies
+				if (Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy) == 1 && (Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) == 9 && Broodwar->self()->allUnitCount(UnitTypes::Terran_Medic) != 3 || Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) == 18 && Broodwar->self()->allUnitCount(UnitTypes::Terran_Medic) != 6))
+				{
+					if (u->isIdle() && !u->train(UnitTypes::Terran_Medic))
+					{
+						// If that fails, draw the error at the location so that you can visibly see what went wrong!
+						// However, drawing the error once will only appear for a single frame
+						// so create an event that keeps it on the screen for some frames
+						Position pos = u->getPosition();
+						Error lastErr = Broodwar->getLastError();
+						Broodwar->registerEvent([pos, lastErr](Game*)
+						{
+							Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
+						},   // action
+							nullptr,    // condition
+							Broodwar->getLatencyFrames());  // frames to run
+					}
+				}
+
+				// Train marines until marine army count is reached
+				else if (u->isIdle() && Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) != 18 && !u->train(UnitTypes::Terran_Marine))
 				{
 					// If that fails, draw the error at the location so that you can visibly see what went wrong!
 					// However, drawing the error once will only appear for a single frame
@@ -224,21 +261,26 @@ void LBot::onFrame()
 						Broodwar->getLatencyFrames());  // frames to run
 				}
 			}
-
-			// Train marines until marine army count is reached
-			else if (u->isIdle() && Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) != 18 && !u->train(UnitTypes::Terran_Marine))
+			else if (Broodwar->enemy()->getRace() == Races::Protoss)
 			{
-				// If that fails, draw the error at the location so that you can visibly see what went wrong!
-				// However, drawing the error once will only appear for a single frame
-				// so create an event that keeps it on the screen for some frames
-				Position pos = u->getPosition();
-				Error lastErr = Broodwar->getLastError();
-				Broodwar->registerEvent([pos, lastErr](Game*)
+
+			}
+			else if (Broodwar->enemy()->getRace() == Races::Terran)
+			{
+				if (u->isIdle() && Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) != 8 && !u->train(UnitTypes::Terran_Vulture))
 				{
-					Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
-				},   // action
-					nullptr,    // condition
-					Broodwar->getLatencyFrames());  // frames to run
+					// If that fails, draw the error at the location so that you can visibly see what went wrong!
+					// However, drawing the error once will only appear for a single frame
+					// so create an event that keeps it on the screen for some frames
+					Position pos = u->getPosition();
+					Error lastErr = Broodwar->getLastError();
+					Broodwar->registerEvent([pos, lastErr](Game*)
+					{
+						Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
+					},   // action
+						nullptr,    // condition
+						Broodwar->getLatencyFrames());  // frames to run
+				}
 			}
 		}
 
@@ -250,8 +292,7 @@ void LBot::onFrame()
 			// Perform research
 			buildingManager->researchTech(u);
 		}
-		
-	} // closure: unit iterator		
+	}	
 }
 
 void LBot::onSendText(std::string txt)
@@ -310,7 +351,7 @@ void LBot::onNukeDetect(BWAPI::Position t)
 //{
 //}
 
-// NOTE: Workers and command center that the player starts with counts as being created
+// NOTE: Workers and command center that the player starts with counts as being created when the game starts
 void LBot::onUnitCreate(BWAPI::Unit u)
 {	
 	// Upon creation of unit belonging to player
