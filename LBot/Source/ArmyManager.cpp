@@ -27,29 +27,41 @@ void ArmyManager::removeUnit(BWAPI::Unitset* set, BWAPI::Unit* u)
 /*
  * Army group attacking
  */
-void ArmyManager::groupAttack(BWAPI::Unitset* set)
+void ArmyManager::groupAttack(BWAPI::Unitset set)
 {
-	//if (set->size() < (set->max_size() / 2))
-	//{
-	//	//Retreat back to base and get to max size
-	//	//if army is at base then continue
-	//}
-	//else
-	//{
-	//	for (Unit u : *set)
-	//	{
-	//		if (u->getHitPoints() < (u->getInitialHitPoints / 2))
-	//		{
-	//			//Retreat to back of group
-	//			//get closest enemies position
-	//			//get units position
-	//			//if enemy is higher than unit, negative retreat
-	//			//if enemy is lower than unit, positive retreat
-	//		}
-	//	}
-	//}
+	// If army is at half strength, retrat back to base until full strength
+	if (set.size() < (set.max_size() / 2))
+	{
+		//Retreat back to base and get to max size
+		//if army is at base then continue
+		TilePosition base = Broodwar->self()->getStartLocation();
+		Position pos(base);
+		set.move(pos);
 
-	set->attack(set->getClosestUnit(Filter::IsEnemy));
+		if (set.size() == set.max_size())
+		{
+			groupAttack(set);
+		}
+	}
+	else
+	{
+		set.attack(set.getClosestUnit(Filter::IsEnemy));
+
+		// Retreat lower health units to the back of the group/kite
+		for (Unit u :set)
+		{
+			if (u->getHitPoints() < (u->getInitialHitPoints() / 2))
+			{
+				//Retreat to back of group
+				//get closest enemies position
+				//get units position
+				//if enemy is higher than unit, negative retreat
+				//if enemy is lower than unit, positive retreat
+			}
+		}
+	}	
 }
+
+// SWITCH TO FOR UNITS IN SET?
 
 
