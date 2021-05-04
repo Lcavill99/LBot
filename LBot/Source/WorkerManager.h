@@ -2,7 +2,7 @@
 #include <BWAPI.h>
 
 class WorkerManager
-{	
+{  
 
 public:	
 	BWAPI::Unit WorkerManager::getWorker();
