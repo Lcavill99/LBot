@@ -208,7 +208,10 @@ void LBot::onFrame()
 				gasWorkers.insert(u);
 			}
 
-			// If worker is idle
+			/*
+			 * Worker gathering functionality
+			 */
+			// If worker is idle and is not the scout
 			if (u->isIdle() && u != scout)
 			{
 				// If worker is carrying a resource return them to the command center
