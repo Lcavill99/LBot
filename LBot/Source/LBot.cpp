@@ -61,7 +61,7 @@ void LBot::onEnd(bool isWinner)
 
 void LBot::onFrame()
 {	
-	// Display the game frame rate as text in the upper left area of the screen
+	// Display the game frame rate
 	Broodwar->drawTextScreen(200, 0,  "FPS: %d", Broodwar->getFPS());
 
 	// Return if the game is a replay or is paused
@@ -73,6 +73,7 @@ void LBot::onFrame()
 	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 		return;
 
+	// Update latest error
 	Error lastErr = Broodwar->getLastError();
 
 	// Call Build order
@@ -83,7 +84,7 @@ void LBot::onFrame()
 	/*
 	 * Scouting
 	 */
-	// If we dont ahve a scout, assign one
+	// If we dont have a scout, assign one
 	if (!scout)
 	{
 		scout = workerManager->getWorker();
@@ -92,7 +93,9 @@ void LBot::onFrame()
 	// If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
 	if (scout && Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy) == 1 && !scouting)
 	{
+		// Updated scouting to avoid spamming of scouting requests
 		scouting = true;
+
 		auto& startLocations = Broodwar->getStartLocations();
 
 		// Loop through all start locations
@@ -109,12 +112,14 @@ void LBot::onFrame()
 			scout->move(pos);
 			break;
 		}
-	}
-	
+	}	
 
+	/*
+	 * Attacking
+	 */
 	army1.attack(army1.getClosestUnit(Filter::IsEnemy));
 		
-	// If supply count is at cap, build a supply depot to continue progression
+	// Supply building. If supply count is at cap, build a supply depot to continue progression
 	if (lastErr == Errors::Insufficient_Supply && lastChecked + 400 < Broodwar->getFrameCount())
 	{
 		lastChecked = Broodwar->getFrameCount();
@@ -146,9 +151,12 @@ void LBot::onFrame()
 		}
 	}
 
-	// Iterate through all the units owned by the player
+	// Iterate through all owned units
 	for (auto &u : Broodwar->self()->getUnits())
 	{
+		/*
+		 * Initial selection process
+		 */
 		// Ignore the unit if it no longer exists
 		if (!u->exists())
 			continue;
@@ -170,8 +178,10 @@ void LBot::onFrame()
 		 */
 		if (u->getType().isWorker())
 		{	
-			// Unitset management
-			// If worker isnt in the allWorkers unitset
+			/*
+		     * Unitset management
+		     */
+			// If worker isn't in the allWorkers unitset
 			if (!allWorkers.contains(u))
 			{
 				// Add to gasWorkers unitset
@@ -211,7 +221,7 @@ void LBot::onFrame()
 				{
 					workerManager->gatherGas(u);
 				}
-				// Otherwise just assign to minerals
+				// Otherwise assign to minerals
 				else
 				{
 					workerManager->gatherMinerals(u);
