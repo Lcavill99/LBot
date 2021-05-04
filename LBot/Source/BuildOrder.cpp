@@ -223,15 +223,15 @@ void BuildOrder::buildOrder()
 			}
 		}
 
-		// Scout
-		if (academy == 1 && !scouting && lastChecked + 150 < Broodwar->getFrameCount())
-		{
-			lastChecked = Broodwar->getFrameCount();
-			scoutManager->setScout();
-			scouting = true;
-			scoutManager->goScout();
+		//// Scout
+		//if (academy == 1 && !scouting && lastChecked + 150 < Broodwar->getFrameCount())
+		//{
+		//	lastChecked = Broodwar->getFrameCount();
+		//	scoutManager->setScout();
+		//	scouting = true;
+		//	scoutManager->goScout();
 
-		}
+		//}
 
 		// Expand
 		if (Broodwar->self()->supplyUsed() >= 68 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Command_Center.mineralPrice())
