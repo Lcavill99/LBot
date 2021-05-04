@@ -7,18 +7,14 @@
 #include "ArmyManager.h"
 
 class LBot : public BWAPI::AIModule
-{
-	int barracks;
-	int depot;
-	int refinery;
-	int academy;
-	int medics;
-
+{	
 	BuildOrder *buildOrder;
 	ScoutManager *scoutManager;
 	WorkerManager *workerManager;
 	BuildingManager *buildingManager;
 	ArmyManager *armyManager;
+	
+	BWAPI::Unit scout;
 
 public:
   virtual void onStart();

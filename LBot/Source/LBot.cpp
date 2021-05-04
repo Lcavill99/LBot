@@ -12,8 +12,6 @@ BWAPI::Unitset allBuildings; // Holds all player buildings
 BWAPI::Unitset army1; // Holds all player units assigned to the offensive army
 BWAPI::Unitset army2; // Holds all player units assigned to the secondary/defensive army
 
-BWAPI::Unit scout;
-
 static int lastChecked = 0;
 bool scouting = false;
 
@@ -75,12 +73,49 @@ void LBot::onFrame()
 	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 		return;
 
-	buildOrder->buildOrder();
+	Error lastErr = Broodwar->getLastError();
 
-	scout = scoutManager->getScout();
+	// Call Build order
+	buildOrder->buildOrder();
+	
+	//scout = scoutManager->getScout();
+
+	/*
+	 * Scouting
+	 */
+	// If we dont ahve a scout, assign one
+	if (!scout)
+	{
+		scout = workerManager->getWorker();
+	}
+
+	// If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
+	if (scout && Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy) == 1 && !scouting)
+	{
+		scouting = true;
+		auto& startLocations = Broodwar->getStartLocations();
+
+		// Loop through all start locations
+		for (BWAPI::TilePosition baseLocation : startLocations)
+		{
+			// If the location is already explored, move on
+			if (Broodwar->isExplored(baseLocation))
+			{
+				continue;
+			}
+
+			BWAPI::Position pos(baseLocation);
+			// Move to start location to scout
+			scout->move(pos);
+			break;
+		}
+	}
+	
+
+	army1.attack(army1.getClosestUnit(Filter::IsEnemy));
 		
-	// If supply count is almost at cap, build a supply depot to continue progression
-	if ((Broodwar->self()->supplyUsed() == Broodwar->self()->supplyTotal() - 1) && lastChecked + 150 < Broodwar->getFrameCount())
+	// If supply count is at cap, build a supply depot to continue progression
+	if (lastErr == Errors::Insufficient_Supply && lastChecked + 400 < Broodwar->getFrameCount())
 	{
 		lastChecked = Broodwar->getFrameCount();
 
@@ -134,7 +169,7 @@ void LBot::onFrame()
 		 * Workers
 		 */
 		if (u->getType().isWorker())
-		{		
+		{	
 			// Unitset management
 			// If worker isnt in the allWorkers unitset
 			if (!allWorkers.contains(u))
@@ -152,7 +187,7 @@ void LBot::onFrame()
 				// Add to mineral workers unitset
 				minWorkers.insert(u);
 			}
-			if (u->isGatheringGas() && !gasWorkers.contains(u))
+			if (u->isGatheringGas() && gasWorkers.size() != 3 && !gasWorkers.contains(u))
 			{
 				// If worker is in the mineral workers unitset, remove to avoid duplicate
 				if (minWorkers.contains(u))
@@ -191,7 +226,14 @@ void LBot::onFrame()
 		{
 			if (u->isIdle())
 			{
-				u->attack(u->getClosestUnit(Filter::IsEnemy));
+				//if (u->getHitPoints() < (u->getInitialHitPoints() / 2))
+				//{
+				//	//Retreat back to base and get to max size
+				//	//if army is at base then continue
+				//	TilePosition base = Broodwar->self()->getStartLocation();
+				//	Position pos(base);
+				//	u->move(pos);
+				//}
 			}			
 		}
 
@@ -202,7 +244,14 @@ void LBot::onFrame()
 		{
 			if (u->isIdle())
 			{
-				u->attack(u->getClosestUnit());
+				//if (u->getHitPoints() < (u->getInitialHitPoints() / 2))
+				//{
+				//	//Retreat back to base and get to max size
+				//	//if army is at base then continue
+				//	TilePosition base = Broodwar->self()->getStartLocation();
+				//	Position pos(base);
+				//	u->move(pos);
+				//}
 			}
 		}
 
