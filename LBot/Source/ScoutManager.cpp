@@ -34,8 +34,8 @@ void ScoutManager::goScout()
 	auto& startLocations = Broodwar->getStartLocations();
 	auto& enemyBase = Broodwar->enemy()->getStartLocation();
 
-	while (!Broodwar->isExplored(enemyBase))
-	{
+	/*while (!Broodwar->isExplored(enemyBase))
+	{*/
 		// Loop through all start locations
 		for (TilePosition baseLocation : startLocations)
 		{
@@ -50,7 +50,7 @@ void ScoutManager::goScout()
 			scout->move(pos);
 			break;
 		}
-	}	
+	//}	
 }
 
 /*
