@@ -37,5 +37,5 @@ public:
   virtual void onUnitMorph(BWAPI::Unit u);
   //virtual void onUnitRenegade(BWAPI::Unit u);
   virtual void onSaveGame(std::string gameName);
-  //virtual void onUnitComplete(BWAPI::Unit u);
+  virtual void onUnitComplete(BWAPI::Unit u);
 };

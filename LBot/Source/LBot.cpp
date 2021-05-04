@@ -12,6 +12,11 @@ BWAPI::Unitset allBuildings; // Holds all player buildings
 BWAPI::Unitset army1; // Holds all player units assigned to the offensive army
 BWAPI::Unitset army2; // Holds all player units assigned to the secondary/defensive army
 
+BWAPI::Unit scout;
+
+static int lastChecked = 0;
+bool scouting = false;
+
 void LBot::onStart()
 {
 	// Enable the UserInput flag, which allows us to control the bot and type messages.
@@ -58,8 +63,6 @@ void LBot::onEnd(bool isWinner)
 
 void LBot::onFrame()
 {	
-	static int lastChecked = 0;
-
 	// Display the game frame rate as text in the upper left area of the screen
 	Broodwar->drawTextScreen(200, 0,  "FPS: %d", Broodwar->getFPS());
 
@@ -74,17 +77,17 @@ void LBot::onFrame()
 
 	buildOrder->buildOrder();
 
-	//armyManager->groupAttack(army1);
-
+	scout = scoutManager->getScout();
+		
 	// If supply count is almost at cap, build a supply depot to continue progression
 	if ((Broodwar->self()->supplyUsed() == Broodwar->self()->supplyTotal() - 1) && lastChecked + 150 < Broodwar->getFrameCount())
 	{
 		lastChecked = Broodwar->getFrameCount();
 
-		Unit builder = workerManager->getWorker();
+		Unit builder = workerManager->getWorker();		
 
-		// If worker is found
-		if (builder)
+		// If worker is found and its not the scout
+		if (builder != scout)
 		{
 			// Find a location for depot
 			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, builder->getTilePosition());
@@ -161,7 +164,7 @@ void LBot::onFrame()
 			}
 
 			// If worker is idle
-			if (u->isIdle())
+			if (u->isIdle() && u != scout)
 			{
 				// If worker is carrying a resource return them to the command center
 				if (u->isCarryingGas() || u->isCarryingMinerals())
@@ -186,7 +189,10 @@ void LBot::onFrame()
 		 */
 		if (u->getType() == UnitTypes::Terran_Marine)
 		{
-
+			if (u->isIdle())
+			{
+				u->attack(u->getClosestUnit(Filter::IsEnemy));
+			}			
 		}
 
 		/*
@@ -194,7 +200,10 @@ void LBot::onFrame()
 		 */
 		if (u->getType() == UnitTypes::Terran_Medic)
 		{
-
+			if (u->isIdle())
+			{
+				u->attack(u->getClosestUnit());
+			}
 		}
 
 		/*
@@ -354,33 +363,33 @@ void LBot::onNukeDetect(BWAPI::Position t)
 // NOTE: Workers and command center that the player starts with counts as being created when the game starts
 void LBot::onUnitCreate(BWAPI::Unit u)
 {	
-	// Upon creation of unit belonging to player
-	if (u->getPlayer() == Broodwar->self())
-	{
-		// Unitset management
-		if (u->getType().isWorker())
-		{
-			// Add worker to worker unitset
-			allWorkers.insert(u);
-		}
-		else if (u->getType().isBuilding())
-		{
-			// Add building to building unitset
-			allBuildings.insert(u);
-		}
-		// If army1 isnt full
-		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() != 12)
-		{
-			// Add unit to army1
-			army1.insert(u);
-		}
-		// If army1 is full and army2 isnt
-		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() == 12 && army2.size() != 12)
-		{
-			// Add unit to army2
-			army2.insert(u);
-		}
-	}
+	//// Upon creation of unit belonging to player
+	//if (u->getPlayer() == Broodwar->self())
+	//{
+	//	// Unitset management
+	//	if (u->getType().isWorker())
+	//	{
+	//		// Add worker to worker unitset
+	//		allWorkers.insert(u);
+	//	}
+	//	else if (u->getType().isBuilding())
+	//	{
+	//		// Add building to building unitset
+	//		allBuildings.insert(u);
+	//	}
+	//	// If army1 isnt full
+	//	else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() != 12)
+	//	{
+	//		// Add unit to army1
+	//		army1.insert(u);
+	//	}
+	//	// If army1 is full and army2 isnt
+	//	else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() == 12 && army2.size() != 12)
+	//	{
+	//		// Add unit to army2
+	//		army2.insert(u);
+	//	}
+	//}
 
 	if (Broodwar->isReplay())
 	{
@@ -457,6 +466,33 @@ void LBot::onSaveGame(std::string gameName)
 	Broodwar << "The game was saved to \"" << gameName << "\"" << std::endl;
 }
 
-//void LBot::onUnitComplete(BWAPI::Unit u)
-//{
-//}
+void LBot::onUnitComplete(BWAPI::Unit u)
+{
+	// Upon creation of unit belonging to player
+	if (u->getPlayer() == Broodwar->self())
+	{
+		// Unitset management
+		if (u->getType().isWorker())
+		{
+			// Add worker to worker unitset
+			allWorkers.insert(u);
+		}
+		else if (u->getType().isBuilding())
+		{
+			// Add building to building unitset
+			allBuildings.insert(u);
+		}
+		// If army1 isnt full
+		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() != 12)
+		{
+			// Add unit to army1
+			army1.insert(u);
+		}
+		// If army1 is full and army2 isnt
+		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() == 12 && army2.size() != 12)
+		{
+			// Add unit to army2
+			army2.insert(u);
+		}
+	}
+}
