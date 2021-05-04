@@ -18,7 +18,7 @@ void BuildOrder::buildOrder()
 
 	static int lastChecked = 0;
 	static int movetime = 150;
-	static bool haveScout = false;	
+	static bool scouting = false;	
 
 	workerManager = new WorkerManager;
 	scoutManager = new ScoutManager;
@@ -224,18 +224,19 @@ void BuildOrder::buildOrder()
 		}
 
 		// Scout
-		if (Broodwar->self()->supplyUsed() == 36 && !haveScout && lastChecked + 500 < Broodwar->getFrameCount())
+		if (academy == 1 && !scouting && lastChecked + 150 < Broodwar->getFrameCount())
 		{
 			lastChecked = Broodwar->getFrameCount();
 			scoutManager->setScout();
-			haveScout = true;
-			scoutManager->goScout();			
+			scouting = true;
+			scoutManager->goScout();
+
 		}
 
 		// Expand
 		if (Broodwar->self()->supplyUsed() >= 68 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Command_Center.mineralPrice())
 		{
-			lastChecked = Broodwar->getFrameCount();
+			
 
 		}
 	}
@@ -342,11 +343,10 @@ void BuildOrder::buildOrder()
 		}
 
 		// Scout
-		if (Broodwar->self()->supplyUsed() == 26 && !haveScout && lastChecked + 500 < Broodwar->getFrameCount())
+		if (Broodwar->self()->supplyUsed() == 26 && !scouting && lastChecked + 500 < Broodwar->getFrameCount())
 		{
-			lastChecked = Broodwar->getFrameCount();
-			scoutManager->setScout();
-			haveScout = true;
+			lastChecked = Broodwar->getFrameCount();			
+			scouting = true;
 			scoutManager->goScout();
 		}
 
