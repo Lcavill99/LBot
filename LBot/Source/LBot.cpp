@@ -11,9 +11,10 @@ BWAPI::Unitset gasWorkers; // Holds all player workers assigned to gather gas
 BWAPI::Unitset allBuildings; // Holds all player buildings
 BWAPI::Unitset army1; // Holds all player units assigned to the offensive army
 BWAPI::Unitset army2; // Holds all player units assigned to the secondary/defensive army
+BWAPI::Unitset enemyBuildings; // Holds all enemy buildings
 
 static int lastChecked = 0;
-bool scouting = false;
+bool finScouting = false;
 
 void LBot::onStart()
 {
@@ -61,8 +62,13 @@ void LBot::onEnd(bool isWinner)
 
 void LBot::onFrame()
 {	
-	// Display the game frame rate
-	Broodwar->drawTextScreen(200, 0,  "FPS: %d", Broodwar->getFPS());
+	// Display values
+	Broodwar->drawTextScreen(0, 0,  "FPS: %d", Broodwar->getFPS());
+	Broodwar->drawTextScreen(0, 10, "Workers: %d", allWorkers.size());
+	Broodwar->drawTextScreen(0, 20, "Mineral workers: %d", minWorkers.size());
+	Broodwar->drawTextScreen(0, 30, "Gas workers: %d", gasWorkers.size());
+	Broodwar->drawTextScreen(0, 40, "Army1: %d", army1.size());
+	Broodwar->drawTextScreen(0, 50, "Army2: %d", army2.size());
 
 	// Return if the game is a replay or is paused
 	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
@@ -79,25 +85,21 @@ void LBot::onFrame()
 	// Call Build order
 	buildOrder->buildOrder();
 	
-	//scout = scoutManager->getScout();
-
 	/*
 	 * Scouting
 	 */
-	// If we dont have a scout, assign one
-	if (!scout)
-	{
-		scout = workerManager->getWorker();
-	}
+	//auto& enemyBase = Broodwar->enemy()->getStartLocation();
 
 	// If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
-	if (scout && Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy) == 1 && !scouting)
+	if (Broodwar->self()->supplyUsed() >= 30 && !finScouting)
 	{
-		// Updated scouting to avoid spamming of scouting requests
-		scouting = true;
-
-		auto& startLocations = Broodwar->getStartLocations();
-
+		// If we dont have a scout, assign one
+		if (!scout)
+		{
+			scout = workerManager->getWorker();
+		}
+		auto& startLocations = Broodwar->getStartLocations();	
+		
 		// Loop through all start locations
 		for (BWAPI::TilePosition baseLocation : startLocations)
 		{
@@ -105,22 +107,40 @@ void LBot::onFrame()
 			if (Broodwar->isExplored(baseLocation))
 			{
 				continue;
-			}
+			}		
 
 			BWAPI::Position pos(baseLocation);
 			// Move to start location to scout
 			scout->move(pos);
 			break;
-		}
+		}		
 	}	
 
 	/*
 	 * Attacking
 	 */
-	army1.attack(army1.getClosestUnit(Filter::IsEnemy));
+	// If army is at half strength, retreat
+	if (army1.size() < (army1.max_size() / 2))
+	{
+		//retreat
+	}
+	else
+	{
+		for (BWAPI::Unit unit : army1)
+		{
+			if (unit->getHitPoints() < (unit->getInitialHitPoints() / 2))
+			{
+				//retreat to back of group
+			}
+			unit->attack(unit->getClosestUnit(Filter::IsEnemy));			
+		}
+	}	
 		
-	// Supply building. If supply count is at cap, build a supply depot to continue progression
-	if (lastErr == Errors::Insufficient_Supply && lastChecked + 400 < Broodwar->getFrameCount())
+	/*
+	 * Supply management
+	 */
+	// If supply count is at cap, build a supply depot to continue progression
+	if (lastErr == Errors::Insufficient_Supply && lastChecked + 150 < Broodwar->getFrameCount())
 	{
 		lastChecked = Broodwar->getFrameCount();
 
@@ -151,6 +171,9 @@ void LBot::onFrame()
 		}
 	}
 
+	/*
+	 * Unit iteration
+	 */
 	// Iterate through all owned units
 	for (auto &u : Broodwar->self()->getUnits())
 	{
@@ -235,7 +258,7 @@ void LBot::onFrame()
 		/*
 		 * Marines
 		 */
-		if (u->getType() == UnitTypes::Terran_Marine)
+		else if (u->getType() == UnitTypes::Terran_Marine)
 		{
 			if (u->isIdle())
 			{
@@ -404,11 +427,33 @@ void LBot::onNukeDetect(BWAPI::Position t)
 	// You can also retrieve all the nuclear missile targets using Broodwar->getNukeDots()!
 }
 
-// MAY POTENTIALLY FIX THE SCOUTING ISSUE?
-//void LBot::onUnitDiscover(BWAPI::Unit u)
-//{
-//    //IF ENEMY BASE DISCOVERED, SEND SCOUT HOME?
-//}
+void LBot::onUnitDiscover(BWAPI::Unit u)
+{
+	if (u->getPlayer() == Broodwar->enemy())
+	{
+		//If enemy base is discovered, stop scouting and go home
+		if (u->getType().isResourceDepot())
+		{						
+			// Add to enemy buildings unitset
+			enemyBuildings.insert(u);
+
+			// Finish scouting
+			finScouting = true;
+
+			// Get player base location
+			BWAPI::TilePosition home = Broodwar->self()->getStartLocation();
+			BWAPI::Position homePos(home);
+
+			// Move to base
+			scout->move(homePos);
+
+			if (scout->getPosition().getDistance(homePos) < 100)
+			{
+				scout = NULL;
+			}			
+		}
+	}    
+}
 
 //void LBot::onUnitEvade(BWAPI::Unit u)
 //{

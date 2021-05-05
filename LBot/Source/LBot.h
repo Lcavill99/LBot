@@ -24,7 +24,7 @@ public:
   virtual void onReceiveText(BWAPI::Player p, std::string txt);
   virtual void onPlayerLeft(BWAPI::Player p);
   virtual void onNukeDetect(BWAPI::Position t);
-  //virtual void onUnitDiscover(BWAPI::Unit u);
+  virtual void onUnitDiscover(BWAPI::Unit u);
   //virtual void onUnitEvade(BWAPI::Unit u);
   //virtual void onUnitShow(BWAPI::Unit u);
   //virtual void onUnitHide(BWAPI::Unit u);
