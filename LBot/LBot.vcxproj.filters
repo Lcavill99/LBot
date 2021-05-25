@@ -5,108 +5,168 @@
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\LBot.cpp" />
     <ClCompile Include="Source\ArmyManager.cpp" />
-    <ClCompile Include="Source\BWEM\area.cpp">
-      <Filter>BWEM</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BWEM\base.cpp">
-      <Filter>BWEM</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BWEM\bwapiExt.cpp">
-      <Filter>BWEM</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BWEM\bwem.cpp">
-      <Filter>BWEM</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BWEM\cp.cpp">
-      <Filter>BWEM</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BWEM\graph.cpp">
-      <Filter>BWEM</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BWEM\gridMap.cpp">
-      <Filter>BWEM</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BWEM\map.cpp">
-      <Filter>BWEM</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BWEM\mapDrawer.cpp">
-      <Filter>BWEM</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BWEM\mapImpl.cpp">
-      <Filter>BWEM</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BWEM\mapPrinter.cpp">
-      <Filter>BWEM</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BWEM\neutral.cpp">
-      <Filter>BWEM</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BWEM\tiles.cpp">
-      <Filter>BWEM</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BWEM\utils.cpp">
-      <Filter>BWEM</Filter>
-    </ClCompile>
     <ClCompile Include="Source\ScoutManager.cpp" />
     <ClCompile Include="Source\WorkerManager.cpp" />
     <ClCompile Include="Source\BuildingManager.cpp" />
+    <ClCompile Include="Source\BWEB\Block.cpp">
+      <Filter>BWEB</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEB\BWEB.cpp">
+      <Filter>BWEB</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEB\PathFind.cpp">
+      <Filter>BWEB</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEB\Station.cpp">
+      <Filter>BWEB</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEB\Wall.cpp">
+      <Filter>BWEB</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\area.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\base.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\bwapiExt.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\bwem.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\cp.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\examples.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\exampleWall.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\graph.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\gridMap.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\map.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\mapDrawer.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\mapImpl.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\mapPrinter.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\neutral.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\tiles.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\utils.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\src\winutils.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BWEMold\EasyBMP_1.06\EasyBMP.cpp">
+      <Filter>BWEMold</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BuildOrder.h" />
     <ClInclude Include="Source\LBot.h" />
     <ClInclude Include="Source\ArmyManager.h" />
-    <ClInclude Include="Source\BWEM\area.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BWEM\base.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BWEM\bwapiExt.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BWEM\bwem.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BWEM\cp.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BWEM\defs.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BWEM\graph.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BWEM\gridMap.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BWEM\map.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BWEM\mapDrawer.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BWEM\mapImpl.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BWEM\mapPrinter.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BWEM\neutral.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BWEM\tiles.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BWEM\utils.h">
-      <Filter>BWEM</Filter>
-    </ClInclude>
     <ClInclude Include="Source\ScoutManager.h" />
     <ClInclude Include="Source\WorkerManager.h" />
     <ClInclude Include="Source\BuildingManager.h" />
+    <ClInclude Include="Source\BWEB\Block.h">
+      <Filter>BWEB</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEB\BWEB.h">
+      <Filter>BWEB</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEB\JPS.h">
+      <Filter>BWEB</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEB\PathFind.h">
+      <Filter>BWEB</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEB\Station.h">
+      <Filter>BWEB</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEB\Wall.h">
+      <Filter>BWEB</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\area.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\base.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\bwapiExt.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\bwem.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\cp.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\defs.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\examples.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\exampleWall.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\graph.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\gridMap.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\map.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\mapDrawer.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\mapImpl.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\mapPrinter.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\neutral.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\tiles.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\utils.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\src\winutils.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BWEMold\EasyBMP_1.06\EasyBMP.h">
+      <Filter>BWEMold</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="BWEM">
-      <UniqueIdentifier>{2010bc00-2ad5-4e09-8c15-846fdde12505}</UniqueIdentifier>
+    <Filter Include="BWEB">
+      <UniqueIdentifier>{4cfa3931-323b-4f8d-b57f-ad4a69c4a169}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BWEMold">
+      <UniqueIdentifier>{95613469-3c45-4035-b1c7-c27687ca7a3c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
