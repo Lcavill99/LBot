@@ -25,7 +25,7 @@ BWAPI::Unit WorkerManager::getWorker()
 			{
 				worker = u;
 				return worker;
-			}
+			}					
 		}		
 	}
 	// If no workers can be found, print an error
@@ -53,22 +53,6 @@ BWAPI::Unit WorkerManager::getWorkerFromSet(BWAPI::Unitset* set)
 	// If no workers can be found, print an error
 	Broodwar->printf("WorkerManager Error: No available workers");
 	return NULL;
-}
-
-/*
- * Add unit to Unitset
- */
-void WorkerManager::addUnit(BWAPI::Unitset* set, BWAPI::Unit* u)
-{
-	set->insert(*u);
-}
-
-/*
- * Remove unit from unitset
- */
-void WorkerManager::removeUnit(BWAPI::Unitset* set, BWAPI::Unit* u)
-{
-	set->erase(*u);
 }
 
 /*
