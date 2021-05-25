@@ -3,9 +3,11 @@
 #include "BWEB.h"
 #include "BuildOrder.h"
 #include <iostream>
+#include <fstream>
 
 using namespace BWAPI;
 using namespace Filter;
+using namespace std;
 
 namespace { auto & theMap = BWEM::Map::Instance(); }
 
@@ -72,10 +74,20 @@ void LBot::onStart()
 void LBot::onEnd(bool isWinner)
 {
 	// Called when the game ends
-	if ( isWinner )
+	if (isWinner)
 	{
-		// Log your win here!
+		ofstream resultFile;
+		resultFile.open("results.txt");
+		resultFile << "Win\n";
+		resultFile.close();
 	}
+	else if (!isWinner)
+	{
+		ofstream resultFile;
+		resultFile.open("results.txt");
+		resultFile << "Loss\n";
+		resultFile.close();
+	}	
 }
 
 void LBot::onFrame()
@@ -234,7 +246,6 @@ void LBot::onFrame()
 		}
 	}	
 
-
 	///				  ///
 	/// GENERAL LOGIC ///
 	///			      ///
@@ -297,7 +308,6 @@ void LBot::onFrame()
 	/*
 	 * Unit iteration
 	 */
-	// Iterate through all owned units
 	for (auto &u : Broodwar->self()->getUnits())
 	{
 		/*
@@ -400,6 +410,24 @@ void LBot::onFrame()
 		 * Medics
 		 */
 		else if (u->getType() == UnitTypes::Terran_Medic)
+		{
+			if (u->isIdle())
+			{
+				//if (u->getHitPoints() < (u->getInitialHitPoints() / 2))
+				//{
+				//	//Retreat back to base and get to max size
+				//	//if army is at base then continue
+				//	TilePosition base = Broodwar->self()->getStartLocation();
+				//	Position pos(base);
+				//	u->move(pos);
+				//}
+			}
+		}
+
+		/*
+		 * Tanks
+		 */
+		else if (u->getType() == UnitTypes::Terran_Siege_Tank_Tank_Mode || u->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode)
 		{
 			if (u->isIdle())
 			{
@@ -628,37 +656,9 @@ void LBot::onUnitDiscover(BWAPI::Unit u)
 //{
 //}
 
-// NOTE: Workers and command center that the player starts with counts as being created when the game starts
+// Workers and command center that the player starts with counts as being created/completed when the game starts
 void LBot::onUnitCreate(BWAPI::Unit u)
 {	
-	//// Upon creation of unit belonging to player
-	//if (u->getPlayer() == Broodwar->self())
-	//{
-	//	// Unitset management
-	//	if (u->getType().isWorker())
-	//	{
-	//		// Add worker to worker unitset
-	//		allWorkers.insert(u);
-	//	}
-	//	else if (u->getType().isBuilding())
-	//	{
-	//		// Add building to building unitset
-	//		allBuildings.insert(u);
-	//	}
-	//	// If army1 isnt full
-	//	else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() != 12)
-	//	{
-	//		// Add unit to army1
-	//		army1.insert(u);
-	//	}
-	//	// If army1 is full and army2 isnt
-	//	else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() == 12 && army2.size() != 12)
-	//	{
-	//		// Add unit to army2
-	//		army2.insert(u);
-	//	}
-	//}
-
 	if (Broodwar->isReplay())
 	{
 		// if we are in a replay, then we will print out the build order of the structures
@@ -741,6 +741,7 @@ void LBot::onSaveGame(std::string gameName)
 	Broodwar << "The game was saved to \"" << gameName << "\"" << std::endl;
 }
 
+// Workers and command center that the player starts with counts as being created/completed when the game starts
 void LBot::onUnitComplete(BWAPI::Unit u)
 {
 	// Upon creation of unit belonging to player
