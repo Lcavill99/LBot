@@ -237,7 +237,6 @@ void BuildOrder::buildOrder()
 		if (Broodwar->self()->supplyUsed() >= 68 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Command_Center.mineralPrice())
 		{
 			
-
 		}
 	}
 
