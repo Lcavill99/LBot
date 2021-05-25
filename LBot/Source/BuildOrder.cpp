@@ -4,6 +4,7 @@
  *
  */
 #include "BuildOrder.h"
+#include "BWEB.h"
 
 using namespace BWAPI;
 using namespace Filter;
@@ -15,6 +16,7 @@ void BuildOrder::buildOrder()
 	refinery = Broodwar->self()->allUnitCount(UnitTypes::Terran_Refinery);
 	academy = Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy);
 	factory = Broodwar->self()->allUnitCount(UnitTypes::Terran_Factory);
+	armory = Broodwar->self()->allUnitCount(UnitTypes::Terran_Armory);
 
 	static int lastChecked = 0;
 	static int movetime = 150;
@@ -159,7 +161,7 @@ void BuildOrder::buildOrder()
 		}
 
 		// Build refinery **NEEDS TO BE IMPROVED FROM CLOSEST**
-		if (refinery == 0 && Broodwar->self()->supplyUsed() >= 30 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
+		if (refinery == 0 && Broodwar->self()->supplyUsed() >= 30 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Refinery) == 0)
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -192,7 +194,7 @@ void BuildOrder::buildOrder()
 		}
 
 		// Build academy
-		if (academy == 0 && Broodwar->self()->supplyUsed() >= 36 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Academy.mineralPrice())
+		if (academy == 0 && Broodwar->self()->supplyUsed() >= 36 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Academy.mineralPrice() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Academy) == 0)
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -230,13 +232,116 @@ void BuildOrder::buildOrder()
 		//	scoutManager->setScout();
 		//	scouting = true;
 		//	scoutManager->goScout();
-
 		//}
 
 		// Expand
-		if (Broodwar->self()->supplyUsed() >= 68 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Command_Center.mineralPrice())
+		if (academy == 1 && Broodwar->self()->supplyUsed() >= 68 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Command_Center.mineralPrice())
 		{
-			
+			/*lastChecked = Broodwar->getFrameCount();
+
+			Unit builder = workerManager->getWorker();
+			TilePosition builderLoc = builder->getTilePosition();
+
+			BWEB::Station baseLoc = *BWEB::Stations::getClosestStation(builderLoc);
+
+			BWEM::Base bwemBaseLoc = BWEB::Station::getBWEMBase();*/
+		}
+
+		// Build factory
+		if (academy == 1 && factory == 0 && Broodwar->self()->supplyUsed() >= 68 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Factory.mineralPrice())
+		{
+			lastChecked = Broodwar->getFrameCount();
+
+			Unit builder = workerManager->getWorker();
+
+			// If worker is found
+			if (builder)
+			{
+				// Find a location for academy
+				TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Factory, builder->getTilePosition());
+
+				// If build position is found
+				if (buildPosition)
+				{
+					// Build
+					builder->build(UnitTypes::Terran_Factory, buildPosition);
+
+					// Register an event that draws the target build location
+					Broodwar->registerEvent([buildPosition, builder](Game*)
+					{
+						Broodwar->drawBoxMap(Position(buildPosition),
+							Position(buildPosition + UnitTypes::Terran_Factory.tileSize()),
+							Colors::Blue);
+					},
+						nullptr,  // condition
+						UnitTypes::Terran_Factory.buildTime() + 100);  // frames to run
+				}
+			}
+		}
+
+		// Machine shop upgrade for factory
+		if (factory == 1 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Machine_Shop.mineralPrice() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Machine_Shop) == 0)
+		{
+			lastChecked = Broodwar->getFrameCount();
+
+			Unit builder = workerManager->getWorker();
+
+			// If worker is found
+			if (builder)
+			{				
+				// Find a location for academy
+				TilePosition buildPosition = Broodwar->getUnit(UnitTypes::Terran_Factory)->getTilePosition();
+					
+				// If build position is found
+				if (buildPosition)
+				{
+					// Build
+					builder->build(UnitTypes::Terran_Machine_Shop, buildPosition);
+
+					// Register an event that draws the target build location
+					Broodwar->registerEvent([buildPosition, builder](Game*)
+					{
+						Broodwar->drawBoxMap(Position(buildPosition),
+							Position(buildPosition + UnitTypes::Terran_Machine_Shop.tileSize()),
+							Colors::Blue);
+					},
+						nullptr,  // condition
+						UnitTypes::Terran_Machine_Shop.buildTime() + 100);  // frames to run
+				}
+				
+			}
+		}
+
+		// Armoury
+		if (factory == 1 && armory == 0 && Broodwar->self()->supplyUsed() >= 68 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Armory.mineralPrice() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Armory) == 0)
+		{
+			lastChecked = Broodwar->getFrameCount();
+
+			Unit builder = workerManager->getWorker();
+
+			// If worker is found
+			if (builder)
+			{
+				// Find a location for academy
+				TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Armory, builder->getTilePosition());
+
+				// If build position is found
+				if (buildPosition)
+				{
+					// Build
+					builder->build(UnitTypes::Terran_Armory, buildPosition);
+
+					// Register an event that draws the target build location
+					Broodwar->registerEvent([buildPosition, builder](Game*)
+					{
+						Broodwar->drawBoxMap(Position(buildPosition),
+							Position(buildPosition + UnitTypes::Terran_Armory.tileSize()),
+							Colors::Blue);
+					},
+						nullptr,  // condition
+						UnitTypes::Terran_Armory.buildTime() + 100);  // frames to run
+				}
+			}
 		}
 	}
 

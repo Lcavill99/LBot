@@ -10,6 +10,7 @@ class BuildOrder
 	int refinery;
 	int academy;
 	int factory;
+	int armory;
 
 	WorkerManager *workerManager;
 	ScoutManager *scoutManager;
