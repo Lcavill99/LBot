@@ -68,7 +68,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include;D:\Storage\Repos\LBot\LBot\Source\BWEMold\src;D:\Storage\Repos\LBot\LBot\Source\BWEB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX;WIN32;_WIN32_WINNT=0x0501;NTDDI_VERSION=0x05010300;NDEBUG;_WINDOWS;_USRDLL;LBOT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -78,6 +78,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <PreLinkEvent />
     <Link>
@@ -93,20 +94,29 @@
     <ClCompile Include="Source\ArmyManager.cpp" />
     <ClCompile Include="Source\BuildingManager.cpp" />
     <ClCompile Include="Source\BuildOrder.cpp" />
-    <ClCompile Include="Source\BWEM\area.cpp" />
-    <ClCompile Include="Source\BWEM\base.cpp" />
-    <ClCompile Include="Source\BWEM\bwapiExt.cpp" />
-    <ClCompile Include="Source\BWEM\bwem.cpp" />
-    <ClCompile Include="Source\BWEM\cp.cpp" />
-    <ClCompile Include="Source\BWEM\graph.cpp" />
-    <ClCompile Include="Source\BWEM\gridMap.cpp" />
-    <ClCompile Include="Source\BWEM\map.cpp" />
-    <ClCompile Include="Source\BWEM\mapDrawer.cpp" />
-    <ClCompile Include="Source\BWEM\mapImpl.cpp" />
-    <ClCompile Include="Source\BWEM\mapPrinter.cpp" />
-    <ClCompile Include="Source\BWEM\neutral.cpp" />
-    <ClCompile Include="Source\BWEM\tiles.cpp" />
-    <ClCompile Include="Source\BWEM\utils.cpp" />
+    <ClCompile Include="Source\BWEB\Block.cpp" />
+    <ClCompile Include="Source\BWEB\BWEB.cpp" />
+    <ClCompile Include="Source\BWEB\PathFind.cpp" />
+    <ClCompile Include="Source\BWEB\Station.cpp" />
+    <ClCompile Include="Source\BWEB\Wall.cpp" />
+    <ClCompile Include="Source\BWEMold\EasyBMP_1.06\EasyBMP.cpp" />
+    <ClCompile Include="Source\BWEMold\src\area.cpp" />
+    <ClCompile Include="Source\BWEMold\src\base.cpp" />
+    <ClCompile Include="Source\BWEMold\src\bwapiExt.cpp" />
+    <ClCompile Include="Source\BWEMold\src\bwem.cpp" />
+    <ClCompile Include="Source\BWEMold\src\cp.cpp" />
+    <ClCompile Include="Source\BWEMold\src\examples.cpp" />
+    <ClCompile Include="Source\BWEMold\src\exampleWall.cpp" />
+    <ClCompile Include="Source\BWEMold\src\graph.cpp" />
+    <ClCompile Include="Source\BWEMold\src\gridMap.cpp" />
+    <ClCompile Include="Source\BWEMold\src\map.cpp" />
+    <ClCompile Include="Source\BWEMold\src\mapDrawer.cpp" />
+    <ClCompile Include="Source\BWEMold\src\mapImpl.cpp" />
+    <ClCompile Include="Source\BWEMold\src\mapPrinter.cpp" />
+    <ClCompile Include="Source\BWEMold\src\neutral.cpp" />
+    <ClCompile Include="Source\BWEMold\src\tiles.cpp" />
+    <ClCompile Include="Source\BWEMold\src\utils.cpp" />
+    <ClCompile Include="Source\BWEMold\src\winutils.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\LBot.cpp" />
     <ClCompile Include="Source\ScoutManager.cpp" />
@@ -116,21 +126,31 @@
     <ClInclude Include="Source\ArmyManager.h" />
     <ClInclude Include="Source\BuildingManager.h" />
     <ClInclude Include="Source\BuildOrder.h" />
-    <ClInclude Include="Source\BWEM\area.h" />
-    <ClInclude Include="Source\BWEM\base.h" />
-    <ClInclude Include="Source\BWEM\bwapiExt.h" />
-    <ClInclude Include="Source\BWEM\bwem.h" />
-    <ClInclude Include="Source\BWEM\cp.h" />
-    <ClInclude Include="Source\BWEM\defs.h" />
-    <ClInclude Include="Source\BWEM\graph.h" />
-    <ClInclude Include="Source\BWEM\gridMap.h" />
-    <ClInclude Include="Source\BWEM\map.h" />
-    <ClInclude Include="Source\BWEM\mapDrawer.h" />
-    <ClInclude Include="Source\BWEM\mapImpl.h" />
-    <ClInclude Include="Source\BWEM\mapPrinter.h" />
-    <ClInclude Include="Source\BWEM\neutral.h" />
-    <ClInclude Include="Source\BWEM\tiles.h" />
-    <ClInclude Include="Source\BWEM\utils.h" />
+    <ClInclude Include="Source\BWEB\Block.h" />
+    <ClInclude Include="Source\BWEB\BWEB.h" />
+    <ClInclude Include="Source\BWEB\JPS.h" />
+    <ClInclude Include="Source\BWEB\PathFind.h" />
+    <ClInclude Include="Source\BWEB\Station.h" />
+    <ClInclude Include="Source\BWEB\Wall.h" />
+    <ClInclude Include="Source\BWEMold\EasyBMP_1.06\EasyBMP.h" />
+    <ClInclude Include="Source\BWEMold\src\area.h" />
+    <ClInclude Include="Source\BWEMold\src\base.h" />
+    <ClInclude Include="Source\BWEMold\src\bwapiExt.h" />
+    <ClInclude Include="Source\BWEMold\src\bwem.h" />
+    <ClInclude Include="Source\BWEMold\src\cp.h" />
+    <ClInclude Include="Source\BWEMold\src\defs.h" />
+    <ClInclude Include="Source\BWEMold\src\examples.h" />
+    <ClInclude Include="Source\BWEMold\src\exampleWall.h" />
+    <ClInclude Include="Source\BWEMold\src\graph.h" />
+    <ClInclude Include="Source\BWEMold\src\gridMap.h" />
+    <ClInclude Include="Source\BWEMold\src\map.h" />
+    <ClInclude Include="Source\BWEMold\src\mapDrawer.h" />
+    <ClInclude Include="Source\BWEMold\src\mapImpl.h" />
+    <ClInclude Include="Source\BWEMold\src\mapPrinter.h" />
+    <ClInclude Include="Source\BWEMold\src\neutral.h" />
+    <ClInclude Include="Source\BWEMold\src\tiles.h" />
+    <ClInclude Include="Source\BWEMold\src\utils.h" />
+    <ClInclude Include="Source\BWEMold\src\winutils.h" />
     <ClInclude Include="Source\LBot.h" />
     <ClInclude Include="Source\ScoutManager.h" />
     <ClInclude Include="Source\WorkerManager.h" />
