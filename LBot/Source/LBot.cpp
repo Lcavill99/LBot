@@ -15,6 +15,7 @@ BWAPI::Unitset gasWorkers; // Holds all player workers assigned to gather gas
 BWAPI::Unitset allBuildings; // Holds all player buildings
 BWAPI::Unitset army1; // Holds all player units assigned to the offensive army
 BWAPI::Unitset army2; // Holds all player units assigned to the secondary/defensive army
+BWAPI::Unitset tankArmy;
 BWAPI::Unitset enemyBuildings; // Holds all enemy buildings
 
 static int lastChecked = 0;
@@ -79,6 +80,9 @@ void LBot::onEnd(bool isWinner)
 
 void LBot::onFrame()
 {	
+	/*
+	 * BWEM
+	 */
 	// Render BWEM map
 	BWEM::utils::gridMapExample(theMap);
 	BWEM::utils::drawMap(theMap);
@@ -103,38 +107,137 @@ void LBot::onFrame()
 	// Update latest error
 	Error lastErr = Broodwar->getLastError();
 
-	// Call Build order
-	buildOrder->buildOrder();
+	///				  ///
+	/// MATCHUP LOGIC ///
+	///			      ///
+
+	/*
+	 * Zerg
+	 */
+	if (Broodwar->enemy()->getRace() == Races::Zerg)
+	{
+		/*
+		 * Build order
+		 */
+		buildingManager->zergBuildings();
+
+		/*
+		 * Scouting
+		 */
+		// If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
+		if (Broodwar->self()->supplyUsed() >= 36 && !finScouting)
+		{
+			// If we dont have a scout, assign one
+			if (!scout)
+			{
+				scout = workerManager->getWorker();
+			}
+
+			auto& startLocations = Broodwar->getStartLocations();
+
+			// Loop through all start locations
+			for (BWAPI::TilePosition baseLocation : startLocations)
+			{
+				// If the location is already explored, move on
+				if (Broodwar->isExplored(baseLocation))
+				{
+					continue;
+				}
+
+				BWAPI::Position pos(baseLocation);
+				// Move to start location to scout
+				scout->move(pos);
+				break;
+			}
+		}
+	}
 	
-	///*
-	// * Scouting
-	// */	
-	//// If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
-	//if (Broodwar->self()->supplyUsed() >= 30 && !finScouting)
-	//{
-	//	// If we dont have a scout, assign one
-	//	if (!scout)
-	//	{
-	//		scout = workerManager->getWorker();
-	//	}
+	/*
+	 * Protoss
+	 */
+	else if (Broodwar->enemy()->getRace() == Races::Protoss)
+	{
+		/*
+		 * Build order
+		 */
+		buildingManager->protossBuildings();
 
-	//	auto& startLocations = Broodwar->getStartLocations();	
-	//	
-	//	// Loop through all start locations
-	//	for (BWAPI::TilePosition baseLocation : startLocations)
-	//	{
-	//		// If the location is already explored, move on
-	//		if (Broodwar->isExplored(baseLocation))
-	//		{
-	//			continue;
-	//		}		
+		/*
+		 * Scouting
+		 */
+		// If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
+		if (Broodwar->self()->supplyUsed() >= 26 && !finScouting)
+		{
+			// If we dont have a scout, assign one
+			if (!scout)
+			{
+				scout = workerManager->getWorker();
+			}
 
-	//		BWAPI::Position pos(baseLocation);
-	//		// Move to start location to scout
-	//		scout->move(pos);
-	//		break;
-	//	}		
-	//}
+			auto& startLocations = Broodwar->getStartLocations();
+
+			// Loop through all start locations
+			for (BWAPI::TilePosition baseLocation : startLocations)
+			{
+				// If the location is already explored, move on
+				if (Broodwar->isExplored(baseLocation))
+				{
+					continue;
+				}
+
+				BWAPI::Position pos(baseLocation);
+				// Move to start location to scout
+				scout->move(pos);
+				break;
+			}
+		}
+	}
+
+	/*
+	 * Terran
+	 */
+	else if (Broodwar->enemy()->getRace() == Races::Terran)
+	{
+		/*
+		 * Build order
+		 */
+		buildingManager->terranBuildings();
+
+		/*
+		 * Scouting
+		 */
+		// If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
+		if (Broodwar->self()->supplyUsed() >= 56 && !finScouting)
+		{
+			// If we dont have a scout, assign one
+			if (!scout)
+			{
+				scout = workerManager->getWorker();
+			}
+
+			auto& startLocations = Broodwar->getStartLocations();
+
+			// Loop through all start locations
+			for (BWAPI::TilePosition baseLocation : startLocations)
+			{
+				// If the location is already explored, move on
+				if (Broodwar->isExplored(baseLocation))
+				{
+					continue;
+				}
+
+				BWAPI::Position pos(baseLocation);
+				// Move to start location to scout
+				scout->move(pos);
+				break;
+			}
+		}
+	}	
+
+
+	///				  ///
+	/// GENERAL LOGIC ///
+	///			      ///
 
 	/*
 	 * Attacking
@@ -160,7 +263,7 @@ void LBot::onFrame()
 	 * Supply management
 	 */
 	// If supply count is at cap, build a supply depot to continue progression
-	if (lastErr == Errors::Insufficient_Supply && lastChecked + 400 < Broodwar->getFrameCount())
+	if (lastErr == Errors::Insufficient_Supply && lastChecked + UnitTypes::Terran_Supply_Depot.buildTime() < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Supply_Depot) == 0)
 	{
 		lastChecked = Broodwar->getFrameCount();
 
@@ -296,7 +399,7 @@ void LBot::onFrame()
 		/*
 		 * Medics
 		 */
-		if (u->getType() == UnitTypes::Terran_Medic)
+		else if (u->getType() == UnitTypes::Terran_Medic)
 		{
 			if (u->isIdle())
 			{
@@ -381,7 +484,7 @@ void LBot::onFrame()
 			}
 			else if (Broodwar->enemy()->getRace() == Races::Terran)
 			{
-				if (u->isIdle() && Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) != 8 && !u->train(UnitTypes::Terran_Vulture))
+				if (u->isIdle() && Broodwar->self()->allUnitCount(UnitTypes::Terran_Vulture) != 8 && !u->train(UnitTypes::Terran_Vulture))
 				{
 					// If that fails, draw the error at the location so that you can visibly see what went wrong!
 					// However, drawing the error once will only appear for a single frame
@@ -399,12 +502,48 @@ void LBot::onFrame()
 		}
 
 		/*
+		 * Factory
+		 */
+		else if (u->getType() == UnitTypes::Terran_Factory)
+		{
+			if (Broodwar->enemy()->getRace() == Races::Zerg)
+			{				
+				if (tankArmy.size() != 12)
+				{
+					if (u->isIdle() && !u->train(UnitTypes::Terran_Siege_Tank_Tank_Mode))
+					{
+						// If that fails, draw the error at the location so that you can visibly see what went wrong!
+						// However, drawing the error once will only appear for a single frame
+						// so create an event that keeps it on the screen for some frames
+						Position pos = u->getPosition();
+						Error lastErr = Broodwar->getLastError();
+						Broodwar->registerEvent([pos, lastErr](Game*)
+						{
+							Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
+						},   // action
+							nullptr,    // condition
+							Broodwar->getLatencyFrames());  // frames to run
+					}
+				}
+			}
+		}
+
+		/*
 		 * Academy
 		 */
 		else if (u->getType() == UnitTypes::Terran_Academy)
 		{
 			// Perform research
-			buildingManager->researchTech(u);
+			buildingManager->academyTech(u);
+		}
+
+		/*
+		 * Armory
+		 */
+		else if (u->getType() == UnitTypes::Terran_Armory)
+		{
+			// Perform research
+			buildingManager->armoryTech(u);
 		}
 	}	
 }
@@ -571,6 +710,10 @@ void LBot::onUnitDestroy(BWAPI::Unit u)
 		{
 			army2.erase(u);
 		}
+		else if ((u->getType() == UnitTypes::Terran_Siege_Tank_Tank_Mode || u->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode) && tankArmy.contains(u))
+		{
+			tankArmy.erase(u);
+		}
 	}
 }
 
@@ -625,6 +768,10 @@ void LBot::onUnitComplete(BWAPI::Unit u)
 		{
 			// Add unit to army2
 			army2.insert(u);
+		}
+		else if ((u->getType() == UnitTypes::Terran_Siege_Tank_Tank_Mode || u->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode) && tankArmy.size() != 12)
+		{
+			tankArmy.insert(u);
 		}
 	}
 }
