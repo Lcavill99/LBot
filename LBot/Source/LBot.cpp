@@ -1,9 +1,13 @@
 #include "LBot.h"
+#include "BWEM.h"
+#include "BWEB.h"
 #include "BuildOrder.h"
 #include <iostream>
 
 using namespace BWAPI;
 using namespace Filter;
+
+namespace { auto & theMap = BWEM::Map::Instance(); }
 
 BWAPI::Unitset allWorkers; // Holds all player workers
 BWAPI::Unitset minWorkers; // Holds all player workers assigned to gather minerals
@@ -33,6 +37,19 @@ void LBot::onStart()
 	workerManager = new WorkerManager;
 	buildingManager = new BuildingManager;
 	armyManager = new ArmyManager;
+	
+	// Initalise BWEM
+	theMap.Initialize();
+	theMap.EnableAutomaticPathAnalysis();
+	bool startingLocationsOK = theMap.FindBasesForStartingLocations();
+	assert(startingLocationsOK);
+
+	BWEM::utils::MapPrinter::Initialize(&theMap);
+	BWEM::utils::printMap(theMap);      // will print the map into the file <StarCraftFolder>bwapi-data/map.bmp
+	
+	// Initalise BWEB
+	BWEB::Map::onStart();
+	BWEB::Blocks::findBlocks();
 
 	// Check if this is a replay
 	if (Broodwar->isReplay())
@@ -62,6 +79,10 @@ void LBot::onEnd(bool isWinner)
 
 void LBot::onFrame()
 {	
+	// Render BWEM map
+	BWEM::utils::gridMapExample(theMap);
+	BWEM::utils::drawMap(theMap);
+
 	// Display values
 	Broodwar->drawTextScreen(0, 0,  "FPS: %d", Broodwar->getFPS());
 	Broodwar->drawTextScreen(0, 10, "Workers: %d", allWorkers.size());
@@ -85,36 +106,35 @@ void LBot::onFrame()
 	// Call Build order
 	buildOrder->buildOrder();
 	
-	/*
-	 * Scouting
-	 */
-	//auto& enemyBase = Broodwar->enemy()->getStartLocation();
+	///*
+	// * Scouting
+	// */	
+	//// If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
+	//if (Broodwar->self()->supplyUsed() >= 30 && !finScouting)
+	//{
+	//	// If we dont have a scout, assign one
+	//	if (!scout)
+	//	{
+	//		scout = workerManager->getWorker();
+	//	}
 
-	// If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
-	if (Broodwar->self()->supplyUsed() >= 30 && !finScouting)
-	{
-		// If we dont have a scout, assign one
-		if (!scout)
-		{
-			scout = workerManager->getWorker();
-		}
-		auto& startLocations = Broodwar->getStartLocations();	
-		
-		// Loop through all start locations
-		for (BWAPI::TilePosition baseLocation : startLocations)
-		{
-			// If the location is already explored, move on
-			if (Broodwar->isExplored(baseLocation))
-			{
-				continue;
-			}		
+	//	auto& startLocations = Broodwar->getStartLocations();	
+	//	
+	//	// Loop through all start locations
+	//	for (BWAPI::TilePosition baseLocation : startLocations)
+	//	{
+	//		// If the location is already explored, move on
+	//		if (Broodwar->isExplored(baseLocation))
+	//		{
+	//			continue;
+	//		}		
 
-			BWAPI::Position pos(baseLocation);
-			// Move to start location to scout
-			scout->move(pos);
-			break;
-		}		
-	}	
+	//		BWAPI::Position pos(baseLocation);
+	//		// Move to start location to scout
+	//		scout->move(pos);
+	//		break;
+	//	}		
+	//}
 
 	/*
 	 * Attacking
@@ -140,7 +160,7 @@ void LBot::onFrame()
 	 * Supply management
 	 */
 	// If supply count is at cap, build a supply depot to continue progression
-	if (lastErr == Errors::Insufficient_Supply && lastChecked + 150 < Broodwar->getFrameCount())
+	if (lastErr == Errors::Insufficient_Supply && lastChecked + 400 < Broodwar->getFrameCount())
 	{
 		lastChecked = Broodwar->getFrameCount();
 
@@ -391,6 +411,8 @@ void LBot::onFrame()
 
 void LBot::onSendText(std::string txt)
 {
+	BWEM::utils::MapDrawer::ProcessCommand(txt);
+
 	// Send the text to the game if it is not being processed.
 	Broodwar->sendText("%s", txt.c_str());
 
@@ -513,6 +535,9 @@ void LBot::onUnitCreate(BWAPI::Unit u)
 
 void LBot::onUnitDestroy(BWAPI::Unit u)
 {	
+	if (u->getType().isMineralField())    theMap.OnMineralDestroyed(u);
+	else if (u->getType().isSpecialBuilding()) theMap.OnStaticBuildingDestroyed(u);
+
 	static int lastChecked = 0;
 
 	// Upon destroying of unit belonging to player
