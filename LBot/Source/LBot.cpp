@@ -48,7 +48,7 @@ void LBot::onStart()
 	assert(startingLocationsOK);
 
 	BWEM::utils::MapPrinter::Initialize(&theMap);
-	BWEM::utils::printMap(theMap);      // will print the map into the file <StarCraftFolder>bwapi-data/map.bmp
+	BWEM::utils::printMap(theMap); // will print the map into the file <StarCraftFolder>bwapi-data/map.bmp
 	
 	// Initalise BWEB
 	BWEB::Map::onStart();
@@ -551,6 +551,90 @@ void LBot::onFrame()
 						},   // action
 							nullptr,    // condition
 							Broodwar->getLatencyFrames());  // frames to run
+					}
+				}
+
+				// Machine shop upgrade for factory
+				if (Broodwar->self()->completedUnitCount(UnitTypes::Terran_Factory) == 1 && lastChecked + UnitTypes::Terran_Machine_Shop.buildTime() < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Machine_Shop.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Machine_Shop.gasPrice())
+				{
+					lastChecked = Broodwar->getFrameCount();
+
+					// Find a location for academy
+					TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Machine_Shop, u->getTilePosition());
+
+					// If build position is found
+					if (buildPosition)
+					{
+						// Build
+						u->build(UnitTypes::Terran_Machine_Shop, buildPosition);
+
+						// Register an event that draws the target build location
+						Broodwar->registerEvent([buildPosition, u](Game*)
+						{
+							Broodwar->drawBoxMap(Position(buildPosition),
+								Position(buildPosition + UnitTypes::Terran_Machine_Shop.tileSize()),
+								Colors::Blue);
+						},
+							nullptr,  // condition
+							UnitTypes::Terran_Machine_Shop.buildTime() + 100);  // frames to run
+					}
+				}
+			}
+
+			if (Broodwar->enemy()->getRace() == Races::Protoss)
+			{				
+				// Machine shop upgrade for factory
+				if (Broodwar->self()->completedUnitCount(UnitTypes::Terran_Factory) == 1 && lastChecked + UnitTypes::Terran_Machine_Shop.buildTime() < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Machine_Shop.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Machine_Shop.gasPrice())
+				{
+					lastChecked = Broodwar->getFrameCount();
+
+					// Find a location for academy
+					TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Machine_Shop, u->getTilePosition());
+
+					// If build position is found
+					if (buildPosition)
+					{
+						// Build
+						u->build(UnitTypes::Terran_Machine_Shop, buildPosition);
+
+						// Register an event that draws the target build location
+						Broodwar->registerEvent([buildPosition, u](Game*)
+						{
+							Broodwar->drawBoxMap(Position(buildPosition),
+								Position(buildPosition + UnitTypes::Terran_Machine_Shop.tileSize()),
+								Colors::Blue);
+						},
+							nullptr,  // condition
+							UnitTypes::Terran_Machine_Shop.buildTime() + 100);  // frames to run
+					}
+				}			
+			}	
+
+			if (Broodwar->enemy()->getRace() == Races::Terran)
+			{
+				// Machine shop upgrade for factory
+				if (Broodwar->self()->completedUnitCount(UnitTypes::Terran_Factory) == 1 && lastChecked + UnitTypes::Terran_Machine_Shop.buildTime() < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Machine_Shop.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Machine_Shop.gasPrice())
+				{
+					lastChecked = Broodwar->getFrameCount();
+
+					// Find a location for academy
+					TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Machine_Shop, u->getTilePosition());
+
+					// If build position is found
+					if (buildPosition)
+					{
+						// Build
+						u->build(UnitTypes::Terran_Machine_Shop, buildPosition);
+
+						// Register an event that draws the target build location
+						Broodwar->registerEvent([buildPosition, u](Game*)
+						{
+							Broodwar->drawBoxMap(Position(buildPosition),
+								Position(buildPosition + UnitTypes::Terran_Machine_Shop.tileSize()),
+								Colors::Blue);
+						},
+							nullptr,  // condition
+							UnitTypes::Terran_Machine_Shop.buildTime() + 100);  // frames to run
 					}
 				}
 			}
