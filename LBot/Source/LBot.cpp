@@ -20,8 +20,12 @@ BWAPI::Unitset army2; // Holds all player units assigned to the secondary/defens
 BWAPI::Unitset tankArmy;
 BWAPI::Unitset enemyBuildings; // Holds all enemy buildings
 
+BWAPI::TilePosition enemyBaseTPos;
+BWAPI::Unit enemyBase;
+
 static int lastChecked = 0;
 bool finScouting = false;
+bool retreating = false;
 
 void LBot::onStart()
 {
@@ -29,7 +33,7 @@ void LBot::onStart()
 	Broodwar->enableFlag(Flag::UserInput);
 
 	// Uncomment the following line and the bot will know about everything through the fog of war (cheat).
-	//Broodwar->enableFlag(Flag::CompleteMapInformation);
+	Broodwar->enableFlag(Flag::CompleteMapInformation);
 
 	// Set the command optimization level so that common commands can be grouped
 	// and reduce the bot's APM (Actions Per Minute).
@@ -52,7 +56,7 @@ void LBot::onStart()
 	
 	// Initalise BWEB
 	BWEB::Map::onStart();
-	BWEB::Blocks::findBlocks();
+	BWEB::Blocks::findBlocks();		
 
 	// Check if this is a replay
 	if (Broodwar->isReplay())
@@ -106,6 +110,7 @@ void LBot::onFrame()
 	Broodwar->drawTextScreen(0, 30, "Gas workers: %d", gasWorkers.size());
 	Broodwar->drawTextScreen(0, 40, "Army1: %d", army1.size());
 	Broodwar->drawTextScreen(0, 50, "Army2: %d", army2.size());
+	
 
 	// Return if the game is a replay or is paused
 	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
@@ -136,32 +141,32 @@ void LBot::onFrame()
 		/*
 		 * Scouting
 		 */
-		// If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
-		if (Broodwar->self()->supplyUsed() >= 36 && !finScouting)
-		{
-			// If we dont have a scout, assign one
-			if (!scout)
-			{
-				scout = workerManager->getWorker();
-			}
+		//// If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
+		//if (Broodwar->self()->supplyUsed() >= 36 && !finScouting)
+		//{
+		//	// If we dont have a scout, assign one
+		//	if (!scout)
+		//	{
+		//		scout = workerManager->getWorker();
+		//	}
 
-			auto& startLocations = Broodwar->getStartLocations();
+		//	auto& startLocations = Broodwar->getStartLocations();
 
-			// Loop through all start locations
-			for (BWAPI::TilePosition baseLocation : startLocations)
-			{
-				// If the location is already explored, move on
-				if (Broodwar->isExplored(baseLocation))
-				{
-					continue;
-				}
+		//	// Loop through all start locations
+		//	for (BWAPI::TilePosition baseLocation : startLocations)
+		//	{
+		//		// If the location is already explored, move on
+		//		if (Broodwar->isExplored(baseLocation))
+		//		{
+		//			continue;
+		//		}
 
-				BWAPI::Position pos(baseLocation);
-				// Move to start location to scout
-				scout->move(pos);
-				break;
-			}
-		}
+		//		BWAPI::Position pos(baseLocation);
+		//		// Move to start location to scout
+		//		scout->move(pos);
+		//		break;
+		//	}
+		//}
 	}
 	
 	/*
@@ -253,28 +258,45 @@ void LBot::onFrame()
 	/*
 	 * Attacking
 	 */
-	// If army is at half strength, retreat
-	if (army1.size() < (army1.max_size() / 2))
-	{
-		//retreat
-	}
-	else
-	{
+	army1.attack(army1.getClosestUnit(Filter::IsEnemy));
+	tankArmy.attack(tankArmy.getClosestUnit(Filter::IsEnemy));
+	
+	// Get player base location
+	BWAPI::TilePosition home = Broodwar->self()->getStartLocation();
+	BWAPI::Position homePos(home);
+
+	BWAPI::Position enemyBasePos(enemyBaseTPos);	
+	 
+	// If full strength and is not retreating, attack enemy base and micromanage units
+	if (army1.size() == 12 && !retreating)
+	{	
+		army1.move(enemyBasePos);
+
 		for (BWAPI::Unit unit : army1)
 		{
 			if (unit->getHitPoints() < (unit->getInitialHitPoints() / 2))
 			{
-				//retreat to back of group
+				unit->move(homePos);
 			}
-			unit->attack(unit->getClosestUnit(Filter::IsEnemy));			
 		}
-	}	
+	}
+	// If half strength and not retreating, retreat to base
+	else if (army1.size() < 6 && !retreating)
+	{
+		retreating = true;
+		army1.move(homePos);
+	}
+	// If full strength and retreating, stop retreating
+	else if (army1.size() == 12 && retreating)
+	{
+		retreating = false;
+	}
 		
 	/*
 	 * Supply management
 	 */
 	// If supply count is at cap, build a supply depot to continue progression
-	if (lastErr == Errors::Insufficient_Supply && lastChecked + UnitTypes::Terran_Supply_Depot.buildTime() < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Supply_Depot) == 0)
+	if (lastErr == Errors::Insufficient_Supply && lastChecked + 150 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Supply_Depot) == 0)
 	{
 		lastChecked = Broodwar->getFrameCount();
 
@@ -710,8 +732,10 @@ void LBot::onUnitDiscover(BWAPI::Unit u)
 			// Add to enemy buildings unitset
 			enemyBuildings.insert(u);
 
+			enemyBaseTPos = u->getTilePosition();
+
 			// Finish scouting
-			finScouting = true;
+			finScouting = true;					
 
 			// Get player base location
 			BWAPI::TilePosition home = Broodwar->self()->getStartLocation();
