@@ -11,11 +11,12 @@ using namespace Filter;
 /*
  * Assign a worker to be the scout
  */
-void ScoutManager::setScout()
+BWAPI::Unit ScoutManager::setScout()
 {
 	workerManager = new WorkerManager;
 	// Get a worker to assign as a scout
 	scout = workerManager->getWorker();
+	return scout;
 }
 
 /*
@@ -27,7 +28,7 @@ BWAPI::Unit ScoutManager::getScout()
 }
 
 /*
- * Scouting logic
+ * Scouting
  */
 void ScoutManager::goScout()
 {
