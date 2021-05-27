@@ -36,12 +36,12 @@ BWAPI::Unit WorkerManager::getWorker()
 /*
  * Select a worker that can build from specific unitset
  */
-BWAPI::Unit WorkerManager::getWorkerFromSet(BWAPI::Unitset* set)
+BWAPI::Unit WorkerManager::getWorkerFromSet(BWAPI::Unitset set)
 {
 	BWAPI::Unit worker;
 
 	// Loop through all units in the unitset
-	for (auto &u : *set)
+	for (auto &u : set)
 	{
 		// Do not want to select a worker that is gathering gas or carrying any resources
 		if (!u->isConstructing() && !u->isGatheringGas() && (!u->isCarryingMinerals() || !u->isCarryingGas()))
