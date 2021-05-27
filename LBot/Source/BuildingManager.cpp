@@ -47,7 +47,7 @@ void BuildingManager::zergBuildings()
 		if (builder)
 		{
 			// Find a location for depot
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, base, 20);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, base, 30);
 
 			// If build position is found
 			if (buildPosition)
@@ -79,7 +79,7 @@ void BuildingManager::zergBuildings()
 		if (builder)
 		{
 			// Find a location for barracks
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, base, 20);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, base, 30);
 
 			// If build position is found
 			if (buildPosition)
@@ -111,7 +111,7 @@ void BuildingManager::zergBuildings()
 		if (builder)
 		{
 			// Find a location for barracks
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, base, 20);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, base, 30);
 
 			// If build position is found
 			if (buildPosition)
@@ -143,7 +143,7 @@ void BuildingManager::zergBuildings()
 		if (builder)
 		{
 			// Find a location for depot
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, base, 20);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, base, 30);
 
 			// If build position is found
 			if (buildPosition)
@@ -208,7 +208,7 @@ void BuildingManager::zergBuildings()
 		if (builder)
 		{
 			// Find a location for academy
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Academy, base, 20);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Academy, base, 30);
 
 			// If build position is found
 			if (buildPosition)
@@ -253,7 +253,7 @@ void BuildingManager::zergBuildings()
 		if (builder)
 		{
 			// Find a location for academy
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Factory, base, 20);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Factory, base, 30);
 
 			// If build position is found
 			if (buildPosition)
@@ -285,7 +285,7 @@ void BuildingManager::zergBuildings()
 		if (builder)
 		{
 			// Find a location for academy
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Armory, base, 20);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Armory, base, 30);
 
 			// If build position is found
 			if (buildPosition)
