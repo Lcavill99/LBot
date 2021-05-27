@@ -251,80 +251,79 @@ void LBot::onFrame()
 	/*
 	 * Attacking
 	 */	 	 
-	 // Get player base location
-	 BWAPI::TilePosition playerBaseTPos = Broodwar->self()->getStartLocation();
-	 BWAPI::Position playerBasePos(playerBaseTPos);
+	// Get player base location
+	BWAPI::TilePosition playerBaseTPos = Broodwar->self()->getStartLocation();
+	BWAPI::Position playerBasePos(playerBaseTPos);
 
-	 // Get enemy base position
-	 BWAPI::TilePosition enemyBaseTPos = Broodwar->enemy()->getStartLocation();
-	 BWAPI::Position enemyBasePos(enemyBaseTPos);
+	// Get enemy base position
+	BWAPI::TilePosition enemyBaseTPos = Broodwar->enemy()->getStartLocation();
+	BWAPI::Position enemyBasePos(enemyBaseTPos);
 	 
-	 if (army1.size() != 0)
-	 {
-		 //Always attack close units
-		 army1.attack(army1.getClosestUnit(Filter::IsEnemy));
+	BWAPI::Unit base = Broodwar->getUnit(UnitTypes::Terran_Command_Center);
+	 
+	// If full strength and is not retreating, attack enemy base and micromanage units
+	if (army1.size() == 12 && lastChecked + 100 < Broodwar->getFrameCount() && retreating == false)
+	{
+		lastChecked = Broodwar->getFrameCount();
 
-		 // If full strength and is not retreating, attack enemy base and micromanage units
-		 if (army1.size() == 12 && lastChecked + 100 < Broodwar->getFrameCount() && retreating == false)
-		 {
-			 lastChecked = Broodwar->getFrameCount();
+		//Always attack close units
+		army1.attack(army1.getClosestUnit(Filter::IsEnemy));
 
-			 army1.attack(enemyBasePos);
+		/*for (BWAPI::Unit unit : army1)
+		{
+			if (unit->getHitPoints() < (unit->getInitialHitPoints() / 2))
+			{
+				unit->move(playerBasePos);
+				break;
+			}
+		}*/
+	}
+	//// If half strength and not retreating, retreat to base to recover
+	//else if (army1.size() < 6 && retreating == false)
+	//{
+	//	retreating = true;
+	//	army1.move(playerBasePos);
+	//}
+	//// If full strength, army can attack again
+	//else if (army1.size() == 12 && retreating == true)
+	//{
+	//	retreating = false;
+	//}	 
 
-			 /*for (BWAPI::Unit unit : army1)
-			 {
-				 if (unit->getHitPoints() < (unit->getInitialHitPoints() / 2))
-				 {
-					 unit->move(playerBasePos);
-					 break;
-				 }
-			 }*/
-		 }
-		 //// If half strength and not retreating, retreat to base to recover
-		 //else if (army1.size() < 6 && retreating == false)
-		 //{
-		 //	retreating = true;
-		 //	army1.move(playerBasePos);
-		 //}
-		 //// If full strength, army can attack again
-		 //else if (army1.size() == 12 && retreating == true)
-		 //{
-		 //	retreating = false;
-		 //}
-	 }
+	// Defensive army only needs to attack units close to base
+	army2.attack(base->getClosestUnit(Filter::IsEnemy, 1000));
 
-	 // Defensive army only needs to attack units close to base
-	 army2.attack(army2.getClosestUnit(Filter::IsEnemy, 1000));
-
-	 tankArmy.attack(tankArmy.getClosestUnit(Filter::IsEnemy));
+	tankArmy.attack(tankArmy.getClosestUnit(Filter::IsEnemy));
 		
 	/*
 	 * Supply management
 	 */
 	// If supply count is at cap, build a supply depot to continue progression
-	if ((Broodwar->self()->supplyUsed() == Broodwar->self()->supplyTotal()) && lastChecked + 400 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Supply_Depot) == 0)
+	if ((Broodwar->self()->supplyUsed() == Broodwar->self()->supplyTotal()) && lastChecked + 150 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Supply_Depot) == 0)
 	{
 		lastChecked = Broodwar->getFrameCount();
 
-		Unit builder = workerManager->getWorker();		
+		Unit builder = workerManager->getWorker();	
+
+		BWAPI::TilePosition base = Broodwar->self()->getStartLocation();
 
 		// If worker is found
 		if (builder)
 		{
 			// Find a location for depot
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, builder->getTilePosition(), 20);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, builder->getTilePosition(), 30);
 
 			// If build position is found
 			if (buildPosition)
 			{
 				// Build
-				builder->build(UnitTypes::Terran_Supply_Depot, buildPosition);
+				builder->build(UnitTypes::Terran_Supply_Depot, base);
 
 				// Register an event that draws the target build location
-				Broodwar->registerEvent([buildPosition, builder](Game*)
+				Broodwar->registerEvent([base, builder](Game*)
 				{
-					Broodwar->drawBoxMap(Position(buildPosition),
-						Position(buildPosition + UnitTypes::Terran_Supply_Depot.tileSize()),
+					Broodwar->drawBoxMap(Position(base),
+						Position(base + UnitTypes::Terran_Supply_Depot.tileSize()),
 						Colors::Blue);
 				},
 					nullptr,  // condition
