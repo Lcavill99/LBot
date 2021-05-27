@@ -20,9 +20,6 @@ BWAPI::Unitset army2; // Holds all player units assigned to the secondary/defens
 BWAPI::Unitset tankArmy;
 BWAPI::Unitset enemyBuildings; // Holds all enemy buildings
 
-BWAPI::TilePosition enemyBaseTPos;
-BWAPI::Unit enemyBase;
-
 static int lastChecked = 0;
 bool finScouting = false;
 bool retreating = false;
@@ -33,7 +30,7 @@ void LBot::onStart()
 	Broodwar->enableFlag(Flag::UserInput);
 
 	// Uncomment the following line and the bot will know about everything through the fog of war (cheat).
-	Broodwar->enableFlag(Flag::CompleteMapInformation);
+	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 
 	// Set the command optimization level so that common commands can be grouped
 	// and reduce the bot's APM (Actions Per Minute).
@@ -45,18 +42,14 @@ void LBot::onStart()
 	buildingManager = new BuildingManager;
 	armyManager = new ArmyManager;
 	
-	// Initalise BWEM
-	theMap.Initialize();
-	theMap.EnableAutomaticPathAnalysis();
-	bool startingLocationsOK = theMap.FindBasesForStartingLocations();
-	assert(startingLocationsOK);
+	//// Initalise BWEM
+	//theMap.Initialize();
+	//theMap.EnableAutomaticPathAnalysis();
+	//bool startingLocationsOK = theMap.FindBasesForStartingLocations();
+	//assert(startingLocationsOK);
 
-	BWEM::utils::MapPrinter::Initialize(&theMap);
-	BWEM::utils::printMap(theMap); // will print the map into the file <StarCraftFolder>bwapi-data/map.bmp
-	
-	// Initalise BWEB
-	BWEB::Map::onStart();
-	BWEB::Blocks::findBlocks();		
+	//BWEM::utils::MapPrinter::Initialize(&theMap);
+	//BWEM::utils::printMap(theMap); // will print the map into the file <StarCraftFolder>bwapi-data/map.bmp		
 
 	// Check if this is a replay
 	if (Broodwar->isReplay())
@@ -96,12 +89,12 @@ void LBot::onEnd(bool isWinner)
 
 void LBot::onFrame()
 {	
-	/*
-	 * BWEM
-	 */
-	// Render BWEM map
-	BWEM::utils::gridMapExample(theMap);
-	BWEM::utils::drawMap(theMap);
+	///*
+	// * BWEM
+	// */
+	//// Render BWEM map
+	//BWEM::utils::gridMapExample(theMap);
+	//BWEM::utils::drawMap(theMap);
 
 	// Display values
 	Broodwar->drawTextScreen(0, 0,  "FPS: %d", Broodwar->getFPS());
@@ -118,8 +111,8 @@ void LBot::onFrame()
 
 	// Prevent spamming by only running our onFrame once every number of latency frames.
 	// Latency frames are the number of frames before commands are processed.
-	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
-		return;
+	/*if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
+		return;*/
 
 	// Update latest error
 	Error lastErr = Broodwar->getLastError();
@@ -141,32 +134,32 @@ void LBot::onFrame()
 		/*
 		 * Scouting
 		 */
-		//// If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
-		//if (Broodwar->self()->supplyUsed() >= 36 && !finScouting)
-		//{
-		//	// If we dont have a scout, assign one
-		//	if (!scout)
-		//	{
-		//		scout = workerManager->getWorker();
-		//	}
+		// If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
+		if (Broodwar->self()->supplyUsed() >= 36 && !finScouting)
+		{
+			// If we dont have a scout, assign one
+			if (!scout)
+			{
+				scout = scoutManager->setScout();
+			}
 
-		//	auto& startLocations = Broodwar->getStartLocations();
+			auto& startLocations = Broodwar->getStartLocations();
 
-		//	// Loop through all start locations
-		//	for (BWAPI::TilePosition baseLocation : startLocations)
-		//	{
-		//		// If the location is already explored, move on
-		//		if (Broodwar->isExplored(baseLocation))
-		//		{
-		//			continue;
-		//		}
+			// Loop through all start locations
+			for (BWAPI::TilePosition baseLocation : startLocations)
+			{
+				// If the location is already explored, move on
+				if (Broodwar->isExplored(baseLocation))
+				{
+					continue;
+				}
 
-		//		BWAPI::Position pos(baseLocation);
-		//		// Move to start location to scout
-		//		scout->move(pos);
-		//		break;
-		//	}
-		//}
+				BWAPI::Position pos(baseLocation);
+				// Move to start location to scout
+				scout->move(pos);
+				break;
+			}
+		}
 	}
 	
 	/*
@@ -257,56 +250,69 @@ void LBot::onFrame()
 
 	/*
 	 * Attacking
-	 */
-	army1.attack(army1.getClosestUnit(Filter::IsEnemy));
-	tankArmy.attack(tankArmy.getClosestUnit(Filter::IsEnemy));
-	
-	// Get player base location
-	BWAPI::TilePosition home = Broodwar->self()->getStartLocation();
-	BWAPI::Position homePos(home);
+	 */	 	 
+	 // Get player base location
+	 BWAPI::TilePosition playerBaseTPos = Broodwar->self()->getStartLocation();
+	 BWAPI::Position playerBasePos(playerBaseTPos);
 
-	BWAPI::Position enemyBasePos(enemyBaseTPos);	
+	 // Get enemy base position
+	 BWAPI::TilePosition enemyBaseTPos = Broodwar->enemy()->getStartLocation();
+	 BWAPI::Position enemyBasePos(enemyBaseTPos);
 	 
-	// If full strength and is not retreating, attack enemy base and micromanage units
-	if (army1.size() == 12 && !retreating)
-	{	
-		army1.move(enemyBasePos);
+	 if (army1.size() != 0)
+	 {
+		 //Always attack close units
+		 army1.attack(army1.getClosestUnit(Filter::IsEnemy));
 
-		for (BWAPI::Unit unit : army1)
-		{
-			if (unit->getHitPoints() < (unit->getInitialHitPoints() / 2))
-			{
-				unit->move(homePos);
-			}
-		}
-	}
-	// If half strength and not retreating, retreat to base
-	else if (army1.size() < 6 && !retreating)
-	{
-		retreating = true;
-		army1.move(homePos);
-	}
-	// If full strength and retreating, stop retreating
-	else if (army1.size() == 12 && retreating)
-	{
-		retreating = false;
-	}
+		 // If full strength and is not retreating, attack enemy base and micromanage units
+		 if (army1.size() == 12 && lastChecked + 100 < Broodwar->getFrameCount() && retreating == false)
+		 {
+			 lastChecked = Broodwar->getFrameCount();
+
+			 army1.attack(enemyBasePos);
+
+			 /*for (BWAPI::Unit unit : army1)
+			 {
+				 if (unit->getHitPoints() < (unit->getInitialHitPoints() / 2))
+				 {
+					 unit->move(playerBasePos);
+					 break;
+				 }
+			 }*/
+		 }
+		 //// If half strength and not retreating, retreat to base to recover
+		 //else if (army1.size() < 6 && retreating == false)
+		 //{
+		 //	retreating = true;
+		 //	army1.move(playerBasePos);
+		 //}
+		 //// If full strength, army can attack again
+		 //else if (army1.size() == 12 && retreating == true)
+		 //{
+		 //	retreating = false;
+		 //}
+	 }
+
+	 // Defensive army only needs to attack units close to base
+	 army2.attack(army2.getClosestUnit(Filter::IsEnemy, 1000));
+
+	 tankArmy.attack(tankArmy.getClosestUnit(Filter::IsEnemy));
 		
 	/*
 	 * Supply management
 	 */
 	// If supply count is at cap, build a supply depot to continue progression
-	if (lastErr == Errors::Insufficient_Supply && lastChecked + 150 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Supply_Depot) == 0)
+	if ((Broodwar->self()->supplyUsed() == Broodwar->self()->supplyTotal()) && lastChecked + 400 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Supply_Depot) == 0)
 	{
 		lastChecked = Broodwar->getFrameCount();
 
 		Unit builder = workerManager->getWorker();		
 
-		// If worker is found and its not the scout
-		if (builder != scout)
+		// If worker is found
+		if (builder)
 		{
 			// Find a location for depot
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, builder->getTilePosition());
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, builder->getTilePosition(), 20);
 
 			// If build position is found
 			if (buildPosition)
@@ -350,6 +356,10 @@ void LBot::onFrame()
 		// Ignore the unit if it is incomplete or busy constructing
 		if (!u->isCompleted() || u->isConstructing())
 			continue;
+
+		// Ignore the unit if it is the scout
+		if (u == scout)
+			continue;
 		
 		/*
 		 * Workers
@@ -389,8 +399,8 @@ void LBot::onFrame()
 			/*
 			 * Worker gathering functionality
 			 */
-			// If worker is idle and is not the scout
-			if (u->isIdle() && u != scout)
+			// If worker is idle
+			if (u->isIdle())
 			{
 				// If worker is carrying a resource return them to the command center
 				if (u->isCarryingGas() || u->isCarryingMinerals())
@@ -556,110 +566,33 @@ void LBot::onFrame()
 		 */
 		else if (u->getType() == UnitTypes::Terran_Factory)
 		{
-			if (Broodwar->enemy()->getRace() == Races::Zerg)
-			{				
-				if (tankArmy.size() != 12)
-				{
-					if (u->isIdle() && !u->train(UnitTypes::Terran_Siege_Tank_Tank_Mode))
-					{
-						// If that fails, draw the error at the location so that you can visibly see what went wrong!
-						// However, drawing the error once will only appear for a single frame
-						// so create an event that keeps it on the screen for some frames
-						Position pos = u->getPosition();
-						Error lastErr = Broodwar->getLastError();
-						Broodwar->registerEvent([pos, lastErr](Game*)
-						{
-							Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
-						},   // action
-							nullptr,    // condition
-							Broodwar->getLatencyFrames());  // frames to run
-					}
-				}
-
-				// Machine shop upgrade for factory
-				if (Broodwar->self()->completedUnitCount(UnitTypes::Terran_Factory) == 1 && lastChecked + UnitTypes::Terran_Machine_Shop.buildTime() < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Machine_Shop.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Machine_Shop.gasPrice())
-				{
-					lastChecked = Broodwar->getFrameCount();
-
-					// Find a location for academy
-					TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Machine_Shop, u->getTilePosition());
-
-					// If build position is found
-					if (buildPosition)
-					{
-						// Build
-						u->build(UnitTypes::Terran_Machine_Shop, buildPosition);
-
-						// Register an event that draws the target build location
-						Broodwar->registerEvent([buildPosition, u](Game*)
-						{
-							Broodwar->drawBoxMap(Position(buildPosition),
-								Position(buildPosition + UnitTypes::Terran_Machine_Shop.tileSize()),
-								Colors::Blue);
-						},
-							nullptr,  // condition
-							UnitTypes::Terran_Machine_Shop.buildTime() + 100);  // frames to run
-					}
-				}
-			}
-
-			if (Broodwar->enemy()->getRace() == Races::Protoss)
-			{				
-				// Machine shop upgrade for factory
-				if (Broodwar->self()->completedUnitCount(UnitTypes::Terran_Factory) == 1 && lastChecked + UnitTypes::Terran_Machine_Shop.buildTime() < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Machine_Shop.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Machine_Shop.gasPrice())
-				{
-					lastChecked = Broodwar->getFrameCount();
-
-					// Find a location for academy
-					TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Machine_Shop, u->getTilePosition());
-
-					// If build position is found
-					if (buildPosition)
-					{
-						// Build
-						u->build(UnitTypes::Terran_Machine_Shop, buildPosition);
-
-						// Register an event that draws the target build location
-						Broodwar->registerEvent([buildPosition, u](Game*)
-						{
-							Broodwar->drawBoxMap(Position(buildPosition),
-								Position(buildPosition + UnitTypes::Terran_Machine_Shop.tileSize()),
-								Colors::Blue);
-						},
-							nullptr,  // condition
-							UnitTypes::Terran_Machine_Shop.buildTime() + 100);  // frames to run
-					}
-				}			
-			}	
-
-			if (Broodwar->enemy()->getRace() == Races::Terran)
+			
+			if (tankArmy.size() != 12)
 			{
-				// Machine shop upgrade for factory
-				if (Broodwar->self()->completedUnitCount(UnitTypes::Terran_Factory) == 1 && lastChecked + UnitTypes::Terran_Machine_Shop.buildTime() < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Machine_Shop.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Machine_Shop.gasPrice())
+				if (u->isIdle() && !u->train(UnitTypes::Terran_Siege_Tank_Tank_Mode))
 				{
-					lastChecked = Broodwar->getFrameCount();
-
-					// Find a location for academy
-					TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Machine_Shop, u->getTilePosition());
-
-					// If build position is found
-					if (buildPosition)
+					// If that fails, draw the error at the location so that you can visibly see what went wrong!
+					// However, drawing the error once will only appear for a single frame
+					// so create an event that keeps it on the screen for some frames
+					Position pos = u->getPosition();
+					Error lastErr = Broodwar->getLastError();
+					Broodwar->registerEvent([pos, lastErr](Game*)
 					{
-						// Build
-						u->build(UnitTypes::Terran_Machine_Shop, buildPosition);
-
-						// Register an event that draws the target build location
-						Broodwar->registerEvent([buildPosition, u](Game*)
-						{
-							Broodwar->drawBoxMap(Position(buildPosition),
-								Position(buildPosition + UnitTypes::Terran_Machine_Shop.tileSize()),
-								Colors::Blue);
-						},
-							nullptr,  // condition
-							UnitTypes::Terran_Machine_Shop.buildTime() + 100);  // frames to run
-					}
+						Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
+					},   // action
+						nullptr,    // condition
+						Broodwar->getLatencyFrames());  // frames to run
 				}
-			}
+			}			
+
+			// Machine shop upgrade for factory
+			if (Broodwar->self()->minerals() >= UnitTypes::Terran_Machine_Shop.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Machine_Shop.gasPrice())
+			{
+				lastChecked = Broodwar->getFrameCount();
+
+				// Build
+				u->buildAddon(UnitTypes::Terran_Machine_Shop);				
+			}			
 		}
 
 		/*
@@ -684,7 +617,7 @@ void LBot::onFrame()
 
 void LBot::onSendText(std::string txt)
 {
-	BWEM::utils::MapDrawer::ProcessCommand(txt);
+	/*BWEM::utils::MapDrawer::ProcessCommand(txt);*/
 
 	// Send the text to the game if it is not being processed.
 	Broodwar->sendText("%s", txt.c_str());
@@ -732,14 +665,12 @@ void LBot::onUnitDiscover(BWAPI::Unit u)
 			// Add to enemy buildings unitset
 			enemyBuildings.insert(u);
 
-			enemyBaseTPos = u->getTilePosition();
-
 			// Finish scouting
 			finScouting = true;					
 
 			// Get player base location
-			BWAPI::TilePosition home = Broodwar->self()->getStartLocation();
-			BWAPI::Position homePos(home);
+			BWAPI::TilePosition homeTPos = Broodwar->self()->getStartLocation();
+			BWAPI::Position homePos(homeTPos);
 
 			// Move to base
 			scout->move(homePos);
