@@ -16,9 +16,9 @@ BWAPI::Unitset minWorkers; // Holds all player workers assigned to gather minera
 BWAPI::Unitset gasWorkers; // Holds all player workers assigned to gather gas
 BWAPI::Unitset allBuildings; // Holds all player buildings
 BWAPI::Unitset army1; // Holds all player units assigned to the offensive army
-BWAPI::Unitset army2; // Holds all player units assigned to the secondary/defensive army
-BWAPI::Unitset defenseArmy;
-BWAPI::Unitset tankArmy;
+BWAPI::Unitset army2; // Holds all player units assigned to the secondary offensive army
+BWAPI::Unitset tankArmy; // Holds all player units assigned to the army containing purely tanks
+BWAPI::Unitset defenseArmy; // Holds all player units assigned to the defensive army
 BWAPI::Unitset enemyBuildings; // Holds all enemy buildings
 
 BWAPI::Unit base;
@@ -79,17 +79,10 @@ void LBot::onEnd(bool isWinner)
 	// Called when the game ends
 	if (isWinner)
 	{
-		ofstream resultFile;
+		/*ofstream resultFile;
 		resultFile.open("results.txt");
 		resultFile << "Win\n";
-		resultFile.close();
-	}
-	else if (!isWinner)
-	{
-		ofstream resultFile;
-		resultFile.open("results.txt");
-		resultFile << "Loss\n";
-		resultFile.close();
+		resultFile.close();*/
 	}	
 }
 
@@ -437,10 +430,10 @@ void LBot::onFrame()
 		 */
 		else if (u->getType() == UnitTypes::Terran_Marine)
 		{
-			if (u->canUseTech(TechTypes::Stim_Packs) && u->isUnderAttack() && u->getHitPoints() > 30)
+			/*if (u->canUseTech(TechTypes::Stim_Packs) && u->isUnderAttack() && u->getHitPoints() > 30)
 			{
 				u->useTech(TechTypes::Stim_Packs);
-			}
+			}*/
 		}
 
 		/*
@@ -789,11 +782,6 @@ void LBot::onUnitComplete(BWAPI::Unit u)
 		{
 			// Add unit to army2
 			army2.insert(u);
-		}
-		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() == 12 && army2.size() == 12 && u->getType() != UnitTypes::Terran_Siege_Tank_Tank_Mode)
-		{
-			// Add unit to defenseArmy
-			defenseArmy.insert(u);
 		}
 		else if ((u->getType() == UnitTypes::Terran_Siege_Tank_Tank_Mode || u->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode) && tankArmy.size() != 12)
 		{

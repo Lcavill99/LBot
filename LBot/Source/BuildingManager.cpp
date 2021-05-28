@@ -40,7 +40,7 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 	 * Supply management
 	 */
 	 // If supply count is at cap, build a supply depot to continue progression
-	if ((Broodwar->self()->supplyUsed() == Broodwar->self()->supplyTotal()) && lastChecked + 100 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Supply_Depot) == 0)
+	if ((Broodwar->self()->supplyUsed() == Broodwar->self()->supplyTotal()) && lastChecked + 100 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Supply_Depot) == 0 && Broodwar->self()->supplyTotal() != 200)
 	{
 		lastChecked = Broodwar->getFrameCount();
 
@@ -82,7 +82,7 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 		if (builder)
 		{
 			// Find a location for depot
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, base, 30);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, base);
 
 			// If build position is found
 			if (buildPosition)
@@ -114,7 +114,7 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 		if (builder)
 		{
 			// Find a location for barracks
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, base, 30);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, base);
 
 			// If build position is found
 			if (buildPosition)
@@ -146,7 +146,7 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 		if (builder)
 		{
 			// Find a location for barracks
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, base, 30);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, base);
 
 			// If build position is found
 			if (buildPosition)
@@ -178,7 +178,7 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 		if (builder)
 		{
 			// Find a location for depot
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, base, 30);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, base);
 
 			// If build position is found
 			if (buildPosition)
@@ -243,7 +243,7 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 		if (builder)
 		{
 			// Find a location for academy
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Academy, base, 40);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Academy, base);
 
 			// If build position is found
 			if (buildPosition)
@@ -277,7 +277,7 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 		if (builder)
 		{
 			// Find a location for academy
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Factory, base, 40);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Factory, base);
 
 			// If build position is found
 			if (buildPosition)
@@ -309,7 +309,7 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 		if (builder)
 		{
 			// Find a location for academy
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Armory, base, 40);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Armory, base);
 
 			// If build position is found
 			if (buildPosition)
@@ -329,8 +329,8 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 			}
 		}
 	}
-	// Build factory
-	if (factory == 1 && Broodwar->self()->supplyUsed() >= 120 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Factory.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Factory.gasPrice())
+	// Build factory 2
+	if (factory == 1 && Broodwar->self()->supplyUsed() >= 80 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Factory.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Factory.gasPrice())
 	{
 		lastChecked = Broodwar->getFrameCount();
 
@@ -340,7 +340,7 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 		if (builder)
 		{
 			// Find a location for academy
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Factory, base, 40);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Factory, base);
 
 			// If build position is found
 			if (buildPosition)
@@ -362,7 +362,7 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 	}
 
 	// Build barracks 3
-	if (barracks == 2 && Broodwar->self()->supplyUsed() >= 120 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
+	if (barracks == 2 && Broodwar->self()->supplyUsed() >= 90 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
 	{
 		lastChecked = Broodwar->getFrameCount();
 
@@ -372,7 +372,7 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 		if (builder)
 		{
 			// Find a location for barracks
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, base, 60);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, base);
 
 			// If build position is found
 			if (buildPosition)
@@ -394,7 +394,7 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 	}
 
 	// Build barracks 4
-	if (barracks == 3 && Broodwar->self()->supplyUsed() >= 120 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
+	if (barracks == 3 && Broodwar->self()->supplyUsed() >= 100 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
 	{
 		lastChecked = Broodwar->getFrameCount();
 
@@ -404,7 +404,7 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 		if (builder)
 		{
 			// Find a location for barracks
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, base, 60);
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Barracks, base);
 
 			// If build position is found
 			if (buildPosition)
