@@ -17,6 +17,7 @@ BWAPI::Unitset gasWorkers; // Holds all player workers assigned to gather gas
 BWAPI::Unitset allBuildings; // Holds all player buildings
 BWAPI::Unitset army1; // Holds all player units assigned to the offensive army
 BWAPI::Unitset army2; // Holds all player units assigned to the secondary/defensive army
+BWAPI::Unitset defenseArmy;
 BWAPI::Unitset tankArmy;
 BWAPI::Unitset enemyBuildings; // Holds all enemy buildings
 
@@ -108,6 +109,8 @@ void LBot::onFrame()
 	Broodwar->drawTextScreen(0, 30, "Gas workers: %d", gasWorkers.size());
 	Broodwar->drawTextScreen(0, 40, "Army1: %d", army1.size());
 	Broodwar->drawTextScreen(0, 50, "Army2: %d", army2.size());
+	Broodwar->drawTextScreen(0, 60, "TankArmy: %d", tankArmy.size());
+	Broodwar->drawTextScreen(0, 70, "DefenseArmy: %d", defenseArmy.size());
 	
 
 	// Return if the game is a replay or is paused
@@ -285,23 +288,44 @@ void LBot::onFrame()
 	//}
 	// Attacking
 	// If full strength and is not retreating, attack enemy base and micromanage units
-	if (army1.size() == 12 && retreating == false && finScouting)
+	if (finScouting)
 	{
-		attacking = true;					
-
-		for (auto &unit : army1)
+		if (army1.size() == 12)
 		{
-			if (unit->isIdle())
+			for (auto &unit : army1)
 			{
-				unit->attack(enemyBasePos);				
-			}	
+				if (unit->isIdle())
+				{
+					unit->attack(enemyBasePos);
 
-			if (unit->getHitPoints() < (unit->getInitialHitPoints() / 2))
-			{
-				unit->move(playerBasePos);
+					if (unit->getHitPoints() < 20)
+					{
+						unit->move(playerBasePos);
+					}					
+				}
 			}
 		}
-	}	
+		if (army2.size() == 12)
+		{
+			for (auto &unit : army2)
+			{
+				if (unit->isIdle())
+				{
+					unit->attack(enemyBasePos);
+				}
+			}
+		}
+		if (tankArmy.size() == 8)
+		{
+			for (auto &unit : tankArmy)
+			{
+				if (unit->isIdle())
+				{
+					unit->attack(enemyBasePos);
+				}
+			}
+		}
+	}
 	//// Retreating
 	//// If half strength, retreat to base to recover
 	//else if (army1.size() < 6)
@@ -412,7 +436,11 @@ void LBot::onFrame()
 		 * Marines
 		 */
 		else if (u->getType() == UnitTypes::Terran_Marine)
-		{			
+		{
+			if (u->canUseTech(TechTypes::Stim_Packs) && u->isUnderAttack() && u->getHitPoints() > 30)
+			{
+				u->useTech(TechTypes::Stim_Packs);
+			}
 		}
 
 		/*
@@ -420,10 +448,6 @@ void LBot::onFrame()
 		 */
 		else if (u->getType() == UnitTypes::Terran_Medic)
 		{
-			if (u->isIdle())
-			{
-				u->attack(u->getClosestUnit(Filter::IsAlly));
-			}
 		}
 
 		/*
@@ -619,23 +643,23 @@ void LBot::onUnitDiscover(BWAPI::Unit u)
 	if (u->getPlayer() == Broodwar->enemy())
 	{
 		//If enemy base is discovered, stop scouting and go home
-		if (u->getType().isResourceDepot())
+		if (u->getType().isResourceDepot() && eBaseFound == false)
 		{						
 			// Add to enemy buildings unitset
 			enemyBuildings.insert(u);
 
 			enemyBaseTPos = u->getTilePosition();
-
-			// Finish scouting
-			finScouting = true;					
+			eBaseFound = true;							
 
 			// Get player base location
 			BWAPI::TilePosition homeTPos = Broodwar->self()->getStartLocation();
 			BWAPI::Position homePos(homeTPos);
 
+			// Finish scouting
+			finScouting = true;
+
 			// Move to base
 			scout->move(homePos);
-			minWorkers.insert(scout);
 		}
 	}    
 }
@@ -755,16 +779,21 @@ void LBot::onUnitComplete(BWAPI::Unit u)
 			allBuildings.insert(u);
 		}
 		// If army1 isnt full
-		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() != 12)
+		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() != 12 && u->getType() != UnitTypes::Terran_Siege_Tank_Tank_Mode)
 		{
 			// Add unit to army1
 			army1.insert(u);
 		}
 		// If army1 is full and army2 isnt
-		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() == 12 && army2.size() != 12)
+		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() == 12 && army2.size() != 12 && u->getType() != UnitTypes::Terran_Siege_Tank_Tank_Mode)
 		{
 			// Add unit to army2
 			army2.insert(u);
+		}
+		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.size() == 12 && army2.size() == 12 && u->getType() != UnitTypes::Terran_Siege_Tank_Tank_Mode)
+		{
+			// Add unit to defenseArmy
+			defenseArmy.insert(u);
 		}
 		else if ((u->getType() == UnitTypes::Terran_Siege_Tank_Tank_Mode || u->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode) && tankArmy.size() != 12)
 		{
