@@ -17,7 +17,7 @@ class BuildingManager
 
 public:
 	void BuildingManager::recruitUnit(BWAPI::Unit u);
-	void BuildingManager::zergBuildings();
+	void BuildingManager::zergBuildings(BWAPI::Unitset set);
 	void BuildingManager::protossBuildings();
 	void BuildingManager::terranBuildings();
 	void BuildingManager::academyTech(BWAPI::Unit u);

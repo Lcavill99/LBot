@@ -18,7 +18,7 @@ void BuildingManager::recruitUnit(BWAPI::Unit u)
 /*
  * vs Zerg building order and management
  */
-void BuildingManager::zergBuildings()
+void BuildingManager::zergBuildings(BWAPI::Unitset set)
 {
 	depot = Broodwar->self()->allUnitCount(UnitTypes::Terran_Supply_Depot);
 	barracks = Broodwar->self()->allUnitCount(UnitTypes::Terran_Barracks);
@@ -28,20 +28,55 @@ void BuildingManager::zergBuildings()
 	armory = Broodwar->self()->allUnitCount(UnitTypes::Terran_Armory);
 
 	static int lastChecked = 0;
-	static int movetime = 150;
+	static int movetime = 200;
 	static bool scouting = false;
 
 	workerManager = new WorkerManager;
 	scoutManager = new ScoutManager;
 
 	BWAPI::TilePosition base = Broodwar->self()->getStartLocation();
+
+	/*
+	 * Supply management
+	 */
+	 // If supply count is at cap, build a supply depot to continue progression
+	if ((Broodwar->self()->supplyUsed() == Broodwar->self()->supplyTotal()) && lastChecked + 100 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Supply_Depot) == 0)
+	{
+		lastChecked = Broodwar->getFrameCount();
+
+		Unit builder = workerManager->getWorkerFromSet(set);
+
+		// If worker is found
+		if (builder)
+		{
+			// Find a location for depot
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, base, 30);
+
+			// If build position is found
+			if (buildPosition)
+			{
+				// Build
+				builder->build(UnitTypes::Terran_Supply_Depot, buildPosition);
+
+				// Register an event that draws the target build location
+				Broodwar->registerEvent([buildPosition, builder](Game*)
+				{
+					Broodwar->drawBoxMap(Position(buildPosition),
+						Position(buildPosition + UnitTypes::Terran_Supply_Depot.tileSize()),
+						Colors::Blue);
+				},
+					nullptr,  // condition
+					UnitTypes::Terran_Supply_Depot.buildTime() + 100);  // frames to run
+			}
+		}
+	}
 		
 	// Build depot
 	if (depot == 0 && Broodwar->self()->supplyUsed() >= 18 && lastChecked + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 	{
 		lastChecked = Broodwar->getFrameCount();
 
-		Unit builder = workerManager->getWorker();
+		Unit builder = workerManager->getWorkerFromSet(set);
 
 		// If worker is found
 		if (builder)
@@ -73,7 +108,7 @@ void BuildingManager::zergBuildings()
 	{
 		lastChecked = Broodwar->getFrameCount();
 
-		Unit builder = workerManager->getWorker();
+		Unit builder = workerManager->getWorkerFromSet(set);
 
 		// If worker is found
 		if (builder)
@@ -105,7 +140,7 @@ void BuildingManager::zergBuildings()
 	{
 		lastChecked = Broodwar->getFrameCount();
 
-		Unit builder = workerManager->getWorker();
+		Unit builder = workerManager->getWorkerFromSet(set);
 
 		// If worker is found
 		if (builder)
@@ -137,7 +172,7 @@ void BuildingManager::zergBuildings()
 	{
 		lastChecked = Broodwar->getFrameCount();
 
-		Unit builder = workerManager->getWorker();
+		Unit builder = workerManager->getWorkerFromSet(set);
 
 		// If worker is found
 		if (builder)
@@ -169,7 +204,7 @@ void BuildingManager::zergBuildings()
 	{
 		lastChecked = Broodwar->getFrameCount();
 
-		Unit builder = workerManager->getWorker();
+		Unit builder = workerManager->getWorkerFromSet(set);
 
 		// If worker is found
 		if (builder)
@@ -202,7 +237,7 @@ void BuildingManager::zergBuildings()
 	{
 		lastChecked = Broodwar->getFrameCount();
 
-		Unit builder = workerManager->getWorker();
+		Unit builder = workerManager->getWorkerFromSet(set);
 
 		// If worker is found
 		if (builder)
@@ -247,7 +282,7 @@ void BuildingManager::zergBuildings()
 	{
 		lastChecked = Broodwar->getFrameCount();
 
-		Unit builder = workerManager->getWorker();
+		Unit builder = workerManager->getWorkerFromSet(set);
 
 		// If worker is found
 		if (builder)
@@ -279,7 +314,7 @@ void BuildingManager::zergBuildings()
 	{
 		lastChecked = Broodwar->getFrameCount();
 
-		Unit builder = workerManager->getWorker();
+		Unit builder = workerManager->getWorkerFromSet(set);
 
 		// If worker is found
 		if (builder)
