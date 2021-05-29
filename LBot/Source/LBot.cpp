@@ -205,7 +205,7 @@ void LBot::onFrame()
 					break;
 				}
 			}		
-		}
+		}		
 	}
 	
 	/*
@@ -464,7 +464,7 @@ void LBot::onFrame()
 		else if (u->getType() == UnitTypes::Terran_Command_Center)
 		{
 			// Construct workers if idle (24 workers per command center)
-			if (u->isIdle() && Broodwar->self()->allUnitCount(UnitTypes::Terran_SCV) != Broodwar->self()->allUnitCount(UnitTypes::Terran_Command_Center) * 24 && !u->train(UnitTypes::Terran_SCV))
+			if (u->isIdle() && (Broodwar->self()->allUnitCount(UnitTypes::Terran_SCV) != Broodwar->self()->allUnitCount(UnitTypes::Terran_Command_Center) * 24) && !u->train(UnitTypes::Terran_SCV))
 			{
 				// If that fails, draw the error at the location so that you can visibly see what went wrong!
 				// However, drawing the error once will only appear for a single frame
