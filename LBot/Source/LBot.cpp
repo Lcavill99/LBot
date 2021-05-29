@@ -7,7 +7,6 @@
 
 using namespace BWAPI;
 using namespace Filter;
-using namespace std;
 
 namespace { auto & theMap = BWEM::Map::Instance(); }
 
@@ -19,7 +18,6 @@ BWAPI::Unitset army1; // Holds all player units assigned to the offensive army
 BWAPI::Unitset army2; // Holds all player units assigned to the secondary offensive army
 BWAPI::Unitset tankArmy; // Holds all player units assigned to the army containing purely tanks
 BWAPI::Unitset defenseArmy; // Holds all player units assigned to the defensive army
-BWAPI::Unitset enemyBuildings; // Holds all enemy buildings
 
 BWAPI::Unit base;
 BWAPI::TilePosition enemyBaseTPos;
@@ -48,14 +46,18 @@ void LBot::onStart()
 	buildingManager = new BuildingManager;
 	armyManager = new ArmyManager;
 	
-	//// Initalise BWEM
-	//theMap.Initialize();
-	//theMap.EnableAutomaticPathAnalysis();
-	//bool startingLocationsOK = theMap.FindBasesForStartingLocations();
-	//assert(startingLocationsOK);
+	// Initalise BWEM
+	theMap.Initialize();
+	theMap.EnableAutomaticPathAnalysis();
+	bool startingLocationsOK = theMap.FindBasesForStartingLocations();
+	assert(startingLocationsOK);
 
-	//BWEM::utils::MapPrinter::Initialize(&theMap);
-	//BWEM::utils::printMap(theMap); // will print the map into the file <StarCraftFolder>bwapi-data/map.bmp		
+	BWEM::utils::MapPrinter::Initialize(&theMap);
+	BWEM::utils::printMap(theMap); // will print the map into the file <StarCraftFolder>bwapi-data/map.bmp		
+
+	// initalise BWEB
+	BWEB::Map::onStart();
+	BWEB::Blocks::findBlocks();
 
 	// Check if this is a replay
 	if (Broodwar->isReplay())
@@ -88,13 +90,19 @@ void LBot::onEnd(bool isWinner)
 
 void LBot::onFrame()
 {	
-	///*
-	// * BWEM
-	// */
-	//// Render BWEM map
-	//BWEM::utils::gridMapExample(theMap);
-	//BWEM::utils::drawMap(theMap);
+	/*
+	 * BWEM & BWEB
+	 */
+	// Render BWEM map
+	BWEM::utils::gridMapExample(theMap);
+	BWEM::utils::drawMap(theMap);
 
+	// Render BWEB
+	BWEB::Map::draw();
+
+	/*
+	 * Initial
+	 */
 	// Display values
 	Broodwar->drawTextScreen(0, 0,  "FPS: %d", Broodwar->getFPS());
 	Broodwar->drawTextScreen(0, 10, "Workers: %d", allWorkers.size());
@@ -105,7 +113,6 @@ void LBot::onFrame()
 	Broodwar->drawTextScreen(0, 60, "TankArmy: %d", tankArmy.size());
 	Broodwar->drawTextScreen(0, 70, "DefenseArmy: %d", defenseArmy.size());
 	
-
 	// Return if the game is a replay or is paused
 	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
 		return;
@@ -131,6 +138,37 @@ void LBot::onFrame()
 		 * Build order
 		 */
 		buildingManager->zergBuildings(minWorkers);
+
+		if (Broodwar->self()->supplyUsed() >= 36 && lastChecked + 400 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Command_Center) == 0)
+		{
+			lastChecked = Broodwar->getFrameCount();
+
+			Unit builder = workerManager->getWorkerFromSet(minWorkers);
+
+			// If worker is found
+			if (builder)
+			{
+				// Find a location for depot
+				BWAPI::TilePosition buildPosition = BWEB::Map::getNaturalTile();
+
+				// If build position is found
+				if (buildPosition)
+				{
+					// Build
+					builder->build(UnitTypes::Terran_Command_Center, buildPosition);
+
+					// Register an event that draws the target build location
+					Broodwar->registerEvent([buildPosition, builder](Game*)
+					{
+						Broodwar->drawBoxMap(Position(buildPosition),
+							Position(buildPosition + UnitTypes::Terran_Supply_Depot.tileSize()),
+							Colors::Blue);
+					},
+						nullptr,  // condition
+						UnitTypes::Terran_Supply_Depot.buildTime() + 100);  // frames to run
+				}
+			}
+		}
 
 		/*
 		 * Scouting
@@ -259,30 +297,16 @@ void LBot::onFrame()
 	/*
 	 * Attacking
 	 */	 
-	// Get player base location
-	BWAPI::TilePosition playerBaseTPos = Broodwar->self()->getStartLocation();
-	BWAPI::Position playerBasePos(playerBaseTPos);
-
-	// Get enemy base position	
-	BWAPI::Position enemyBasePos(enemyBaseTPos);
-	 
-	//// Army 1 can be in different states: idle, attacking, retreating, or rearmed
-	//// Idle
-	//if (attacking == false)
-	//{		
-	//	for (auto &unit : army1)
-	//	{	
-	//		if (unit->isIdle())
-	//		{
-	//			// Still want them to defend themselves
-	//			unit->attack(army1.getClosestUnit(Filter::IsEnemy, 1000));
-	//		}			
-	//	}
-	//}
-	// Attacking
-	// If full strength and is not retreating, attack enemy base and micromanage units
 	if (finScouting)
 	{
+		// Get player base location
+		BWAPI::TilePosition playerBaseTPos = Broodwar->self()->getStartLocation();
+		BWAPI::Position playerBasePos(playerBaseTPos);
+
+		// Get enemy base position	
+		BWAPI::Position enemyBasePos(enemyBaseTPos);
+
+		// army 1 attacking
 		if (army1.size() == 12)
 		{
 			for (auto &unit : army1)
@@ -298,6 +322,7 @@ void LBot::onFrame()
 				}
 			}
 		}
+		// Army 2 attacking
 		if (army2.size() == 12)
 		{
 			for (auto &unit : army2)
@@ -308,6 +333,7 @@ void LBot::onFrame()
 				}
 			}
 		}
+		// Tank army attacking
 		if (tankArmy.size() == 8)
 		{
 			for (auto &unit : tankArmy)
@@ -319,24 +345,6 @@ void LBot::onFrame()
 			}
 		}
 	}
-	//// Retreating
-	//// If half strength, retreat to base to recover
-	//else if (army1.size() < 6)
-	//{
-	//	retreating = true;
-	//	army1.move(playerBasePos);
-	//}
-	//// Rearmed
-	//// If full strength, army can attack again
-	//else if (army1.size() == 12 && retreating == true)
-	//{
-	//	retreating = false;
-	//}	 
-
-	//// Defensive army only needs to attack units close to base
-	//army2.attack(base->getClosestUnit(Filter::IsEnemy, 1000));
-
-	//tankArmy.attack(tankArmy.getClosestUnit(Filter::IsEnemy));
 
 	/*
 	 * Unit iteration
@@ -593,7 +601,7 @@ void LBot::onFrame()
 
 void LBot::onSendText(std::string txt)
 {
-	/*BWEM::utils::MapDrawer::ProcessCommand(txt);*/
+	BWEM::utils::MapDrawer::ProcessCommand(txt);
 
 	// Send the text to the game if it is not being processed.
 	Broodwar->sendText("%s", txt.c_str());
@@ -637,10 +645,7 @@ void LBot::onUnitDiscover(BWAPI::Unit u)
 	{
 		//If enemy base is discovered, stop scouting and go home
 		if (u->getType().isResourceDepot() && eBaseFound == false)
-		{						
-			// Add to enemy buildings unitset
-			enemyBuildings.insert(u);
-
+		{
 			enemyBaseTPos = u->getTilePosition();
 			eBaseFound = true;							
 
@@ -687,8 +692,8 @@ void LBot::onUnitCreate(BWAPI::Unit u)
 
 void LBot::onUnitDestroy(BWAPI::Unit u)
 {	
-	if (u->getType().isMineralField())    theMap.OnMineralDestroyed(u);
-	else if (u->getType().isSpecialBuilding()) theMap.OnStaticBuildingDestroyed(u);
+	/*if (u->getType().isMineralField())    theMap.OnMineralDestroyed(u);
+	else if (u->getType().isSpecialBuilding()) theMap.OnStaticBuildingDestroyed(u);*/
 
 	static int lastChecked = 0;
 
