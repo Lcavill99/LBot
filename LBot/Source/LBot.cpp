@@ -4,9 +4,11 @@
 #include "BuildOrder.h"
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 using namespace BWAPI;
 using namespace Filter;
+using namespace std;
 
 namespace { auto & theMap = BWEM::Map::Instance(); }
 
@@ -81,10 +83,10 @@ void LBot::onEnd(bool isWinner)
 	// Called when the game ends
 	if (isWinner)
 	{
-		/*ofstream resultFile;
+		ofstream resultFile;
 		resultFile.open("results.txt");
 		resultFile << "Win\n";
-		resultFile.close();*/
+		resultFile.close();
 	}	
 }
 
@@ -111,7 +113,7 @@ void LBot::onFrame()
 	Broodwar->drawTextScreen(0, 40, "Army1: %d", army1.size());
 	Broodwar->drawTextScreen(0, 50, "Army2: %d", army2.size());
 	Broodwar->drawTextScreen(0, 60, "TankArmy: %d", tankArmy.size());
-	Broodwar->drawTextScreen(0, 70, "DefenseArmy: %d", defenseArmy.size());
+	Broodwar->drawTextScreen(0, 70, "DefenseArmy: %d", defenseArmy.size());	
 	
 	// Return if the game is a replay or is paused
 	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
@@ -139,7 +141,7 @@ void LBot::onFrame()
 		 */
 		buildingManager->zergBuildings(minWorkers);
 
-		if (Broodwar->self()->supplyUsed() >= 36 && lastChecked + 400 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Command_Center) == 0)
+		if ((Broodwar->self()->supplyUsed() >= (Broodwar->self()->allUnitCount(UnitTypes::Terran_Command_Center) * 36)) && lastChecked + 200 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Command_Center) == 0)
 		{
 			lastChecked = Broodwar->getFrameCount();
 
@@ -173,8 +175,8 @@ void LBot::onFrame()
 		/*
 		 * Scouting
 		 */
-		// If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
-		if (Broodwar->self()->supplyUsed() == 36 && !finScouting)
+		//If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
+		if (!finScouting)
 		{
 			// If we dont have a scout, assign one
 			if (!scout)
@@ -186,26 +188,34 @@ void LBot::onFrame()
 					minWorkers.erase(scout);
 				}
 			}
-			else 
+			else
 			{
-				auto& startLocations = Broodwar->getStartLocations();
-
-				// Loop through all start locations
-				for (BWAPI::TilePosition baseLocation : startLocations)
+				Unitset geysers = Broodwar->getGeysers();
+				for (Unit geyser : geysers)
 				{
-					// If the location is already explored, move on
-					if (Broodwar->isExplored(baseLocation))
-					{
-						continue;
-					}
-
-					BWAPI::Position pos(baseLocation);
-					// Move to start location to scout
-					scout->move(pos);
-					break;
 				}
-			}		
-		}		
+			}
+			
+			//else
+			//{
+			//	auto& startLocations = Broodwar->getStartLocations();
+
+			//	// Loop through all start locations
+			//	for (BWAPI::TilePosition baseLocation : startLocations)
+			//	{
+			//		// If the location is already explored, move on
+			//		if (Broodwar->isExplored(baseLocation))
+			//		{
+			//			continue;
+			//		}
+
+			//		BWAPI::Position pos(baseLocation);
+			//		// Move to start location to scout
+			//		scout->move(pos);
+			//		break;
+			//	}
+			//}
+		}			
 	}
 	
 	/*
@@ -297,6 +307,22 @@ void LBot::onFrame()
 	/*
 	 * Attacking
 	 */	 
+
+	 // Attacking enemies close
+	 BWAPI::Unitset localEnemies = army1.getUnitsInRadius(400, Filter::IsEnemy);
+
+	 // If there are enemies close, attack them
+	 if (localEnemies.size() != 0)
+	 {
+		 for (auto &unit : army1)
+		 {
+			 if (unit->isIdle())
+			 {
+				 army1.attack(army1.getClosestUnit(Filter::IsEnemy));
+			 }
+		 }		 
+	 }
+
 	if (finScouting)
 	{
 		// Get player base location
@@ -304,7 +330,7 @@ void LBot::onFrame()
 		BWAPI::Position playerBasePos(playerBaseTPos);
 
 		// Get enemy base position	
-		BWAPI::Position enemyBasePos(enemyBaseTPos);
+		BWAPI::Position enemyBasePos(enemyBaseTPos);		
 
 		// army 1 attacking
 		if (army1.size() == 12)
