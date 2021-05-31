@@ -9,13 +9,6 @@ using namespace BWAPI;
 using namespace Filter;
 
 /*
- * Recruit units
- */
-void BuildingManager::recruitUnit(BWAPI::Unit u)
-{
-}
-
-/*
  * vs Zerg building order and management
  */
 void BuildingManager::zergBuildings(BWAPI::Unitset set)
@@ -58,15 +51,15 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 				// Build
 				builder->build(UnitTypes::Terran_Supply_Depot, buildPosition);
 
-				// Register an event that draws the target build location
-				Broodwar->registerEvent([buildPosition, builder](Game*)
-				{
-					Broodwar->drawBoxMap(Position(buildPosition),
-						Position(buildPosition + UnitTypes::Terran_Supply_Depot.tileSize()),
-						Colors::Blue);
-				},
-					nullptr,  // condition
-					UnitTypes::Terran_Supply_Depot.buildTime() + 100);  // frames to run
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Supply_Depot.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Supply_Depot.buildTime() + 100);  // frames to run
 			}
 		}
 	}
@@ -90,15 +83,15 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 				// Build
 				builder->build(UnitTypes::Terran_Supply_Depot, buildPosition);
 
-				// Register an event that draws the target build location
-				Broodwar->registerEvent([buildPosition, builder](Game*)
-				{
-					Broodwar->drawBoxMap(Position(buildPosition),
-						Position(buildPosition + UnitTypes::Terran_Supply_Depot.tileSize()),
-						Colors::Blue);
-				},
-					nullptr,  // condition
-					UnitTypes::Terran_Supply_Depot.buildTime() + 100);  // frames to run
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Supply_Depot.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Supply_Depot.buildTime() + 100);  // frames to run
 			}
 		}
 	}
@@ -122,15 +115,15 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 				//Build
 				builder->build(UnitTypes::Terran_Barracks, buildPosition);
 
-				// Register an event that draws the target build location
-				Broodwar->registerEvent([buildPosition, builder](Game*)
-				{
-					Broodwar->drawBoxMap(Position(buildPosition),
-						Position(buildPosition + UnitTypes::Terran_Barracks.tileSize()),
-						Colors::Blue);
-				},
-					nullptr,  // condition
-					UnitTypes::Terran_Barracks.buildTime() + 100);  // frames to run
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Barracks.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Barracks.buildTime() + 100);  // frames to run
 			}
 		}
 	}
@@ -154,15 +147,15 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 				// Build
 				builder->build(UnitTypes::Terran_Barracks, buildPosition);
 
-				// Register an event that draws the target build location
-				Broodwar->registerEvent([buildPosition, builder](Game*)
-				{
-					Broodwar->drawBoxMap(Position(buildPosition),
-						Position(buildPosition + UnitTypes::Terran_Barracks.tileSize()),
-						Colors::Blue);
-				},
-					nullptr,  // condition
-					UnitTypes::Terran_Barracks.buildTime() + 100);  // frames to run
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Barracks.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Barracks.buildTime() + 100);  // frames to run
 			}
 		}
 	}
@@ -186,15 +179,15 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 				// Build
 				builder->build(UnitTypes::Terran_Supply_Depot, buildPosition);
 
-				// Register an event that draws the target build location
-				Broodwar->registerEvent([buildPosition, builder](Game*)
-				{
-					Broodwar->drawBoxMap(Position(buildPosition),
-						Position(buildPosition + UnitTypes::Terran_Supply_Depot.tileSize()),
-						Colors::Blue);
-				},
-					nullptr,  // condition
-					UnitTypes::Terran_Supply_Depot.buildTime() + 100);  // frames to run
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Supply_Depot.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Supply_Depot.buildTime() + 100);  // frames to run
 			}
 		}
 	}
@@ -219,15 +212,15 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 				// Build 
 				builder->build(UnitTypes::Terran_Refinery, buildPosition);
 
-				// Register an event that draws the target build location
-				Broodwar->registerEvent([buildPosition, builder](Game*)
-				{
-					Broodwar->drawBoxMap(Position(buildPosition),
-						Position(buildPosition + UnitTypes::Terran_Refinery.tileSize()),
-						Colors::Blue);
-				},
-					nullptr,  // condition
-					UnitTypes::Terran_Refinery.buildTime() + 100);  // frames to run
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Refinery.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Refinery.buildTime() + 100);  // frames to run
 			}
 		}
 	}
@@ -251,15 +244,15 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 				// Build
 				builder->build(UnitTypes::Terran_Academy, buildPosition);
 
-				// Register an event that draws the target build location
-				Broodwar->registerEvent([buildPosition, builder](Game*)
-				{
-					Broodwar->drawBoxMap(Position(buildPosition),
-						Position(buildPosition + UnitTypes::Terran_Academy.tileSize()),
-						Colors::Blue);
-				},
-					nullptr,  // condition
-					UnitTypes::Terran_Academy.buildTime() + 100);  // frames to run
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Academy.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Academy.buildTime() + 100);  // frames to run
 			}
 		}
 	}
@@ -285,15 +278,15 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 				// Build
 				builder->build(UnitTypes::Terran_Factory, buildPosition);
 
-				// Register an event that draws the target build location
-				Broodwar->registerEvent([buildPosition, builder](Game*)
-				{
-					Broodwar->drawBoxMap(Position(buildPosition),
-						Position(buildPosition + UnitTypes::Terran_Factory.tileSize()),
-						Colors::Blue);
-				},
-					nullptr,  // condition
-					UnitTypes::Terran_Factory.buildTime() + 100);  // frames to run
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Factory.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Factory.buildTime() + 100);  // frames to run
 			}
 		}
 	}	
@@ -317,15 +310,15 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 				// Build
 				builder->build(UnitTypes::Terran_Armory, buildPosition);
 
-				// Register an event that draws the target build location
-				Broodwar->registerEvent([buildPosition, builder](Game*)
-				{
-					Broodwar->drawBoxMap(Position(buildPosition),
-						Position(buildPosition + UnitTypes::Terran_Armory.tileSize()),
-						Colors::Blue);
-				},
-					nullptr,  // condition
-					UnitTypes::Terran_Armory.buildTime() + 100);  // frames to run
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Armory.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Armory.buildTime() + 100);  // frames to run
 			}
 		}
 	}
@@ -348,15 +341,15 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 				// Build
 				builder->build(UnitTypes::Terran_Factory, buildPosition);
 
-				// Register an event that draws the target build location
-				Broodwar->registerEvent([buildPosition, builder](Game*)
-				{
-					Broodwar->drawBoxMap(Position(buildPosition),
-						Position(buildPosition + UnitTypes::Terran_Factory.tileSize()),
-						Colors::Blue);
-				},
-					nullptr,  // condition
-					UnitTypes::Terran_Factory.buildTime() + 100);  // frames to run
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Factory.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Factory.buildTime() + 100);  // frames to run
 			}
 		}
 	}
@@ -380,15 +373,15 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 				//Build
 				builder->build(UnitTypes::Terran_Barracks, buildPosition);
 
-				// Register an event that draws the target build location
-				Broodwar->registerEvent([buildPosition, builder](Game*)
-				{
-					Broodwar->drawBoxMap(Position(buildPosition),
-						Position(buildPosition + UnitTypes::Terran_Barracks.tileSize()),
-						Colors::Blue);
-				},
-					nullptr,  // condition
-					UnitTypes::Terran_Barracks.buildTime() + 100);  // frames to run
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Barracks.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Barracks.buildTime() + 100);  // frames to run
 			}
 		}
 	}
@@ -412,15 +405,15 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 				//Build
 				builder->build(UnitTypes::Terran_Barracks, buildPosition);
 
-				// Register an event that draws the target build location
-				Broodwar->registerEvent([buildPosition, builder](Game*)
-				{
-					Broodwar->drawBoxMap(Position(buildPosition),
-						Position(buildPosition + UnitTypes::Terran_Barracks.tileSize()),
-						Colors::Blue);
-				},
-					nullptr,  // condition
-					UnitTypes::Terran_Barracks.buildTime() + 100);  // frames to run
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Barracks.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Barracks.buildTime() + 100);  // frames to run
 			}
 		}
 	}

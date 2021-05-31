@@ -4,9 +4,15 @@
 
 class ScoutManager
 {	
-	BWAPI::Unit scout;
-
+	/*
+	 * Manager files
+	 */
 	WorkerManager *workerManager;
+
+	/*
+	 * BWAPI
+	 */
+	BWAPI::Unit scout;
 
 public:
 	BWAPI::Unit ScoutManager::setScout();

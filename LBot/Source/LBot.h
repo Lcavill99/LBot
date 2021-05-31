@@ -1,6 +1,5 @@
 #pragma once
 #include <BWAPI.h>
-#include "BuildOrder.h"
 #include "ScoutManager.h"
 #include "WorkerManager.h"
 #include "BuildingManager.h"
@@ -8,13 +7,28 @@
 
 class LBot : public BWAPI::AIModule
 {	
-	BuildOrder *buildOrder;
+	/*
+	 * Manager files
+	 */
 	ScoutManager *scoutManager;
 	WorkerManager *workerManager;
 	BuildingManager *buildingManager;
 	ArmyManager *armyManager;
 	
-	BWAPI::Unit scout;
+	/*
+	 * BWAPI 
+	 */
+	BWAPI::Unit scout; // Holds the unit assigned as the scout
+	BWAPI::Position eBasePos; // Holds the position of the enemy base once it is discovered
+
+	/*
+	 * Variables
+	 */
+	int lastChecked = 0;
+	bool finScouting = false;
+	bool retreating = false;
+	bool attacking = false;
+	bool eBaseFound = false;
 
 public:
   virtual void onStart();

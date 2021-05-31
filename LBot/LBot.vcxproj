@@ -93,7 +93,6 @@
   <ItemGroup>
     <ClCompile Include="Source\ArmyManager.cpp" />
     <ClCompile Include="Source\BuildingManager.cpp" />
-    <ClCompile Include="Source\BuildOrder.cpp" />
     <ClCompile Include="Source\BWEB\Block.cpp" />
     <ClCompile Include="Source\BWEB\BWEB.cpp" />
     <ClCompile Include="Source\BWEB\PathFind.cpp" />
@@ -125,7 +124,6 @@
   <ItemGroup>
     <ClInclude Include="Source\ArmyManager.h" />
     <ClInclude Include="Source\BuildingManager.h" />
-    <ClInclude Include="Source\BuildOrder.h" />
     <ClInclude Include="Source\BWEB\Block.h" />
     <ClInclude Include="Source\BWEB\BWEB.h" />
     <ClInclude Include="Source\BWEB\JPS.h" />

@@ -5,6 +5,15 @@
 
 class BuildingManager
 {
+	/*
+	 * Manager files
+	 */
+	WorkerManager *workerManager;
+	ScoutManager *scoutManager;
+
+	/*
+	 * Variables
+	 */
 	int depot;
 	int barracks;
 	int refinery;
@@ -12,11 +21,7 @@ class BuildingManager
 	int factory;
 	int armory;
 
-	WorkerManager *workerManager;
-	ScoutManager *scoutManager;
-
 public:
-	void BuildingManager::recruitUnit(BWAPI::Unit u);
 	void BuildingManager::zergBuildings(BWAPI::Unitset set);
 	void BuildingManager::protossBuildings();
 	void BuildingManager::terranBuildings();

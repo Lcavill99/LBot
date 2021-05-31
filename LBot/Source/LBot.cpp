@@ -1,7 +1,6 @@
 #include "LBot.h"
 #include "BWEM.h"
 #include "BWEB.h"
-#include "BuildOrder.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -12,6 +11,9 @@ using namespace std;
 
 namespace { auto & theMap = BWEM::Map::Instance(); }
 
+/*
+ * Unitsets
+ */
 BWAPI::Unitset allWorkers; // Holds all player workers
 BWAPI::Unitset minWorkers; // Holds all player workers assigned to gather minerals
 BWAPI::Unitset gasWorkers; // Holds all player workers assigned to gather gas
@@ -21,34 +23,30 @@ BWAPI::Unitset army2; // Holds all player units assigned to the secondary offens
 BWAPI::Unitset tankArmy; // Holds all player units assigned to the army containing purely tanks
 BWAPI::Unitset defenseArmy; // Holds all player units assigned to the defensive army
 
-BWAPI::Unit base;
-BWAPI::TilePosition enemyBaseTPos;
-
-static int lastChecked = 0;
-bool finScouting = false;
-bool retreating = false;
-bool attacking = false;
-bool eBaseFound = false;
-
 void LBot::onStart()
 {
-	// Enable the UserInput flag, which allows us to control the bot and type messages.
-	Broodwar->enableFlag(Flag::UserInput);
+	// UserInput flag, allows control of the bot and ability to type messages.
+	//Broodwar->enableFlag(Flag::UserInput);
 
-	// Uncomment the following line and the bot will know about everything through the fog of war (cheat).
+	// Uncomment and the bot will know about everything through the fog of war (cheat).
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 
 	// Set the command optimization level so that common commands can be grouped
 	// and reduce the bot's APM (Actions Per Minute).
 	Broodwar->setCommandOptimizationLevel(2);	
 
-	buildOrder = new BuildOrder;
+	/*
+	 * Manager files
+	 */
 	scoutManager = new ScoutManager;
 	workerManager = new WorkerManager;
 	buildingManager = new BuildingManager;
 	armyManager = new ArmyManager;
 	
-	// Initalise BWEM
+	/*
+	 * BWEM & BWEB Initialisation
+	 */
+	// Initialise BWEM
 	theMap.Initialize();
 	theMap.EnableAutomaticPathAnalysis();
 	bool startingLocationsOK = theMap.FindBasesForStartingLocations();
@@ -57,7 +55,7 @@ void LBot::onStart()
 	BWEM::utils::MapPrinter::Initialize(&theMap);
 	BWEM::utils::printMap(theMap); // will print the map into the file <StarCraftFolder>bwapi-data/map.bmp		
 
-	// initalise BWEB
+	// Initalise BWEB
 	BWEB::Map::onStart();
 	BWEB::Blocks::findBlocks();
 
@@ -92,28 +90,32 @@ void LBot::onEnd(bool isWinner)
 
 void LBot::onFrame()
 {	
+	///				         ///
+	/// Initial onFrame code ///
+	///			             ///
+
 	/*
 	 * BWEM & BWEB
 	 */
-	// Render BWEM map
-	BWEM::utils::gridMapExample(theMap);
-	BWEM::utils::drawMap(theMap);
+	//// Render BWEM map
+	//BWEM::utils::gridMapExample(theMap);
+	//BWEM::utils::drawMap(theMap);
 
-	// Render BWEB
-	BWEB::Map::draw();
+	//// Render BWEB
+	//BWEB::Map::draw();
 
 	/*
 	 * Initial
 	 */
-	// Display values
-	Broodwar->drawTextScreen(0, 0,  "FPS: %d", Broodwar->getFPS());
-	Broodwar->drawTextScreen(0, 10, "Workers: %d", allWorkers.size());
-	Broodwar->drawTextScreen(0, 20, "Mineral workers: %d", minWorkers.size());
-	Broodwar->drawTextScreen(0, 30, "Gas workers: %d", gasWorkers.size());
-	Broodwar->drawTextScreen(0, 40, "Army1: %d", army1.size());
-	Broodwar->drawTextScreen(0, 50, "Army2: %d", army2.size());
-	Broodwar->drawTextScreen(0, 60, "TankArmy: %d", tankArmy.size());
-	Broodwar->drawTextScreen(0, 70, "DefenseArmy: %d", defenseArmy.size());	
+	//// Display values
+	//Broodwar->drawTextScreen(0, 0,  "FPS: %d", Broodwar->getFPS());
+	//Broodwar->drawTextScreen(0, 10, "Workers: %d", allWorkers.size());
+	//Broodwar->drawTextScreen(0, 20, "Mineral workers: %d", minWorkers.size());
+	//Broodwar->drawTextScreen(0, 30, "Gas workers: %d", gasWorkers.size());
+	//Broodwar->drawTextScreen(0, 40, "Army1: %d", army1.size());
+	//Broodwar->drawTextScreen(0, 50, "Army2: %d", army2.size());
+	//Broodwar->drawTextScreen(0, 60, "TankArmy: %d", tankArmy.size());
+	//Broodwar->drawTextScreen(0, 70, "DefenseArmy: %d", defenseArmy.size());	
 	
 	// Return if the game is a replay or is paused
 	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
@@ -176,7 +178,7 @@ void LBot::onFrame()
 		 * Scouting
 		 */
 		//If we have a scout and aren't already scouting, once we have started building an academy, send scout to all possible start locations to find the enemy base
-		if (!finScouting)
+		if (Broodwar->self()->allUnitCount(UnitTypes::Terran_Academy) == 1 && !finScouting)
 		{
 			// If we dont have a scout, assign one
 			if (!scout)
@@ -187,34 +189,26 @@ void LBot::onFrame()
 				{
 					minWorkers.erase(scout);
 				}
-			}
+			}			
 			else
 			{
-				Unitset geysers = Broodwar->getGeysers();
-				for (Unit geyser : geysers)
+				auto& startLocations = Broodwar->getStartLocations();
+
+				// Loop through all start locations
+				for (BWAPI::TilePosition startLocation : startLocations)
 				{
+					// If the location is already explored, move on
+					if (Broodwar->isExplored(startLocation))
+					{
+						continue;
+					}
+
+					BWAPI::Position pos(startLocation);
+					// Move to start location to scout
+					scout->move(pos);
+					break;
 				}
 			}
-			
-			//else
-			//{
-			//	auto& startLocations = Broodwar->getStartLocations();
-
-			//	// Loop through all start locations
-			//	for (BWAPI::TilePosition baseLocation : startLocations)
-			//	{
-			//		// If the location is already explored, move on
-			//		if (Broodwar->isExplored(baseLocation))
-			//		{
-			//			continue;
-			//		}
-
-			//		BWAPI::Position pos(baseLocation);
-			//		// Move to start location to scout
-			//		scout->move(pos);
-			//		break;
-			//	}
-			//}
 		}			
 	}
 	
@@ -307,12 +301,13 @@ void LBot::onFrame()
 	/*
 	 * Attacking
 	 */	 
+	 // Get units close to the armies
+	 BWAPI::Unitset localEnemiesA1 = army1.getUnitsInRadius(400, Filter::IsEnemy);
+	 BWAPI::Unitset localEnemiesA2 = army2.getUnitsInRadius(400, Filter::IsEnemy);
+	 BWAPI::Unitset localEnemiesTA = tankArmy.getUnitsInRadius(400, Filter::IsEnemy);
 
-	 // Attacking enemies close
-	 BWAPI::Unitset localEnemies = army1.getUnitsInRadius(400, Filter::IsEnemy);
-
-	 // If there are enemies close, attack them
-	 if (localEnemies.size() != 0)
+	 // Attack enemies if close
+	 if (localEnemiesA1.size() != 0)
 	 {
 		 for (auto &unit : army1)
 		 {
@@ -322,51 +317,69 @@ void LBot::onFrame()
 			 }
 		 }		 
 	 }
+	 if (localEnemiesA2.size() != 0)
+	 {
+		 for (auto &unit : army2)
+		 {
+			 if (unit->isIdle())
+			 {
+				 army2.attack(army1.getClosestUnit(Filter::IsEnemy));
+			 }
+		 }
+	 }
+	 if (localEnemiesTA.size() != 0)
+	 {
+		 for (auto &unit : tankArmy)
+		 {
+			 if (unit->isIdle())
+			 {
+				 tankArmy.attack(army1.getClosestUnit(Filter::IsEnemy));
+			 }
+		 }
+	 }
 
+	// Main attacking functionality
 	if (finScouting)
 	{
 		// Get player base location
 		BWAPI::TilePosition playerBaseTPos = Broodwar->self()->getStartLocation();
-		BWAPI::Position playerBasePos(playerBaseTPos);
+		BWAPI::Position playerBasePos(playerBaseTPos);		
 
-		// Get enemy base position	
-		BWAPI::Position enemyBasePos(enemyBaseTPos);		
-
-		// army 1 attacking
+		// Army 1 attacking enemy base
 		if (army1.size() == 12)
 		{
 			for (auto &unit : army1)
 			{
 				if (unit->isIdle())
 				{
-					unit->attack(enemyBasePos);
+					unit->attack(eBasePos);
 
-					if (unit->getHitPoints() < 20)
+					/*if (unit->getHitPoints() < 20)
 					{
 						unit->move(playerBasePos);
-					}					
+					}	*/				
 				}
 			}
 		}
-		// Army 2 attacking
+		// Army 2 attacking enemy base
 		if (army2.size() == 12)
 		{
 			for (auto &unit : army2)
 			{
 				if (unit->isIdle())
 				{
-					unit->attack(enemyBasePos);
+					unit->attack(eBasePos);
 				}
 			}
 		}
-		// Tank army attacking
+		// Tank army attacking enemy base
 		if (tankArmy.size() == 8)
 		{
 			for (auto &unit : tankArmy)
 			{
 				if (unit->isIdle())
 				{
-					unit->attack(enemyBasePos);
+					unit->attack(eBasePos);
 				}
 			}
 		}
@@ -446,7 +459,7 @@ void LBot::onFrame()
 				{
 					u->returnCargo();
 				}
-				// Assign workers to refinery *WORKS TEMP only with 1 refinery*
+				// Assign workers to refinery until fully worked
 				else if ((Broodwar->self()->completedUnitCount(UnitTypes::Terran_Refinery) == 1 && gasWorkers.size() != 3) || gasWorkers.contains(u))
 				{
 					workerManager->gatherGas(u);
@@ -460,49 +473,24 @@ void LBot::onFrame()
 		}
 
 		/*
-		 * Marines
-		 */
-		else if (u->getType() == UnitTypes::Terran_Marine)
-		{
-			/*if (u->canUseTech(TechTypes::Stim_Packs) && u->isUnderAttack() && u->getHitPoints() > 30)
-			{
-				u->useTech(TechTypes::Stim_Packs);
-			}*/
-		}
-
-		/*
-		 * Medics
-		 */
-		else if (u->getType() == UnitTypes::Terran_Medic)
-		{
-		}
-
-		/*
-		 * Tanks
-		 */
-		else if (u->getType() == UnitTypes::Terran_Siege_Tank_Tank_Mode || u->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode)
-		{		
-		}
-
-		/*
 		 * Command Center
 		 */
 		else if (u->getType() == UnitTypes::Terran_Command_Center)
 		{
-			// Construct workers if idle (24 workers per command center)
+			// Recruit workers up to 24 workers per command center
 			if (u->isIdle() && (Broodwar->self()->allUnitCount(UnitTypes::Terran_SCV) != Broodwar->self()->allUnitCount(UnitTypes::Terran_Command_Center) * 24) && !u->train(UnitTypes::Terran_SCV))
 			{
-				// If that fails, draw the error at the location so that you can visibly see what went wrong!
-				// However, drawing the error once will only appear for a single frame
-				// so create an event that keeps it on the screen for some frames
-				Position pos = u->getPosition();
-				Error lastErr = Broodwar->getLastError();
-				Broodwar->registerEvent([pos,lastErr](Game*)
-				{ 
-					Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str()); 
-				},   // action
-					nullptr,    // condition
-					Broodwar->getLatencyFrames());  // frames to run
+				//// If that fails, draw the error at the location so that you can visibly see what went wrong!
+				//// However, drawing the error once will only appear for a single frame
+				//// so create an event that keeps it on the screen for some frames
+				//Position pos = u->getPosition();
+				//Error lastErr = Broodwar->getLastError();
+				//Broodwar->registerEvent([pos,lastErr](Game*)
+				//{ 
+				//	Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str()); 
+				//},   // action
+				//	nullptr,    // condition
+				//	Broodwar->getLatencyFrames());  // frames to run
 			}
 		}
 		
@@ -511,6 +499,7 @@ void LBot::onFrame()
 		 */
 		else if (u->getType() == UnitTypes::Terran_Barracks)
 		{
+			// Zerg unit recruitment & army composition
 			if (Broodwar->enemy()->getRace() == Races::Zerg)
 			{
 				// Train 1 medic for every 3 marines, enough for 2 armies
@@ -518,55 +507,57 @@ void LBot::onFrame()
 				{
 					if (u->isIdle() && !u->train(UnitTypes::Terran_Medic))
 					{
-						// If that fails, draw the error at the location so that you can visibly see what went wrong!
-						// However, drawing the error once will only appear for a single frame
-						// so create an event that keeps it on the screen for some frames
-						Position pos = u->getPosition();
-						Error lastErr = Broodwar->getLastError();
-						Broodwar->registerEvent([pos, lastErr](Game*)
-						{
-							Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
-						},   // action
-							nullptr,    // condition
-							Broodwar->getLatencyFrames());  // frames to run
+						//// If that fails, draw the error at the location so that you can visibly see what went wrong!
+						//// However, drawing the error once will only appear for a single frame
+						//// so create an event that keeps it on the screen for some frames
+						//Position pos = u->getPosition();
+						//Error lastErr = Broodwar->getLastError();
+						//Broodwar->registerEvent([pos, lastErr](Game*)
+						//{
+						//	Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
+						//},   // action
+						//	nullptr,    // condition
+						//	Broodwar->getLatencyFrames());  // frames to run
 					}
 				}
 
 				// Train marines until marine army count is reached
 				else if (u->isIdle() && Broodwar->self()->allUnitCount(UnitTypes::Terran_Marine) != 18 && !u->train(UnitTypes::Terran_Marine))
 				{
-					// If that fails, draw the error at the location so that you can visibly see what went wrong!
-					// However, drawing the error once will only appear for a single frame
-					// so create an event that keeps it on the screen for some frames
-					Position pos = u->getPosition();
-					Error lastErr = Broodwar->getLastError();
-					Broodwar->registerEvent([pos, lastErr](Game*)
-					{
-						Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
-					},   // action
-						nullptr,    // condition
-						Broodwar->getLatencyFrames());  // frames to run
+					//// If that fails, draw the error at the location so that you can visibly see what went wrong!
+					//// However, drawing the error once will only appear for a single frame
+					//// so create an event that keeps it on the screen for some frames
+					//Position pos = u->getPosition();
+					//Error lastErr = Broodwar->getLastError();
+					//Broodwar->registerEvent([pos, lastErr](Game*)
+					//{
+					//	Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
+					//},   // action
+					//	nullptr,    // condition
+					//	Broodwar->getLatencyFrames());  // frames to run
 				}
 			}
+			// Protoss unit recruitment & army composition
 			else if (Broodwar->enemy()->getRace() == Races::Protoss)
 			{
 
 			}
+			// Terran unit recruitment & army composition
 			else if (Broodwar->enemy()->getRace() == Races::Terran)
 			{
 				if (u->isIdle() && Broodwar->self()->allUnitCount(UnitTypes::Terran_Vulture) != 8 && !u->train(UnitTypes::Terran_Vulture))
 				{
-					// If that fails, draw the error at the location so that you can visibly see what went wrong!
-					// However, drawing the error once will only appear for a single frame
-					// so create an event that keeps it on the screen for some frames
-					Position pos = u->getPosition();
-					Error lastErr = Broodwar->getLastError();
-					Broodwar->registerEvent([pos, lastErr](Game*)
-					{
-						Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
-					},   // action
-						nullptr,    // condition
-						Broodwar->getLatencyFrames());  // frames to run
+					//// If that fails, draw the error at the location so that you can visibly see what went wrong!
+					//// However, drawing the error once will only appear for a single frame
+					//// so create an event that keeps it on the screen for some frames
+					//Position pos = u->getPosition();
+					//Error lastErr = Broodwar->getLastError();
+					//Broodwar->registerEvent([pos, lastErr](Game*)
+					//{
+					//	Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
+					//},   // action
+					//	nullptr,    // condition
+					//	Broodwar->getLatencyFrames());  // frames to run
 				}
 			}
 		}
@@ -576,30 +567,28 @@ void LBot::onFrame()
 		 */
 		else if (u->getType() == UnitTypes::Terran_Factory)
 		{
-			
+			// Tank army recruitment
 			if (tankArmy.size() != 12)
 			{
 				if (u->isIdle() && !u->train(UnitTypes::Terran_Siege_Tank_Tank_Mode))
 				{
-					// If that fails, draw the error at the location so that you can visibly see what went wrong!
-					// However, drawing the error once will only appear for a single frame
-					// so create an event that keeps it on the screen for some frames
-					Position pos = u->getPosition();
-					Error lastErr = Broodwar->getLastError();
-					Broodwar->registerEvent([pos, lastErr](Game*)
-					{
-						Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
-					},   // action
-						nullptr,    // condition
-						Broodwar->getLatencyFrames());  // frames to run
+					//// If that fails, draw the error at the location so that you can visibly see what went wrong!
+					//// However, drawing the error once will only appear for a single frame
+					//// so create an event that keeps it on the screen for some frames
+					//Position pos = u->getPosition();
+					//Error lastErr = Broodwar->getLastError();
+					//Broodwar->registerEvent([pos, lastErr](Game*)
+					//{
+					//	Broodwar->drawTextMap(pos, "%c%s", Text::White, lastErr.c_str());
+					//},   // action
+					//	nullptr,    // condition
+					//	Broodwar->getLatencyFrames());  // frames to run
 				}
 			}			
 
 			// Machine shop upgrade for factory
 			if (Broodwar->self()->minerals() >= UnitTypes::Terran_Machine_Shop.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Machine_Shop.gasPrice())
 			{
-				lastChecked = Broodwar->getFrameCount();
-
 				// Build
 				u->buildAddon(UnitTypes::Terran_Machine_Shop);				
 			}			
@@ -627,7 +616,7 @@ void LBot::onFrame()
 
 void LBot::onSendText(std::string txt)
 {
-	BWEM::utils::MapDrawer::ProcessCommand(txt);
+	/*BWEM::utils::MapDrawer::ProcessCommand(txt);*/
 
 	// Send the text to the game if it is not being processed.
 	Broodwar->sendText("%s", txt.c_str());
@@ -672,17 +661,20 @@ void LBot::onUnitDiscover(BWAPI::Unit u)
 		//If enemy base is discovered, stop scouting and go home
 		if (u->getType().isResourceDepot() && eBaseFound == false)
 		{
-			enemyBaseTPos = u->getTilePosition();
-			eBaseFound = true;							
+			// Found enemy base
+			eBaseFound = true;
+
+			// Finish scouting
+			finScouting = true;
+
+			// Get enemy base position
+			eBasePos = u->getPosition();
 
 			// Get player base location
 			BWAPI::TilePosition homeTPos = Broodwar->self()->getStartLocation();
 			BWAPI::Position homePos(homeTPos);
 
-			// Finish scouting
-			finScouting = true;
-
-			// Move to base
+			// Move scout to player base
 			scout->move(homePos);
 		}
 	}    
@@ -743,8 +735,7 @@ void LBot::onUnitDestroy(BWAPI::Unit u)
 		}
 		else if (u->getType().isBuilding())
 		{
-			allBuildings.erase(u);
-			// REBUILD BUILDING			
+			allBuildings.erase(u);	
 		}
 		else if ((!u->getType().isWorker() && !u->getType().isBuilding()) && army1.contains(u))
 		{
@@ -790,8 +781,7 @@ void LBot::onUnitComplete(BWAPI::Unit u)
 {
 	// Upon creation of unit belonging to player
 	if (u->getPlayer() == Broodwar->self())
-	{
-		// Unitset management
+	{		
 		if (u->getType().isWorker())
 		{
 			// Add worker to worker unitset
@@ -814,8 +804,10 @@ void LBot::onUnitComplete(BWAPI::Unit u)
 			// Add unit to army2
 			army2.insert(u);
 		}
+		// If unit is a tank and tankArmy isnt full
 		else if ((u->getType() == UnitTypes::Terran_Siege_Tank_Tank_Mode || u->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode) && tankArmy.size() != 12)
 		{
+			// Add unit to the tank army
 			tankArmy.insert(u);
 		}
 	}

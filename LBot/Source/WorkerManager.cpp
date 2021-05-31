@@ -28,8 +28,8 @@ BWAPI::Unit WorkerManager::getWorker()
 			}					
 		}		
 	}
-	// If no workers can be found, print an error
-	Broodwar->printf("WorkerManager Error: No available workers");
+	//// If no workers can be found, print an error
+	//Broodwar->printf("WorkerManager Error: No available workers");
 	return NULL;
 }
 
@@ -50,8 +50,8 @@ BWAPI::Unit WorkerManager::getWorkerFromSet(BWAPI::Unitset set)
 			return worker;
 		}		
 	}
-	// If no workers can be found, print an error
-	Broodwar->printf("WorkerManager Error: No available workers");
+	//// If no workers can be found, print an error
+	//Broodwar->printf("WorkerManager Error: No available workers");
 	return NULL;
 }
 
@@ -69,8 +69,8 @@ void WorkerManager::gatherMinerals(BWAPI::Unit u)
 		// Gather from the nearest mineral patch 
 		if (!u->gather(u->getClosestUnit(IsMineralField)))
 		{
-			// If the call fails, then print the last error message
-			Broodwar << Broodwar->getLastError() << std::endl;
+			//// If the call fails, then print the last error message
+			//Broodwar << Broodwar->getLastError() << std::endl;
 		}
 	}
 }
@@ -89,8 +89,8 @@ void WorkerManager::gatherGas(BWAPI::Unit u)
 		// Gather from nearest refinery
 		if (!u->gather(u->getClosestUnit(IsRefinery)))
 		{
-			// If the call fails, then print the last error message
-			Broodwar << Broodwar->getLastError() << std::endl;
+			//// If the call fails, then print the last error message
+			//Broodwar << Broodwar->getLastError() << std::endl;
 		}
 	}
 }
