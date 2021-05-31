@@ -10,6 +10,11 @@ class BuildingManager
 	 */
 	WorkerManager *workerManager;
 	ScoutManager *scoutManager;
+	
+	/*
+	 * BWAPI
+	 */
+	BWAPI::TilePosition base;
 
 	/*
 	 * Variables
@@ -20,11 +25,13 @@ class BuildingManager
 	int academy;
 	int factory;
 	int armory;
+	int commandCenter;
 
 public:
 	void BuildingManager::zergBuildings(BWAPI::Unitset set);
-	void BuildingManager::protossBuildings();
-	void BuildingManager::terranBuildings();
+	void BuildingManager::protossBuildings(BWAPI::Unitset set);
+	void BuildingManager::terranBuildings(BWAPI::Unitset set);
 	void BuildingManager::academyTech(BWAPI::Unit u);
 	void BuildingManager::armoryTech(BWAPI::Unit u);
+	void BuildingManager::machineTech(BWAPI::Unit u);
 };

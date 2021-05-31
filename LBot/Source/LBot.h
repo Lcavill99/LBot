@@ -23,11 +23,8 @@ class LBot : public BWAPI::AIModule
 
 	/*
 	 * Variables
-	 */
-	int lastChecked = 0;
+	 */	
 	bool finScouting = false;
-	bool retreating = false;
-	bool attacking = false;
 	bool eBaseFound = false;
 
 public:

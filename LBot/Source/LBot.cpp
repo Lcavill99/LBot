@@ -22,6 +22,9 @@ BWAPI::Unitset army1; // Holds all player units assigned to the offensive army
 BWAPI::Unitset army2; // Holds all player units assigned to the secondary offensive army
 BWAPI::Unitset tankArmy; // Holds all player units assigned to the army containing purely tanks
 BWAPI::Unitset defenseArmy; // Holds all player units assigned to the defensive army
+BWAPI::Unitset localEnemiesA1; // Holds all enemy units close to army1
+BWAPI::Unitset localEnemiesA2; // Holds all enemy units close to army2
+BWAPI::Unitset localEnemiesTA; // Holds all enemy units close to the tank army
 
 void LBot::onStart()
 {
@@ -143,37 +146,6 @@ void LBot::onFrame()
 		 */
 		buildingManager->zergBuildings(minWorkers);
 
-		if ((Broodwar->self()->supplyUsed() >= (Broodwar->self()->allUnitCount(UnitTypes::Terran_Command_Center) * 36)) && lastChecked + 200 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Command_Center) == 0)
-		{
-			lastChecked = Broodwar->getFrameCount();
-
-			Unit builder = workerManager->getWorkerFromSet(minWorkers);
-
-			// If worker is found
-			if (builder)
-			{
-				// Find a location for depot
-				BWAPI::TilePosition buildPosition = BWEB::Map::getNaturalTile();
-
-				// If build position is found
-				if (buildPosition)
-				{
-					// Build
-					builder->build(UnitTypes::Terran_Command_Center, buildPosition);
-
-					// Register an event that draws the target build location
-					Broodwar->registerEvent([buildPosition, builder](Game*)
-					{
-						Broodwar->drawBoxMap(Position(buildPosition),
-							Position(buildPosition + UnitTypes::Terran_Supply_Depot.tileSize()),
-							Colors::Blue);
-					},
-						nullptr,  // condition
-						UnitTypes::Terran_Supply_Depot.buildTime() + 100);  // frames to run
-				}
-			}
-		}
-
 		/*
 		 * Scouting
 		 */
@@ -220,7 +192,7 @@ void LBot::onFrame()
 		/*
 		 * Build order
 		 */
-		buildingManager->protossBuildings();
+		buildingManager->protossBuildings(minWorkers);
 
 		/*
 		 * Scouting
@@ -231,7 +203,12 @@ void LBot::onFrame()
 			// If we dont have a scout, assign one
 			if (!scout)
 			{
-				scout = workerManager->getWorker();
+				scout = scoutManager->setScout();
+
+				if (minWorkers.contains(scout))
+				{
+					minWorkers.erase(scout);
+				}
 			}
 
 			auto& startLocations = Broodwar->getStartLocations();
@@ -261,7 +238,7 @@ void LBot::onFrame()
 		/*
 		 * Build order
 		 */
-		buildingManager->terranBuildings();
+		buildingManager->terranBuildings(minWorkers);
 
 		/*
 		 * Scouting
@@ -272,7 +249,12 @@ void LBot::onFrame()
 			// If we dont have a scout, assign one
 			if (!scout)
 			{
-				scout = workerManager->getWorker();
+				scout = scoutManager->setScout();
+
+				if (minWorkers.contains(scout))
+				{
+					minWorkers.erase(scout);
+				}
 			}
 
 			auto& startLocations = Broodwar->getStartLocations();
@@ -302,9 +284,9 @@ void LBot::onFrame()
 	 * Attacking
 	 */	 
 	 // Get units close to the armies
-	 BWAPI::Unitset localEnemiesA1 = army1.getUnitsInRadius(400, Filter::IsEnemy);
-	 BWAPI::Unitset localEnemiesA2 = army2.getUnitsInRadius(400, Filter::IsEnemy);
-	 BWAPI::Unitset localEnemiesTA = tankArmy.getUnitsInRadius(400, Filter::IsEnemy);
+	 localEnemiesA1 = army1.getUnitsInRadius(400, Filter::IsEnemy);
+	 localEnemiesA2 = army2.getUnitsInRadius(400, Filter::IsEnemy);
+	 localEnemiesTA = tankArmy.getUnitsInRadius(400, Filter::IsEnemy);
 
 	 // Attack enemies if close
 	 if (localEnemiesA1.size() != 0)
@@ -352,12 +334,7 @@ void LBot::onFrame()
 			{
 				if (unit->isIdle())
 				{
-					unit->attack(eBasePos);
-
-					/*if (unit->getHitPoints() < 20)
-					{
-						unit->move(playerBasePos);
-					}	*/				
+					unit->attack(eBasePos);			
 				}
 			}
 		}
@@ -587,7 +564,7 @@ void LBot::onFrame()
 			}			
 
 			// Machine shop upgrade for factory
-			if (Broodwar->self()->minerals() >= UnitTypes::Terran_Machine_Shop.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Machine_Shop.gasPrice())
+			if (u->canBuildAddon() && Broodwar->self()->minerals() >= UnitTypes::Terran_Machine_Shop.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Machine_Shop.gasPrice())
 			{
 				// Build
 				u->buildAddon(UnitTypes::Terran_Machine_Shop);				
@@ -610,6 +587,15 @@ void LBot::onFrame()
 		{
 			// Perform research
 			buildingManager->armoryTech(u);
+		}
+
+		/*
+		 * Machine shop
+		 */
+		else if (u->getType() == UnitTypes::Terran_Machine_Shop)
+		{
+			// Perform research
+			buildingManager->machineTech(u);
 		}
 	}	
 }
@@ -713,7 +699,7 @@ void LBot::onUnitDestroy(BWAPI::Unit u)
 	/*if (u->getType().isMineralField())    theMap.OnMineralDestroyed(u);
 	else if (u->getType().isSpecialBuilding()) theMap.OnStaticBuildingDestroyed(u);*/
 
-	static int lastChecked = 0;
+	static int lastRequest = 0;
 
 	// Upon destroying of unit belonging to player
 	if (u->getPlayer() == Broodwar->self())
