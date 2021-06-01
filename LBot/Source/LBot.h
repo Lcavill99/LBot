@@ -26,6 +26,7 @@ class LBot : public BWAPI::AIModule
 	 */	
 	bool finScouting = false;
 	bool eBaseFound = false;
+	bool rushed = false;
 
 public:
   virtual void onStart();
@@ -45,4 +46,5 @@ public:
   //virtual void onUnitRenegade(BWAPI::Unit u);
   virtual void onSaveGame(std::string gameName);
   virtual void onUnitComplete(BWAPI::Unit u);
+  void scoutMore();
 };

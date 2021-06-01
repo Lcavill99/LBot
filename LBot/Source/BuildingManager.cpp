@@ -228,9 +228,9 @@ void BuildingManager::zergBuildings(BWAPI::Unitset set)
 		if (builder)
 		{
 			// Find a build position for structure
-			Unitset geysers = Broodwar->getGeysers(); // Get all geysers
-			Unit closestGeyser = geysers.getClosestUnit(); // Get closest geyser
-			TilePosition buildPosition = closestGeyser->getTilePosition(); // Get closest geyser position
+			Unitset geysers = Broodwar->getGeysers();
+			Unit closestGeyser = geysers.getClosestUnit();
+			TilePosition buildPosition = closestGeyser->getTilePosition();
 
 			// If build position is found
 			if (buildPosition)
@@ -629,7 +629,7 @@ void BuildingManager::protossBuildings(BWAPI::Unitset set)
 	}
 
 	// Refinery
-	if (refinery == 0 && Broodwar->self()->supplyUsed() >= 26 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
+	if (refinery == 0 && Broodwar->self()->supplyUsed() >= 26 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Refinery) == 0)
 	{
 		// Update lastRequest
 		lastRequest = Broodwar->getFrameCount();
@@ -732,8 +732,76 @@ void BuildingManager::protossBuildings(BWAPI::Unitset set)
 		}
 	}
 
+	// Depot 2
+	if (Broodwar->self()->completedUnitCount(UnitTypes::Terran_Factory) == 1 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= 200)
+	{
+		// Update lastRequest
+		lastRequest = Broodwar->getFrameCount();
+
+		// Get builder
+		Unit builder = workerManager->getWorkerFromSet(set);
+
+		// If builder is found
+		if (builder)
+		{
+			// Find a location for structure
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Supply_Depot, base);
+
+			// If build position is found
+			if (buildPosition)
+			{
+				// Build
+				builder->build(UnitTypes::Terran_Supply_Depot, buildPosition);
+
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Supply_Depot.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Supply_Depot.buildTime() + 100);  // frames to run
+			}
+		}
+	}
+	
+	// Factory 2
+	if (factory == 1 && depot == 2 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Factory.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Factory.gasPrice())
+	{
+		// Update lastRequest
+		lastRequest = Broodwar->getFrameCount();
+
+		// Get builder
+		Unit builder = workerManager->getWorkerFromSet(set);
+
+		// If builder is found
+		if (builder)
+		{
+			// Find a location for structure
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Factory, base);
+
+			// If build position is found
+			if (buildPosition)
+			{
+				// Build
+				builder->build(UnitTypes::Terran_Factory, buildPosition);
+
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Factory.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Factory.buildTime() + 100);  // frames to run
+			}
+		}
+	}
+
 	// Depot 3
-	if (factory == 1 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
+	if (factory == 2 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 	{
 		// Update lastRequest
 		lastRequest = Broodwar->getFrameCount();
@@ -766,8 +834,8 @@ void BuildingManager::protossBuildings(BWAPI::Unitset set)
 		}
 	}
 
-	// Factory 2
-	if (factory == 1 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Factory.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Factory.gasPrice())
+	// Academy
+	if (academy == 0 && depot == 3 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Academy.mineralPrice() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Academy) == 0)
 	{
 		// Update lastRequest
 		lastRequest = Broodwar->getFrameCount();
@@ -778,27 +846,62 @@ void BuildingManager::protossBuildings(BWAPI::Unitset set)
 		// If builder is found
 		if (builder)
 		{
-			// Find a location for structure
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Factory, base);
+			// Find a build position for structure
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Academy, base);
 
 			// If build position is found
 			if (buildPosition)
 			{
 				// Build
-				builder->build(UnitTypes::Terran_Factory, buildPosition);
+				builder->build(UnitTypes::Terran_Academy, buildPosition);
 
 				//// Register an event that draws the target build location
 				//Broodwar->registerEvent([buildPosition, builder](Game*)
 				//{
 				//	Broodwar->drawBoxMap(Position(buildPosition),
-				//		Position(buildPosition + UnitTypes::Terran_Factory.tileSize()),
+				//		Position(buildPosition + UnitTypes::Terran_Academy.tileSize()),
 				//		Colors::Blue);
 				//},
 				//	nullptr,  // condition
-				//	UnitTypes::Terran_Factory.buildTime() + 100);  // frames to run
+				//	UnitTypes::Terran_Academy.buildTime() + 100);  // frames to run
 			}
 		}
 	}
+
+	// Expansion
+	if (academy == 1 && lastRequest + 200 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Command_Center) == 0)
+	{
+		// Update lastRequest
+		lastRequest = Broodwar->getFrameCount();
+
+		// Get builder
+		Unit builder = workerManager->getWorkerFromSet(set);
+
+		// If builder is found
+		if (builder)
+		{
+			// Find a location for natural expansion
+			BWAPI::TilePosition buildPosition = BWEB::Map::getNaturalTile();
+
+			// If build position is found
+			if (buildPosition)
+			{
+				// Build
+				builder->build(UnitTypes::Terran_Command_Center, buildPosition);
+
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Supply_Depot.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Supply_Depot.buildTime() + 100);  // frames to run
+			}
+		}
+	}
+
 }
 
 /*
@@ -906,7 +1009,7 @@ void BuildingManager::terranBuildings(BWAPI::Unitset set)
 	}
 
 	// Barracks
-	if (barracks == 0 && Broodwar->self()->supplyUsed() >= 22 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
+	if (barracks == 0 && Broodwar->self()->supplyUsed() >= 24 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Barracks.mineralPrice())
 	{
 		// Update lastRequest
 		lastRequest = Broodwar->getFrameCount();
@@ -940,7 +1043,7 @@ void BuildingManager::terranBuildings(BWAPI::Unitset set)
 	}
 
 	// Refinery
-	if (refinery == 0 && Broodwar->self()->supplyUsed() >= 22 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
+	if (refinery == 0 && Broodwar->self()->supplyUsed() >= 24 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Refinery.mineralPrice())
 	{
 		// Update lastRequest
 		lastRequest = Broodwar->getFrameCount();
@@ -1042,41 +1145,7 @@ void BuildingManager::terranBuildings(BWAPI::Unitset set)
 			}
 		}
 	}
-
-	// Factory 2
-	if (factory == 1 && Broodwar->self()->supplyUsed() >= 36 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Factory.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Factory.gasPrice())
-	{
-		// Update lastRequest
-		lastRequest = Broodwar->getFrameCount();
-
-		// Get builder
-		Unit builder = workerManager->getWorkerFromSet(set);
-
-		// If builder is found
-		if (builder)
-		{
-			// Find a location for structure
-			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Factory, base);
-
-			// If build position is found
-			if (buildPosition)
-			{
-				// Build
-				builder->build(UnitTypes::Terran_Factory, buildPosition);
-
-				//// Register an event that draws the target build location
-				//Broodwar->registerEvent([buildPosition, builder](Game*)
-				//{
-				//	Broodwar->drawBoxMap(Position(buildPosition),
-				//		Position(buildPosition + UnitTypes::Terran_Factory.tileSize()),
-				//		Colors::Blue);
-				//},
-				//	nullptr,  // condition
-				//	UnitTypes::Terran_Factory.buildTime() + 100);  // frames to run
-			}
-		}
-	}
-
+		
 	// Depot 3
 	if (depot == 2 && Broodwar->self()->supplyUsed() >= 46 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 	{
@@ -1097,6 +1166,40 @@ void BuildingManager::terranBuildings(BWAPI::Unitset set)
 			{
 				// Build
 				builder->build(UnitTypes::Terran_Supply_Depot, buildPosition);
+
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Supply_Depot.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Supply_Depot.buildTime() + 100);  // frames to run
+			}
+		}
+	}
+
+	// Expansion
+	if (Broodwar->self()->supplyUsed() >= 56 && lastRequest + 200 < Broodwar->getFrameCount() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Command_Center) == 0)
+	{
+		// Update lastRequest
+		lastRequest = Broodwar->getFrameCount();
+
+		// Get builder
+		Unit builder = workerManager->getWorkerFromSet(set);
+
+		// If builder is found
+		if (builder)
+		{
+			// Find a location for natural expansion
+			BWAPI::TilePosition buildPosition = BWEB::Map::getNaturalTile();
+
+			// If build position is found
+			if (buildPosition)
+			{
+				// Build
+				builder->build(UnitTypes::Terran_Command_Center, buildPosition);
 
 				//// Register an event that draws the target build location
 				//Broodwar->registerEvent([buildPosition, builder](Game*)
@@ -1144,6 +1247,75 @@ void BuildingManager::terranBuildings(BWAPI::Unitset set)
 			}
 		}
 	}
+
+	// Factory 2
+	if (factory == 1 && Broodwar->self()->supplyUsed() >= 64 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Factory.mineralPrice() && Broodwar->self()->gas() >= UnitTypes::Terran_Factory.gasPrice())
+	{
+		// Update lastRequest
+		lastRequest = Broodwar->getFrameCount();
+
+		// Get builder
+		Unit builder = workerManager->getWorkerFromSet(set);
+
+		// If builder is found
+		if (builder)
+		{
+			// Find a location for structure
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Factory, base);
+
+			// If build position is found
+			if (buildPosition)
+			{
+				// Build
+				builder->build(UnitTypes::Terran_Factory, buildPosition);
+
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Factory.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Factory.buildTime() + 100);  // frames to run
+			}
+		}
+	}
+
+	// Academy
+	if (academy == 0 && factory == 2 && lastRequest + movetime < Broodwar->getFrameCount() && Broodwar->self()->minerals() >= UnitTypes::Terran_Academy.mineralPrice() && Broodwar->self()->incompleteUnitCount(UnitTypes::Terran_Academy) == 0)
+	{
+		// Update lastRequest
+		lastRequest = Broodwar->getFrameCount();
+
+		// Get builder
+		Unit builder = workerManager->getWorkerFromSet(set);
+
+		// If builder is found
+		if (builder)
+		{
+			// Find a build position for structure
+			TilePosition buildPosition = Broodwar->getBuildLocation(UnitTypes::Terran_Academy, base);
+
+			// If build position is found
+			if (buildPosition)
+			{
+				// Build
+				builder->build(UnitTypes::Terran_Academy, buildPosition);
+
+				//// Register an event that draws the target build location
+				//Broodwar->registerEvent([buildPosition, builder](Game*)
+				//{
+				//	Broodwar->drawBoxMap(Position(buildPosition),
+				//		Position(buildPosition + UnitTypes::Terran_Academy.tileSize()),
+				//		Colors::Blue);
+				//},
+				//	nullptr,  // condition
+				//	UnitTypes::Terran_Academy.buildTime() + 100);  // frames to run
+			}
+		}
+	}
+
 }
 
 /*

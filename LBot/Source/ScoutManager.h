@@ -19,4 +19,5 @@ public:
 	BWAPI::Unit ScoutManager::getScout();
 	void ScoutManager::goScout();
 	void ScoutManager::sendHome();
+	void ScoutManager::scoutMore();
 };
